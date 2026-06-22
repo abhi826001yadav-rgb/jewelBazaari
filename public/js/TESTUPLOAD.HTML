@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<input type="file" id="fileInput">
+<button onclick="uploadImage()">Upload</button>
+
+<script>
+async function uploadImage() {
+
+  const file =
+    document.getElementById("fileInput").files[0];
+
+  if (!file) {
+    alert("Select a file first");
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  formData.append(
+    "upload_preset",
+    "jewellery_upload"
+  );
+
+  try {
+
+    const response = await fetch(
+      "https://api.cloudinary.com/v1_1/dbhxymcuc/image/upload",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(data);
+
+    alert(data.secure_url);
+
+  } catch(error) {
+
+    console.error(error);
+
+  }
+}
+</script>
+
+</body>
+</html>

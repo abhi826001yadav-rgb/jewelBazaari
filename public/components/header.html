@@ -1,0 +1,39 @@
+<header class="bg-white py-4 relative z-40">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 jb-header-standard">
+        <a href="index.html" aria-label="jewelBazaari Home" class="jb-logo inline-flex items-center shrink-0 max-w-[11rem]">
+            <img src="images/logo.png" alt="" width="176" height="80" class="h-20 w-auto max-w-full object-contain">
+        </a>
+
+        <div class="flex-1 flex justify-center px-3 md:px-5 hidden md:flex min-w-0">
+            <input type="text" placeholder="Search diamond jewellery..."
+                class="w-full max-w-[22rem] border border-gray-300 rounded-full px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
+        </div>
+
+        <div class="jb-header-nav flex items-center text-gray-700">
+            <a href="index.html" aria-label="Home" class="jb-header-nav-item hover:text-[#4A0E17]">
+                <span class="jb-header-nav-emoji md:hidden" aria-hidden="true">🏠</span>
+                <span class="jb-header-nav-label hidden md:inline">Home</span>
+            </a>
+            <a href="all-jewellery.html" aria-label="Shop" class="jb-header-nav-item hover:text-[#4A0E17]">
+                <span class="jb-header-nav-emoji md:hidden" aria-hidden="true">🛍️</span>
+                <span class="jb-header-nav-label hidden md:inline">Shop</span>
+            </a>
+            <a href="vendor-upload.html" aria-label="Sell" class="jb-header-nav-item hover:text-[#4A0E17]">
+                <span class="jb-header-nav-emoji md:hidden" aria-hidden="true">💰</span>
+                <span class="jb-header-nav-label hidden md:inline">Sell</span>
+            </a>
+            <button type="button" id="wishlist-icon-btn" data-wishlist-icon title="Wishlist" aria-label="Wishlist" class="jb-header-nav-item relative flex items-center justify-center gap-1 hover:text-[#4A0E17] transition-all duration-300">
+                <span data-wishlist-header-heart class="jb-header-nav-emoji md:hidden leading-none opacity-80 transition-all duration-300">🤍</span>
+                <span class="jb-header-nav-label hidden md:inline-flex items-center gap-1">
+                    <span data-wishlist-header-heart class="leading-none opacity-80 transition-all duration-300">🤍</span>
+                    Wishlist
+                </span>
+            </button>
+            <button type="button" id="cart-icon-btn" data-cart-icon title="Cart" aria-label="Cart" class="jb-header-nav-item relative leading-none hover:opacity-80">
+                <span class="jb-header-nav-emoji md:hidden" aria-hidden="true">🛒</span>
+                <span class="jb-header-nav-label hidden md:inline">Cart</span>
+                <span data-cart-count class="hidden absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-[#4A0E17] text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            </button>
+        </div>
+    </div>
+</header>

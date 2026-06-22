@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Collection - jewelBazaari.com</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+        .font-luxury { font-family: 'Cormorant+Garamond', serif; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <div id="announcement-placeholder"></div>
+    <div id="header-placeholder"></div>
+    <div id="category-placeholder"></div>
+
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <div class="text-center mb-10 mt-6">
+            <span class="text-xs uppercase tracking-[0.2em] text-amber-600 font-medium">The Grand Heritage</span>
+            <h1 class="font-luxury text-4xl text-gray-800 tracking-wide mt-1">The Bridal & Wedding Vault</h1>
+            <p class="text-sm text-gray-500 mt-2">Heavy royal chokers, intricate bridal sets, and heritage marriage jewellery.</p>
+        </div>
+
+        <div class="jb-placeholder-card border-2 border-dashed border-gray-200 rounded-xl p-20 text-center text-gray-400 bg-white shadow-sm">
+            👑 Exquisite bridal necklaces, royal mathapattis, and heavy bangles are being polished for your big day! 👑
+            <div class="mt-6">
+                <a href="index.html" class="inline-block bg-luxuryMaroon text-white text-xs uppercase tracking-wider px-6 py-3 rounded-md hover:bg-opacity-90 transition">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { loadPageLayout } from './js/product-ui.js';
+        loadPageLayout();
+    </script>
+</body>
+</html>

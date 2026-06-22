@@ -1,0 +1,429 @@
+<style>
+    .jb-nav-dropdown {
+        background: linear-gradient(135deg, #4A0E17 0%, #3A0A12 55%, #2A0A0F 100%) !important;
+        color: #fff !important;
+        border: 1px solid rgba(155, 126, 75, 0.35) !important;
+        box-shadow: 0 20px 40px -12px rgba(74, 14, 23, 0.45) !important;
+        border-radius: 0.5rem !important;
+    }
+    .jb-nav-dropdown--compact { padding: 0.5rem !important; }
+    .jb-nav-dropdown:not(.jb-nav-dropdown--compact) { padding: 2rem !important; }
+    .jb-nav-dropdown a { color: rgba(255, 255, 255, 0.92) !important; transition: background-color 0.2s ease, color 0.2s ease; }
+    .jb-nav-dropdown-link:hover { background: rgba(255, 255, 255, 0.08) !important; color: #C5A880 !important; }
+    .jb-nav-dropdown-card span { color: rgba(255, 255, 255, 0.92) !important; }
+    .jb-nav-dropdown-card:hover span { color: #C5A880 !important; }
+    .jb-nav-dropdown-card > div { border-color: rgba(155, 126, 75, 0.45) !important; }
+    .jb-nav-vendor-link { color: #C5A880 !important; }
+    .jb-nav-vendor-link:hover { background: rgba(197, 168, 128, 0.15) !important; color: #fff !important; }
+</style>
+<div class="bg-white border-b border-gray-100 relative z-50">
+
+    <!-- Mobile hamburger menu -->
+    <div class="jb-mobile-nav-bar md:hidden flex items-center h-12 px-4">
+        <button type="button" id="jb-mobile-menu-toggle" class="jb-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="jb-mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <span class="ml-3 text-[11px] font-bold uppercase tracking-wider text-gray-600">Browse Collections</span>
+    </div>
+
+    <div id="jb-mobile-menu-backdrop" class="jb-mobile-menu-backdrop hidden" aria-hidden="true"></div>
+    <aside id="jb-mobile-menu" class="jb-mobile-menu" aria-hidden="true">
+        <div class="jb-mobile-menu-header">
+            <span class="jb-mobile-menu-title">Collections</span>
+            <button type="button" id="jb-mobile-menu-close" class="jb-mobile-menu-close" aria-label="Close menu">&times;</button>
+        </div>
+        <nav class="jb-mobile-menu-links">
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="all-jewellery.html" class="jb-mobile-menu-link">All Jewellery</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show All Jewellery options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">💍 Finger Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">✨ Nose Pin</a>
+                    <a href="#" class="jb-mobile-submenu-link">💎 Bangles</a>
+                    <a href="#" class="jb-mobile-submenu-link">👂 Earrings</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Mangalsutra</a>
+                    <a href="#" class="jb-mobile-submenu-link">⛓️ Necklaces</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Bracelets</a>
+                    <a href="#" class="jb-mobile-submenu-link">💎 Pendants</a>
+                    <a href="#" class="jb-mobile-submenu-link">⛓️ Chains</a>
+                    <a href="#" class="jb-mobile-submenu-link">✨ Necklace Set</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Pendants &amp; Earring Set</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="gold.html" class="jb-mobile-menu-link">Gold</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show Gold options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">💍 All Gold</a>
+                    <a href="#" class="jb-mobile-submenu-link">👂 Gold Earrings</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Gold Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">👃 Gold Nose Pins</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Gold Bangles</a>
+                    <a href="#" class="jb-mobile-submenu-link">⛓️ Gold Chains</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Gold Engagement Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Gold Kadas</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Gold Bracelets</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Gold Pendants</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Gold Necklaces</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Gold Mangalsutras</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="diamond.html" class="jb-mobile-menu-link">Diamond</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show Diamond options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">💎 All Diamond</a>
+                    <a href="#" class="jb-mobile-submenu-link">👂 Diamond Earrings</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Diamond Necklace Set</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Diamond Pendants</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Diamond Bangles</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Diamond Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">⛓️ Diamond Necklaces</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Diamond Bracelets</a>
+                    <a href="#" class="jb-mobile-submenu-link">📿 Diamond Mangalsutra</a>
+                    <a href="#" class="jb-mobile-submenu-link">👃 Diamond Nose Pins</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="gemstones.html" class="jb-mobile-menu-link">Gemstone</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show Gemstone options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">💎 All Gemstones</a>
+                    <a href="#" class="jb-mobile-submenu-link">🔴 Ruby</a>
+                    <a href="#" class="jb-mobile-submenu-link">💚 Emerald</a>
+                    <a href="#" class="jb-mobile-submenu-link">💙 Sapphire</a>
+                    <a href="#" class="jb-mobile-submenu-link">💎 Diamond</a>
+                    <a href="#" class="jb-mobile-submenu-link">✨ Topaz</a>
+                    <a href="#" class="jb-mobile-submenu-link">💜 Amethyst</a>
+                    <a href="#" class="jb-mobile-submenu-link">💧 Aquamarine</a>
+                    <a href="#" class="jb-mobile-submenu-link">⚪ Pearl</a>
+                    <a href="#" class="jb-mobile-submenu-link">💛 Citrine</a>
+                    <a href="#" class="jb-mobile-submenu-link">🔥 Garnet</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="earrings.html" class="jb-mobile-menu-link">Earrings</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show Earrings options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">👂 All Earrings</a>
+                    <a href="#" class="jb-mobile-submenu-link">✨ Traditional Jhumkas</a>
+                    <a href="#" class="jb-mobile-submenu-link">💎 Sophisticated Studs</a>
+                    <a href="#" class="jb-mobile-submenu-link">⭕ Elegant Hoops</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="rings.html" class="jb-mobile-menu-link">Rings</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show Rings options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">💍 All Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">✨ Casual Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Diamond Engagement</a>
+                    <a href="#" class="jb-mobile-submenu-link">💍 Gold Engagement</a>
+                    <a href="#" class="jb-mobile-submenu-link">🤵 Men's Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">💎 Platinum Rings</a>
+                    <a href="#" class="jb-mobile-submenu-link">💑 Couple Rings</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="wedding.html" class="jb-mobile-menu-link">Wedding</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show Wedding options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">Wedding Haram</a>
+                    <a href="#" class="jb-mobile-submenu-link">Wedding Bangles</a>
+                    <a href="#" class="jb-mobile-submenu-link">Mangalsutra</a>
+                    <a href="#" class="jb-mobile-submenu-link">Accessories</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-group">
+                <div class="jb-mobile-menu-row">
+                    <a href="combos.html" class="jb-mobile-menu-link">Combos</a>
+                    <button type="button" class="jb-mobile-menu-expand" aria-label="Show Combos options">&gt;</button>
+                </div>
+                <div class="jb-mobile-submenu">
+                    <a href="#" class="jb-mobile-submenu-link">Bride Combo</a>
+                    <a href="#" class="jb-mobile-submenu-link">Groom Combo</a>
+                    <a href="#" class="jb-mobile-submenu-link">Couple Combo</a>
+                </div>
+            </div>
+            <div class="jb-mobile-menu-divider"></div>
+            <a href="#" class="jb-mobile-menu-link" data-mobile-gold-price>Live Gold Price</a>
+            <a href="track-order.html" class="jb-mobile-menu-link">Track Your Order</a>
+            <a href="query.html" class="jb-mobile-menu-link">Customer Query</a>
+            <a href="vendor-upload.html" class="jb-mobile-menu-link jb-mobile-menu-link--gold">Become a Vendor</a>
+        </nav>
+    </aside>
+
+    <div class="jb-category-scroll max-w-7xl mx-auto hidden md:block">
+    <nav class="jb-category-nav max-w-7xl mx-auto px-3 sm:px-4 flex flex-nowrap justify-start md:justify-center h-14 items-center text-[12px] font-bold tracking-wider text-gray-600 uppercase">
+        
+        <!-- ALL JEWELLERY -->
+        <div class="relative group h-14 flex items-center">
+            <a href="all-jewellery.html" class="hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">All Jewellery</a>
+            
+            <div class="absolute top-14 left-0 w-[700px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-3 gap-8">
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Finger Rings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>✨</span> Nose Pin</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💎</span> Bangles</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>👂</span> Earrings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Mangalsutra</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>⛓️</span> Necklaces</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Bracelets</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💎</span> Pendants</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>⛓️</span> Chains</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>✨</span> Necklace Set</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Pendants & Earring Set</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- GOLD -->
+        <div class="relative group h-14 flex items-center">
+            <a href="gold.html" class="hover:text-luxuryMaroon border-b-2 border-transparent hover:border-luxuryMaroon h-14 flex items-center transition">Gold</a>
+            
+            <div class="absolute top-14 left-0 w-[620px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-3 gap-8">
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> All Gold</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>👂</span> Gold Earrings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Gold Rings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>👃</span> Gold Nose Pins</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Gold Bangles</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>⛓️</span> Gold Chains</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Gold Engagement Rings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Gold Kadas</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Gold Bracelets</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Gold Pendants</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Gold Necklaces</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Gold Mangalsutras</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAMOND -->
+        <div class="relative group h-14 flex items-center">
+            <a href="diamond.html" class="hover:text-luxuryMaroon border-b-2 border-transparent hover:border-luxuryMaroon h-14 flex items-center transition">Diamond</a>
+            
+            <div class="absolute top-14 left-0 w-[620px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-3 gap-8">
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💎</span> All Diamond</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>👂</span> Diamond Earrings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Diamond Necklace Set</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Diamond Pendants</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Diamond Bangles</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Diamond Rings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>⛓️</span> Diamond Necklaces</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Diamond Bracelets</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>📿</span> Diamond Mangalsutra</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>👃</span> Diamond Nose Pins</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- GEMSTONE -->
+        <div class="relative group h-14 flex items-center">
+            <a href="gemstones.html" class="hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">Gemstone</a>
+            
+            <div class="absolute top-14 left-0 w-[620px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-3 gap-8">
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💎</span> All Gemstones</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>🔴</span> Ruby</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💚</span> Emerald</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💙</span> Sapphire</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💎</span> Diamond</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>✨</span> Topaz</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💜</span> Amethyst</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💧</span> Aquamarine</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>⚪</span> Pearl</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💛</span> Citrine</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>🔥</span> Garnet</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- EARRINGS -->
+        <div class="relative group h-14 flex items-center">
+            <a href="earrings.html" class="hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">Earrings</a>
+            
+            <div class="absolute top-14 left-0 w-[600px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-3 gap-8">
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>👂</span> All Earrings</a></li>
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>✨</span> Traditional Jhumkas</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💎</span> Sophisticated Studs</a></li>
+                    </ul>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>⭕</span> Elegant Hoops</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- RINGS -->
+        <div class="relative group h-14 flex items-center">
+            <a href="rings.html" class="hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">Rings</a>
+            
+            <div class="absolute top-14 left-0 w-[500px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-2 gap-x-10 gap-y-2">
+                    <a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> All Rings</a>
+                    <a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>✨</span> Casual Rings</a>
+                    
+                    <a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Diamond Engagement</a>
+                    <a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💍</span> Gold Engagement</a>
+                    
+                    <a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>🤵</span> Men's Rings</a>
+                    <a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💎</span> Platinum Rings</a>
+                    
+                    <a href="#" class="jb-nav-dropdown-link flex items-center gap-3 px-3 py-2 rounded-lg"><span>💑</span> Couple Rings</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- WEDDING -->
+        <div class="relative group jb-wedding-group h-14 flex items-center">
+            <a href="wedding.html" class="hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">Wedding</a>
+            
+            <div class="absolute top-14 left-0 w-[420px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-2 gap-6">
+                    <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
+                            <img src="images/haram.jpg" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Wedding Haram</span>
+                    </a>
+                    <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
+                            <img src="images/bangles.jpg" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Wedding Bangles</span>
+                    </a>
+                    <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
+                            <img src="images/mangalsutra.jpg" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Mangalsutra</span>
+                    </a>
+                    <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
+                            <img src="images/accessories.jpg" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Accessories</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMBOS -->
+        <div class="relative group jb-combos-group h-14 flex items-center">
+            <a href="combos.html" class="hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">Combos</a>
+            
+            <div class="absolute top-14 left-0 w-[420px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-2 gap-6">
+                    <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
+                            <img src="images/bride.jpg" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Bride Combo</span>
+                    </a>
+                    <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
+                            <img src="images/groom.jpg" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Groom Combo</span>
+                    </a>
+                    <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
+                            <img src="images/couple.jpg" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Couple Combo</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- MORE -->
+        <div class="relative group jb-more-group h-14 flex items-center">
+            <a href="#" class="jb-more-toggle hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">More</a>
+            
+            <div class="jb-more-dropdown jb-nav-dropdown jb-nav-dropdown--compact absolute top-14 left-0 w-[260px] hidden group-hover:block z-50">
+                <ul class="list-none p-0 m-0 flex flex-col gap-2">
+                    
+                    <!-- Live Gold Price -->
+                    <li class="p-0 m-0">
+                        <a href="#" onclick="openGoldPriceModal(); return false;" class="jb-nav-dropdown-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                            <span class="text-lg w-6 text-center shrink-0">📍</span>
+                            <span class="font-medium">Live Gold Price</span>
+                        </a>
+                    </li>
+
+                    <!-- Track Order -->
+                    <li class="p-0 m-0">
+                        <a href="track-order.html" class="jb-nav-dropdown-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                            <span class="text-lg w-6 text-center shrink-0">🚚</span>
+                            <span class="font-medium">Track Your Order</span>
+                        </a>
+                    </li>
+
+                    <!-- Customer Query -->
+                    <li class="p-0 m-0">
+                        <a href="query.html" class="jb-nav-dropdown-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                            <span class="text-lg w-6 text-center shrink-0">💬</span>
+                            <span class="font-medium">Customer Query</span>
+                        </a>
+                    </li>
+
+                    <!-- Become a Vendor -->
+                    <li class="p-0 m-0">
+                        <a href="vendor-upload.html" class="jb-nav-dropdown-link jb-nav-vendor-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                            <span class="text-lg w-6 text-center shrink-0">✨</span>
+                            <span class="font-medium">Become a Vendor</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </nav>
+    </div>
+</div>

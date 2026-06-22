@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us • jewelBazaari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        luxuryMaroon: '#4A0E17',
+                        luxuryGold: '#9B7E4B',
+                        luxuryGoldLight: '#C5A880',
+                        luxuryBg: '#FAF7F2',
+                        luxuryDark: '#2A2A2A'
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        html { overflow-x: clip; scroll-behavior: smooth; }
+        body {
+            background-color: #FAF7F2;
+            font-family: 'Montserrat', system-ui, sans-serif;
+            min-height: 100vh;
+            color: #2A2A2A;
+        }
+        .section-title { font-family: 'Playfair Display', Georgia, serif; }
+        #announcement-placeholder, #header-placeholder, #category-placeholder { position: relative; z-index: 40; }
+        main { position: relative; z-index: 1; }
+
+        .contact-hero {
+            background: linear-gradient(135deg, #4A0E17 0%, #2A0A0F 55%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(155, 126, 75, 0.18) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(197, 168, 128, 0.12) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .gold-line {
+            width: 4rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #9B7E4B, transparent);
+            margin: 0.75rem auto 0;
+        }
+        .info-card {
+            background: #fff;
+            border: 1px solid rgba(155, 126, 75, 0.25);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -8px rgba(74, 14, 23, 0.12);
+        }
+        .info-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4A0E17, #6B1520);
+            color: #C5A880;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .form-card {
+            background: #fff;
+            border: 1px solid rgba(155, 126, 75, 0.2);
+            border-radius: 1.25rem;
+            box-shadow: 0 20px 40px -12px rgba(74, 14, 23, 0.1);
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.625rem;
+            font-size: 0.9375rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #FAF7F2;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #9B7E4B;
+            box-shadow: 0 0 0 3px rgba(155, 126, 75, 0.15);
+            background: #fff;
+        }
+        .form-input.error { border-color: #dc2626; }
+        .field-error {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            min-height: 1rem;
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #4A0E17, #6B1520);
+            color: #fff;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 11rem;
+        }
+        .submit-btn:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
+        .submit-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+        .spinner {
+            width: 1.125rem;
+            height: 1.125rem;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .quick-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .quick-btn:hover { transform: translateY(-2px); }
+        .quick-btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+            box-shadow: 0 8px 20px -4px rgba(37, 211, 102, 0.4);
+        }
+        .quick-btn-email {
+            background: #4A0E17;
+            color: #fff;
+            border: 1px solid #9B7E4B;
+            box-shadow: 0 8px 20px -4px rgba(74, 14, 23, 0.3);
+        }
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            z-index: 300;
+            padding: 0.875rem 1.5rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.35s ease;
+            max-width: calc(100vw - 2rem);
+            text-align: center;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast-success { background: #166534; color: #fff; }
+        .toast-error { background: #991b1b; color: #fff; }
+        @media (max-width: 640px) {
+            .contact-hero h1 { font-size: 2rem; }
+            .info-card { padding: 1.25rem; }
+            .form-card { padding: 1.25rem !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="announcement-placeholder"></div>
+    <div id="header-placeholder"></div>
+    <div id="category-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="contact-hero text-white text-center py-14 sm:py-20 px-4">
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <a href="index.html" aria-label="jewelBazaari Home" class="inline-block mb-4">
+                <img src="images/logo.png" alt="jewelBazaari" width="176" height="80" class="h-14 sm:h-16 w-auto mx-auto object-contain">
+            </a>
+            <h1 class="section-title text-4xl sm:text-5xl font-bold">Contact Us</h1>
+            <div class="gold-line"></div>
+            <p class="text-white/80 mt-4 text-base sm:text-lg font-light">We'd love to hear from you</p>
+        </div>
+    </section>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+
+        <!-- Contact Information Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-12 sm:mb-16">
+            <div class="info-card text-center">
+                <div class="info-icon">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-semibold text-luxuryMaroon uppercase tracking-wider text-xs mb-2">WhatsApp</h3>
+                <a href="https://wa.me/918917219139" target="_blank" rel="noopener noreferrer"
+                   class="text-sm text-gray-600 hover:text-luxuryGold transition">+91 8917219139</a>
+            </div>
+            <div class="info-card text-center">
+                <div class="info-icon">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-semibold text-luxuryMaroon uppercase tracking-wider text-xs mb-2">Email</h3>
+                <a href="mailto:abhishekyadav98.official@gmail.com"
+                   class="text-sm text-gray-600 hover:text-luxuryGold transition break-all">abhishekyadav98.official@gmail.com</a>
+            </div>
+            <div class="info-card text-center">
+                <div class="info-icon">
+                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-semibold text-luxuryMaroon uppercase tracking-wider text-xs mb-2">Address</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">Vishal Nagar, Surat,<br>Gujarat, India</p>
+            </div>
+        </section>
+
+        <!-- Customer Query Form -->
+        <section class="form-card p-6 sm:p-10 mb-10">
+            <div class="text-center mb-8">
+                <h2 class="section-title text-2xl sm:text-3xl font-bold text-luxuryMaroon">Customer Query</h2>
+                <div class="gold-line"></div>
+                <p class="text-gray-500 text-sm mt-3">Send us your questions — our team will respond shortly.</p>
+            </div>
+
+            <form id="query-form" novalidate>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                    <div>
+                        <label for="name" class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">Name <span class="text-luxuryMaroon">*</span></label>
+                        <input type="text" id="name" name="name" class="form-input" placeholder="Your full name" autocomplete="name">
+                        <p class="field-error" id="name-error"></p>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">Email <span class="text-luxuryMaroon">*</span></label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" autocomplete="email">
+                        <p class="field-error" id="email-error"></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                    <div>
+                        <label for="phone" class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">Phone Number <span class="text-luxuryMaroon">*</span></label>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="+91 98765 43210" autocomplete="tel">
+                        <p class="field-error" id="phone-error"></p>
+                    </div>
+                    <div>
+                        <label for="subject" class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">Subject <span class="text-luxuryMaroon">*</span></label>
+                        <input type="text" id="subject" name="subject" class="form-input" placeholder="How can we help?">
+                        <p class="field-error" id="subject-error"></p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label for="message" class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">Message <span class="text-luxuryMaroon">*</span></label>
+                    <textarea id="message" name="message" rows="5" class="form-input resize-y min-h-[7rem]" placeholder="Tell us about your query..."></textarea>
+                    <p class="field-error" id="message-error"></p>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" id="submit-btn" class="submit-btn">
+                        <span id="submit-text">Submit Query</span>
+                        <span id="submit-spinner" class="spinner hidden"></span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Quick Contact Buttons -->
+        <section class="text-center">
+            <p class="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold mb-5">Quick Contact</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="https://wa.me/918917219139" target="_blank" rel="noopener noreferrer" class="quick-btn quick-btn-whatsapp w-full sm:w-auto">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    Chat on WhatsApp
+                </a>
+                <a href="mailto:abhishekyadav98.official@gmail.com" class="quick-btn quick-btn-email w-full sm:w-auto">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    Send Email
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <script type="module">
+        /* ============================================================
+           FIREBASE CONFIGURATION — Paste your config below
+           ============================================================ */
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2qTMc6KyLQPQWfCk7ENJAwzS8vqobc18",
+            authDomain: "jewelbazaari.firebaseapp.com",
+            projectId: "jewelbazaari",
+            storageBucket: "jewelbazaari.appspot.com",
+            messagingSenderId: "733760448297",
+            appId: "1:733760448297:web:421633a1e0fab027007938",
+            measurementId: "G-KTJKGE3PWJ"
+        };
+        /* ============================================================ */
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        import { loadPageLayout } from './js/product-ui.js';
+        import { initCartUI } from './js/cart-ui.js';
+        import { initWishlistUI } from './js/wishlist-ui.js';
+
+        initCartUI();
+        initWishlistUI();
+        loadPageLayout().then(() => {
+            if (window.lucide) window.lucide.createIcons();
+        });
+
+        const form = document.getElementById('query-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        const toast = document.getElementById('toast');
+
+        const fields = {
+            name: document.getElementById('name'),
+            email: document.getElementById('email'),
+            phone: document.getElementById('phone'),
+            subject: document.getElementById('subject'),
+            message: document.getElementById('message')
+        };
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast toast-${type}`;
+            requestAnimationFrame(() => toast.classList.add('show'));
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 4500);
+        }
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            submitText.textContent = isLoading ? 'Submitting...' : 'Submit Query';
+            submitSpinner.classList.toggle('hidden', !isLoading);
+        }
+
+        function clearErrors() {
+            Object.keys(fields).forEach((key) => {
+                fields[key].classList.remove('error');
+                const errEl = document.getElementById(`${key}-error`);
+                if (errEl) errEl.textContent = '';
+            });
+        }
+
+        function setFieldError(field, message) {
+            fields[field].classList.add('error');
+            const errEl = document.getElementById(`${field}-error`);
+            if (errEl) errEl.textContent = message;
+        }
+
+        function validateForm() {
+            clearErrors();
+            let valid = true;
+
+            const name = fields.name.value.trim();
+            const email = fields.email.value.trim();
+            const phone = fields.phone.value.trim().replace(/\s+/g, '');
+            const subject = fields.subject.value.trim();
+            const message = fields.message.value.trim();
+
+            if (!name || name.length < 2) {
+                setFieldError('name', 'Please enter your full name.');
+                valid = false;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailPattern.test(email)) {
+                setFieldError('email', 'Please enter a valid email address.');
+                valid = false;
+            }
+
+            const phoneDigits = phone.replace(/\D/g, '');
+            if (!phone || phoneDigits.length < 10) {
+                setFieldError('phone', 'Please enter a valid 10-digit phone number.');
+                valid = false;
+            }
+
+            if (!subject || subject.length < 3) {
+                setFieldError('subject', 'Please enter a subject (min 3 characters).');
+                valid = false;
+            }
+
+            if (!message || message.length < 10) {
+                setFieldError('message', 'Please enter a message (min 10 characters).');
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!validateForm()) return;
+
+            setLoading(true);
+
+            try {
+                await addDoc(collection(db, 'customerQueries'), {
+                    name: fields.name.value.trim(),
+                    email: fields.email.value.trim(),
+                    phone: fields.phone.value.trim(),
+                    subject: fields.subject.value.trim(),
+                    message: fields.message.value.trim(),
+                    createdAt: serverTimestamp()
+                });
+
+                form.reset();
+                clearErrors();
+                showToast('Your query has been submitted successfully. We will get back to you soon!', 'success');
+            } catch (error) {
+                console.error('Firestore submission error:', error);
+                showToast('Something went wrong. Please try again or contact us directly.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>

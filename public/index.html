@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jewelBazaari | Premium B2C Jewelry Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        luxuryMaroon: '#4A0E17',
+                        luxuryGold: '#9B7E4B',
+                        luxuryGoldLight: '#C5A880',
+                        luxuryBg: '#FAF7F2',
+                        luxuryDark: '#2A2A2A'
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hero banner swiper only */
+        .mySwiper {
+            width: 100%;
+            height: 500px;
+        }
+
+        .mySwiper .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Trending Now + New Arrivals shadow carousel */
+        .jb-featured-carousel-wrap {
+            position: relative;
+            padding: 0 2.75rem;
+        }
+
+        .jb-shadow-carousel {
+            width: 100%;
+            overflow: hidden;
+            padding: 1.5rem 0 2rem;
+        }
+
+        .jb-shadow-carousel-stage {
+            position: relative;
+            min-height: 24rem;
+            margin: 0 auto;
+            max-width: 52rem;
+        }
+
+        .jb-shadow-card {
+            position: absolute;
+            top: 0;
+            width: 68%;
+            max-width: 22rem;
+            transition: transform 0.55s ease, opacity 0.55s ease, left 0.55s ease, right 0.55s ease, filter 0.55s ease;
+            filter: drop-shadow(0 6px 18px rgba(74, 14, 23, 0.1));
+            will-change: transform, opacity;
+        }
+
+        .jb-shadow-card--left {
+            left: 0;
+            transform: translateX(-28%) scale(0.86);
+            opacity: 0.42;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .jb-shadow-card--center {
+            left: 50%;
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
+            z-index: 3;
+            filter: drop-shadow(0 14px 32px rgba(74, 14, 23, 0.18));
+            cursor: default;
+        }
+
+        .jb-shadow-card--right {
+            right: 0;
+            transform: translateX(28%) scale(0.86);
+            opacity: 0.42;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .jb-shadow-card--left .jb-home-product-card,
+        .jb-shadow-card--right .jb-home-product-card {
+            pointer-events: none;
+        }
+
+        .jb-shadow-card--center .jb-home-product-card {
+            pointer-events: auto;
+        }
+
+        .jb-shadow-card--left .jb-featured-details,
+        .jb-shadow-card--right .jb-featured-details {
+            opacity: 0;
+            visibility: hidden;
+            max-height: 0;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .jb-shadow-card--left .aspect-square,
+        .jb-shadow-card--right .aspect-square {
+            margin-bottom: 0;
+        }
+
+        .jb-featured-details {
+            transition: opacity 0.35s ease;
+        }
+
+        .jb-featured-carousel-prev,
+        .jb-featured-carousel-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(155, 126, 75, 0.35);
+            background: #fff;
+            color: #4A0E17;
+            font-size: 1.5rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(74, 14, 23, 0.12);
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .jb-featured-carousel-prev:hover,
+        .jb-featured-carousel-next:hover {
+            background: #4A0E17;
+            color: #fff;
+        }
+
+        .jb-featured-carousel-prev {
+            left: 0;
+        }
+
+        .jb-featured-carousel-next {
+            right: 0;
+        }
+
+        .jb-featured-carousel-prev.swiper-button-disabled,
+        .jb-featured-carousel-next.swiper-button-disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+            .jb-featured-carousel-wrap {
+                padding: 0 2.25rem;
+            }
+
+            .jb-shadow-card {
+                width: 78%;
+            }
+
+            .jb-shadow-carousel-stage {
+                min-height: 20rem;
+            }
+
+            .jb-featured-carousel-prev,
+            .jb-featured-carousel-next {
+                width: 2.25rem;
+                height: 2.25rem;
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+</head>
+<body class="overflow-x-hidden">
+
+    <header class="sticky top-0 z-50 bg-white">
+        <div data-include="components/announcement.html"></div>
+        
+        <div data-include="components/header-home.html"></div>
+        
+        <div data-include="components/category-bar.html"></div>
+    </header>
+
+    <section class="w-full">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="images/photo1.jpg"></div>
+                <div class="swiper-slide"><img src="images/photo2.jpg"></div>
+                <div class="swiper-slide"><img src="images/photo3.jpg"></div>
+                <div class="swiper-slide"><img src="images/photo4.jpg"></div>
+            
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
+    
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            loop: true,
+            speed: 1000, // <--- This makes the slide movement take 1 full second
+            autoplay: { 
+                delay: 6000, // <--- This keeps the image still for 6 seconds
+                disableOnInteraction: false 
+            },
+            pagination: { el: ".swiper-pagination", clickable: true },
+            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+        });
+    </script>
+
+    <section class="bg-white py-16 lg:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                <div>
+                    <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Trending Now</h2>
+                    <p class="text-gray-500 text-xs mt-1">Jewelry pieces everyone’s loving right now</p>
+                </div>
+                <a href="#" class="text-xs font-semibold tracking-wider uppercase text-luxuryGold hover:text-luxuryMaroon transition mt-4 md:mt-0 flex items-center gap-1">
+                    View All Trending <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+            <div class="jb-featured-carousel-wrap">
+                <button type="button" class="jb-featured-carousel-prev trending-carousel-prev" aria-label="Previous trending product">&#8249;</button>
+                <div class="jb-shadow-carousel" id="trending-featured-carousel">
+                    <div class="jb-shadow-carousel-stage" id="trending-products-grid">
+                        <p id="trending-loading" class="text-center py-10 text-gray-400">Loading trending products...</p>
+                    </div>
+                </div>
+                <button type="button" class="jb-featured-carousel-next trending-carousel-next" aria-label="Next trending product">&#8250;</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+        <div class="text-center max-w-xl mx-auto mb-12">
+            <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">New Arrivals</h2>
+            <div class="h-[1px] w-20 bg-luxuryGold mx-auto my-3"></div>
+            <p class="text-gray-500 text-xs tracking-wider uppercase">Fresh drops from verified sellers this week</p>
+        </div>
+        <div class="jb-featured-carousel-wrap">
+            <button type="button" class="jb-featured-carousel-prev new-arrivals-carousel-prev" aria-label="Previous new arrival">&#8249;</button>
+            <div class="jb-shadow-carousel" id="new-arrivals-featured-carousel">
+                <div class="jb-shadow-carousel-stage" id="new-arrivals-grid">
+                    <p id="new-arrivals-loading" class="text-center py-10 text-gray-400">Loading new arrivals...</p>
+                </div>
+            </div>
+            <button type="button" class="jb-featured-carousel-next new-arrivals-carousel-next" aria-label="Next new arrival">&#8250;</button>
+        </div>
+    </section>
+
+    <section class="bg-luxuryMaroon text-white py-16 lg:py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="font-luxury text-3xl font-bold text-luxuryGoldLight">Why jewelBazaari?</h2>
+                <div class="h-[1px] w-20 bg-luxuryGoldLight mx-auto my-3"></div>
+                <p class="text-gray-300 text-xs tracking-wider uppercase">Redefining Premium Marketplace Trust</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
+                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-luxury font-semibold text-lg">Absolute Trust</h3>
+                    <p class="text-gray-300 text-xs leading-relaxed font-light">Every single vendor goes through strict background and hallmark documentation verifications.</p>
+                </div>
+                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
+                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-luxury font-semibold text-lg">Affordable Luxury</h3>
+                    <p class="text-gray-300 text-xs leading-relaxed font-light">By cutting out middle-tier distributor channels, we bring fair prices straight from the creators.</p>
+                </div>
+                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
+                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
+                        <i data-lucide="package" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-luxury font-semibold text-lg">Unmatched Selection</h3>
+                    <p class="text-gray-300 text-xs leading-relaxed font-light">Discover unique regional designs from local jewelry hubs across India in one single place.</p>
+                </div>
+                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
+                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
+                        <i data-lucide="heart" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-luxury font-semibold text-lg">Buyer Protection</h3>
+                    <p class="text-gray-300 text-xs leading-relaxed font-light">Your money is entirely safe with secure escrows until your verified product arrives safely at your doorstep.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+        <div class="text-center max-w-xl mx-auto mb-12">
+            <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Featured Sellers</h2>
+            <div class="h-[1px] w-20 bg-luxuryGold mx-auto my-3"></div>
+            <p class="text-gray-500 text-xs tracking-wider uppercase">Sellers celebrated for legacy and quality</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white border border-gray-100 overflow-hidden relative group">
+                <div class="h-48 bg-luxuryMaroon overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80" alt="Seller Banner" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-60">
+                </div>
+                <div class="p-6 text-center relative -mt-12">
+                    <div class="w-20 h-20 bg-white border-2 border-luxuryGold mx-auto rounded-full flex items-center justify-center overflow-hidden shadow-md">
+                        <span class="font-luxury font-bold text-luxuryMaroon text-xl">TD</span>
+                    </div>
+                    <h3 class="font-luxury font-bold text-lg text-luxuryDark mt-4">Tarika Diamonds</h3>
+                    <p class="text-xs text-luxuryGold font-semibold uppercase tracking-wider mb-2">Signature Partner</p>
+                    <p class="text-gray-500 text-xs line-clamp-2 px-4 mb-4">Renowned curated diamond architectures certified by global standards and crafted with absolute meticulous precision.</p>
+                    <a href="#" class="inline-block text-xs uppercase font-semibold tracking-widest text-luxuryMaroon border-b border-luxuryGold pb-1 hover:text-luxuryGold transition">Visit Store</a>
+                </div>
+            </div>
+            <div class="bg-white border border-gray-100 overflow-hidden relative group">
+                <div class="h-48 bg-luxuryMaroon overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=80" alt="Seller Banner" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-60">
+                </div>
+                <div class="p-6 text-center relative -mt-12">
+                    <div class="w-20 h-20 bg-white border-2 border-luxuryGold mx-auto rounded-full flex items-center justify-center overflow-hidden shadow-md">
+                        <span class="font-luxury font-bold text-luxuryMaroon text-xl">JG</span>
+                    </div>
+                    <h3 class="font-luxury font-bold text-lg text-luxuryDark mt-4">Jaipur Gem House</h3>
+                    <p class="text-xs text-luxuryGold font-semibold uppercase tracking-wider mb-2">Verified Antique Seller</p>
+                    <p class="text-gray-500 text-xs line-clamp-2 px-4 mb-4">Bringing traditional Rajasthan heritage, timeless Kundan, and Meenakari treasures straight to global collectors.</p>
+                    <a href="#" class="inline-block text-xs uppercase font-semibold tracking-widest text-luxuryMaroon border-b border-luxuryGold pb-1 hover:text-luxuryGold transition">Visit Store</a>
+                </div>
+            </div>
+            <div class="bg-white border border-gray-100 overflow-hidden relative group">
+                <div class="h-48 bg-luxuryMaroon overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80" alt="Seller Banner" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-60">
+                </div>
+                <div class="p-6 text-center relative -mt-12">
+                    <div class="w-20 h-20 bg-white border-2 border-luxuryGold mx-auto rounded-full flex items-center justify-center overflow-hidden shadow-md">
+                        <span class="font-luxury font-bold text-luxuryMaroon text-xl">MA</span>
+                    </div>
+                    <h3 class="font-luxury font-bold text-lg text-luxuryDark mt-4">Malabar Artisans</h3>
+                    <p class="text-xs text-luxuryGold font-semibold uppercase tracking-wider mb-2">Gold Expert</p>
+                    <p class="text-gray-500 text-xs line-clamp-2 px-4 mb-4">Preserving traditional lightweight and heavy bridal pure gold artistry handed down through generations of masters.</p>
+                    <a href="#" class="inline-block text-xs uppercase font-semibold tracking-widest text-luxuryMaroon border-b border-luxuryGold pb-1 hover:text-luxuryGold transition">Visit Store</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white py-16 border-t border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-luxuryBg border border-luxuryGold/20 p-8 lg:p-12">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                    <div class="space-y-4 text-center lg:text-left">
+                        <span class="text-xs text-luxuryGold font-bold uppercase tracking-widest block">Our Absolute Promise</span>
+                        <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">The jewelBazaari Assurance</h2>
+                        <p class="text-gray-600 text-xs leading-relaxed max-w-sm">Inspired by the highest benchmarks of premium Indian jewelry transparency, protecting your investment at every step.</p>
+                    </div>
+                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="flex items-start gap-4">
+                            <div class="text-luxuryGold mt-1"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">100% Verified Sellers</h4>
+                                <p class="text-gray-500 text-xs leading-relaxed">Only licensed boutique businesses and certified legacy stores are permitted to sell.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="text-luxuryGold mt-1"><i data-lucide="award" class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">Hallmark Certified Jewelry</h4>
+                                <p class="text-gray-500 text-xs leading-relaxed">Every piece carries official government hallmarking specifications or authorized laboratory certificates.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="text-luxuryGold mt-1"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">Easy Returns & Exchange</h4>
+                                <p class="text-gray-500 text-xs leading-relaxed">No hassles, simple return pathways if you are not fully in love with your purchase.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="text-luxuryGold mt-1"><i data-lucide="lock" class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">Buyer Protection Escrow</h4>
+                                <p class="text-gray-500 text-xs leading-relaxed">Funds are securely processed and held until transit delivery confirmation protects against fraud.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 bg-luxuryMaroon text-white overflow-hidden shadow-xl">
+            <div class="p-8 sm:p-12 lg:p-16 flex flex-col justify-center space-y-6">
+                <span class="text-luxuryGoldLight text-xs uppercase tracking-widest font-bold">Smart Smart Upgrades</span>
+                <h2 class="font-luxury text-3xl sm:text-4xl font-bold">The Luxury Gold Exchange Program</h2>
+                <p class="text-gray-300 text-xs sm:text-sm font-light leading-relaxed">
+                    Ready to upgrade your old jewelry? Bring your ancestral gold or old pieces to any of our verified partner showrooms (including Tarika Diamonds centers) across India. Secure the absolute best valuation market rates and instantly exchange it for modern marketplace selections.
+                </p>
+                <div class="pt-2">
+                    <a href="#" class="inline-block bg-white text-luxuryMaroon hover:bg-luxuryGoldLight hover:text-white px-6 py-3 text-xs tracking-widest uppercase font-semibold transition duration-300">
+                        Book An Appointment
+                    </a>
+                </div>
+            </div>
+            <div class="h-64 lg:h-auto min-h-[350px] relative">
+                <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80" alt="Gold melt exchange program" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white py-16 lg:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Curated Collections</h2>
+                <div class="h-[1px] w-20 bg-luxuryGold mx-auto my-3"></div>
+                <p class="text-gray-500 text-xs tracking-wider uppercase">Shop by Occasion & Milestone</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=500&q=80" alt="Wedding" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
+                        <h3 class="font-luxury font-bold text-xl text-white">The Wedding Gala</h3>
+                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Regal Heavyweight Masterpieces</p>
+                    </div>
+                </div>
+                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=500&q=80" alt="Festive" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
+                        <h3 class="font-luxury font-bold text-xl text-white">Festive Radiance</h3>
+                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Celebrate Heritage Designs</p>
+                    </div>
+                </div>
+                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=500&q=80" alt="Daily Minimal" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
+                        <h3 class="font-luxury font-bold text-xl text-white">Modern Minimalist</h3>
+                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Office & Daily Wear Gems</p>
+                    </div>
+                </div>
+                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=500&q=80" alt="Gifting" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
+                        <h3 class="font-luxury font-bold text-xl text-white">Luxury Gifting</h3>
+                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Tokens of Eternal Love</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 border-t border-gray-100">
+        <div class="text-center max-w-xl mx-auto mb-12">
+            <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Patron Stories</h2>
+            <div class="h-[1px] w-20 bg-luxuryGold mx-auto my-3"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 lg:p-8 border border-gray-100 shadow-sm relative">
+                <span class="text-6xl text-luxuryGold/20 font-serif absolute top-2 left-4">“</span>
+                <p class="text-gray-600 text-xs leading-relaxed italic relative z-10 pt-4">
+                    "I was highly skeptical about buying a diamond necklace online, but seeing Tarika Diamonds onboarded gave me absolute reassurance. The escrow framework and the hallmark certification verification checked out seamlessly. jewelBazaari has made buying luxury jewelry completely safe and affordable."
+                </p>
+                <div class="mt-6 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-luxuryMaroon rounded-full flex items-center justify-center text-white text-xs font-semibold">AD</div>
+                    <div>
+                        <h4 class="text-xs font-bold text-luxuryDark">Ananya Deshmukh</h4>
+                        <p class="text-[10px] text-gray-400">Verified Purchaser, Mumbai</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-luxuryBg p-6 lg:p-8 border border-luxuryGold/20 shadow-sm relative">
+                <span class="text-6xl text-luxuryGold/20 font-serif absolute top-2 left-4">“</span>
+                <p class="text-gray-600 text-xs leading-relaxed italic relative z-10 pt-4">
+                    "Our foundational principle when conceptualizing this marketplace ecosystem was basic transparency. India loves luxury jewelry, but buyers deserve fair prices and complete protection. We guarantee that every transaction meets the absolute highest standards."
+                </p>
+                <div class="mt-6 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-luxuryGold rounded-full flex items-center justify-center text-white text-xs font-semibold">F</div>
+                    <div>
+                        <h4 class="text-xs font-bold text-luxuryDark">Abhishek Yadav</h4>
+                        <p class="text-[10px] text-luxuryGold font-medium uppercase tracking-wider">Founders, jewelBazaari</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white py-16 lg:py-24">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+            <span class="text-xs text-luxuryGold font-bold uppercase tracking-widest block">The Genesis</span>
+            <h2 class="font-luxury text-3xl sm:text-4xl font-bold text-luxuryMaroon">Behind jewelBazaari</h2>
+            <div class="h-[1px] w-20 bg-luxuryGold mx-auto"></div>
+            <p class="text-gray-600 text-sm font-light leading-relaxed max-w-3xl mx-auto">
+                founded by JewelBazaari digital marketplace innovator <strong class="text-luxuryDark font-medium">Abhishek Yadav</strong>, jewelBazaari was born to unify India's decentralized jewelry ecosystem. By merging rigorous technological verification with trusted seller standards, we bring affordable luxury directly to your home with unmatched transparency.
+            </p>
+        </div>
+    </section>
+
+    <div data-include="components/footer.html"></div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <script>
+        document.querySelectorAll('[data-include]').forEach(el => {
+            fetch(el.getAttribute('data-include'))
+                .then(res => res.text())
+                .then(data => {
+                    el.outerHTML = data;
+                    if (window.jewelBazaariCart && window.jewelBazaariCart.updateCartBadge) {
+                        window.jewelBazaariCart.updateCartBadge();
+                    }
+                    import('./js/wishlist-ui.js').then(({ updateWishlistBadge }) => updateWishlistBadge());
+                });
+        });
+    </script>
+    <script type="module">
+        import { initCartUI, updateCartBadge, syncCartButtonStates } from './js/cart-ui.js';
+        import { initWishlistUI, updateWishlistBadge, syncWishlistHeartStates, buildWishlistHeartButton } from './js/wishlist-ui.js';
+        import './js/category-nav.js';
+        import { getTrendingProducts, getAllProducts } from './js/firebase-product-service.js';
+        import { getCoverImage, getProductImages } from './js/product-images.js';
+        import { initProductGalleryUI } from './js/product-ui.js';
+        import { initShadowCarousel, destroyShadowCarousel } from './js/home-featured-carousel.js';
+
+        window.jewelBazaariCart = { updateCartBadge };
+        initCartUI();
+        initWishlistUI();
+        initProductGalleryUI();
+
+        function escapeHtml(value = '') {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatTrendingPrice(price) {
+            const amount = Number(price);
+            if (!amount) return 'Price on request';
+            return `₹${amount.toLocaleString('en-IN')}`;
+        }
+
+        function buildTrendingCard(product, slot, index) {
+            const images = getProductImages(product);
+            const imageSrc = getCoverImage(product);
+            const vendor = product.vendor || 'Verified Vendor';
+            const bestSellerBadge = slot === 'center' && index === 0 && (Number(product.addToCartCount) || 0) > 0
+                ? '<span class="absolute top-2 left-2 bg-luxuryGold text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-medium">Best Seller</span>'
+                : '';
+
+            return `
+                <div class="jb-home-product-card group bg-luxuryBg p-3 relative flex flex-col justify-between h-full min-w-0">
+                    <div class="overflow-hidden aspect-square mb-4 bg-white relative">
+                        <button type="button"
+                            class="product-gallery-trigger block w-full h-full"
+                            data-product-gallery="${escapeHtml(JSON.stringify(images))}"
+                            data-product-name="${escapeHtml(product.name || 'Product')}"
+                            aria-label="View product images">
+                            <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+                        </button>
+                        ${slot === 'center' ? buildWishlistHeartButton({ ...product, imageUrl: imageSrc }, 'absolute top-2 right-2') : ''}
+                        ${bestSellerBadge}
+                    </div>
+                    <div class="jb-featured-details">
+                        <p class="text-[10px] uppercase font-semibold text-luxuryGold tracking-wider mb-1">${escapeHtml(vendor)}</p>
+                        <h3 class="font-luxury font-semibold text-base text-luxuryDark mb-2 line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h3>
+                        <div class="flex items-center justify-between mt-2 border-t border-gray-200/60 pt-3">
+                            <div>
+                                <span class="text-sm font-bold text-luxuryMaroon">${formatTrendingPrice(product.price)}</span>
+                            </div>
+                            <button type="button" data-add-cart="${escapeHtml(product.id)}" data-add-name="${escapeHtml(product.name || 'Product')}" data-add-price="${escapeHtml(product.price || 0)}" data-add-image="${escapeHtml(imageSrc)}" class="text-xs uppercase font-semibold tracking-wider text-luxuryGold hover:text-luxuryMaroon transition">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildNewArrivalCard(product, slot) {
+            const images = getProductImages(product);
+            const imageSrc = getCoverImage(product);
+            const vendor = product.vendor || 'Verified Vendor';
+
+            return `
+                <div class="jb-home-product-card group bg-white border border-gray-100 p-4 transition duration-300 hover:shadow-lg h-full flex flex-col">
+                    <div class="aspect-square bg-luxuryBg mb-4 overflow-hidden relative">
+                        <button type="button"
+                            class="product-gallery-trigger block w-full h-full"
+                            data-product-gallery="${escapeHtml(JSON.stringify(images))}"
+                            data-product-name="${escapeHtml(product.name || 'Product')}"
+                            aria-label="View product images">
+                            <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+                        </button>
+                        ${slot === 'center' ? buildWishlistHeartButton({ ...product, imageUrl: imageSrc }, 'absolute top-3 right-3') : ''}
+                    </div>
+                    <div class="jb-featured-details flex flex-col flex-1 justify-between min-h-0">
+                        <div>
+                            <p class="text-[10px] uppercase text-luxuryGold font-semibold tracking-wider">${escapeHtml(vendor)}</p>
+                            <h3 class="font-luxury font-semibold text-base text-luxuryDark mt-1 mb-2 line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h3>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-50">
+                            <span class="text-sm font-bold text-luxuryMaroon">${formatTrendingPrice(product.price)}</span>
+                            <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 uppercase tracking-wide">New In</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadTrendingProducts() {
+            const stage = document.getElementById('trending-products-grid');
+            const carouselEl = document.getElementById('trending-featured-carousel');
+            if (!stage || !carouselEl) return;
+
+            destroyShadowCarousel(carouselEl);
+
+            try {
+                const products = await getTrendingProducts(10);
+
+                if (!products.length) {
+                    stage.innerHTML = '<p class="text-center text-gray-500 py-10">No trending products yet. Add items to your cart to see them here.</p>';
+                    return;
+                }
+
+                initShadowCarousel(carouselEl, {
+                    products,
+                    renderCard: buildTrendingCard,
+                    prevEl: '.trending-carousel-prev',
+                    nextEl: '.trending-carousel-next',
+                    onAfterRender: () => {
+                        syncCartButtonStates();
+                        syncWishlistHeartStates();
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to load trending products:', error);
+                stage.innerHTML = '<p class="text-center text-red-500 py-10">Failed to load trending products. Please refresh the page.</p>';
+            }
+        }
+
+        async function loadNewArrivals() {
+            const stage = document.getElementById('new-arrivals-grid');
+            const carouselEl = document.getElementById('new-arrivals-featured-carousel');
+            if (!stage || !carouselEl) return;
+
+            destroyShadowCarousel(carouselEl);
+
+            try {
+                const products = await getAllProducts();
+
+                if (!products.length) {
+                    stage.innerHTML = '<p class="text-center text-gray-500 py-10">No new arrivals yet.</p>';
+                    return;
+                }
+
+                initShadowCarousel(carouselEl, {
+                    products,
+                    renderCard: buildNewArrivalCard,
+                    prevEl: '.new-arrivals-carousel-prev',
+                    nextEl: '.new-arrivals-carousel-next',
+                    onAfterRender: () => {
+                        syncCartButtonStates();
+                        syncWishlistHeartStates();
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to load new arrivals:', error);
+                stage.innerHTML = '<p class="text-center text-red-500 py-10">Failed to load new arrivals. Please refresh the page.</p>';
+            }
+        }
+
+        loadTrendingProducts();
+        loadNewArrivals();
+        window.addEventListener('jewelbazaari:add-to-cart-count-updated', loadTrendingProducts);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            loop: true,
+            autoplay: {
+                delay: 3000, // Changes every 3 seconds
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+    </script>
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        console.log('Database connected successfully!');
+    </script>
+<!-- ========== LIVE GOLD PRICE MODAL + DYNAMIC JS ========== -->
+<div id="gold-price-modal" onclick="if (event.target.id === 'gold-price-modal') closeGoldPriceModal()" 
+     class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+
+    <div onclick="event.stopImmediatePropagation()" class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        
+        <!-- Header -->
+        <div class="bg-[#4A0E17] px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-[#9B7E4B] rounded-2xl flex items-center justify-center">
+                    <i data-lucide="trending-up" class="w-5 h-5 text-[#4A0E17]"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif text-2xl text-white tracking-tight">Live Gold Price</h3>
+                    <p class="text-[#C5A880] text-xs tracking-wider">TODAY'S RATE • VERIFIED</p>
+                </div>
+            </div>
+            <button onclick="closeGoldPriceModal()" class="text-white/70 hover:text-white text-2xl leading-none">×</button>
+        </div>
+
+        <div class="p-6">
+            <!-- Location -->
+            <div class="mb-5">
+                <div class="flex justify-between mb-2">
+                    <span class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Showing price for</span>
+                    <button onclick="detectCurrentLocation()" class="flex items-center gap-1 text-xs font-semibold text-[#9B7E4B]">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                        <span>Detect My Location</span>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3 bg-[#FAF7F2] border border-[#9B7E4B]/30 rounded-2xl px-4 py-3">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-[#9B7E4B]"></i>
+                    <div>
+                        <div id="location-city" class="font-semibold text-[#2A2A2A]">Surat, Gujarat</div>
+                        <div id="location-pin" class="text-xs text-gray-500">PIN: 395001 • Your current location</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- City Dropdown -->
+            <div class="mb-4">
+                <label class="text-xs uppercase tracking-widest text-gray-500 font-semibold block mb-1.5">Or choose another city</label>
+                <select id="city-select" onchange="updateGoldPriceForCity()" class="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm">
+                    <option value="Surat">Surat, Gujarat</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Bangalore">Bengaluru</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Jaipur">Jaipur</option>
+                    <option value="Lucknow">Lucknow, Uttar Pradesh</option>
+                    <option value="Patna">Patna, Bihar</option>
+                    <option value="Ranchi">Ranchi, Jharkhand</option>
+                    <option value="Colombo">Colombo, Sri Lanka</option>
+                    <option value="Dubai">Dubai, UAE</option>
+                </select>
+            </div>
+
+            <!-- PIN Code -->
+            <div class="mb-6">
+                <label class="text-xs uppercase tracking-widest text-gray-500 font-semibold block mb-1.5">Or enter PIN code</label>
+                <div class="flex gap-2">
+                    <input type="text" id="pincode-input" placeholder="e.g. 395007 or 110001" class="flex-1 border border-gray-200 rounded-2xl px-4 py-3 text-sm">
+                    <button onclick="lookupByPincode()" class="px-6 bg-[#4A0E17] text-white text-sm font-semibold rounded-2xl">Check</button>
+                </div>
+            </div>
+
+            <!-- Prices -->
+            <div class="bg-[#FAF7F2] rounded-3xl p-5 border border-[#9B7E4B]/20">
+                <div class="text-center mb-4">
+                    <div class="text-xs tracking-[1.5px] text-[#9B7E4B] font-bold">20 JUNE 2026 • 05:30 PM IST</div>
+                </div>
+
+                <div class="flex justify-between items-end mb-4 pb-4 border-b border-[#9B7E4B]/20">
+                    <div>
+                        <span class="font-semibold text-xl">22K Gold</span>
+                        <span class="ml-2 text-xs px-2 py-0.5 bg-[#9B7E4B]/10 text-[#9B7E4B] rounded">Most Popular</span>
+                        <div class="text-xs text-gray-500">Per 10 grams</div>
+                    </div>
+                    <div class="text-right">
+                        <div id="price-22k" class="font-serif text-4xl font-bold text-[#4A0E17]">Loading...</div>
+                        <div id="change-22k" class="text-emerald-600 text-xs">+0.00%</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end">
+                    <div>
+                        <span class="font-semibold text-xl">24K Gold</span>
+                        <div class="text-xs text-gray-500">Per 10 grams • Pure</div>
+                    </div>
+                    <div class="text-right">
+                        <div id="price-24k" class="font-serif text-4xl font-bold text-[#4A0E17]">Loading...</div>
+                        <div id="change-24k" class="text-emerald-600 text-xs">+0.00%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Gold Price JavaScript -->
+<script>
+    let currentGoldPrice = null;
+
+    async function fetchLiveGoldPrice() {
+        try {
+            const response = await fetch('https://api.gold-api.com/price/XAU-INR');
+            const data = await response.json();
+            currentGoldPrice = Math.round(data.price * 10);
+            return currentGoldPrice;
+        } catch (error) {
+            currentGoldPrice = 78200;
+            return currentGoldPrice;
+        }
+    }
+
+    function calculate22KPrice(price24k) {
+        return Math.round(price24k * 0.916);
+    }
+
+    async function openGoldPriceModal() {
+        const modal = document.getElementById('gold-price-modal');
+        if (!modal) {
+            alert("Modal not found! Make sure you pasted the Modal HTML.");
+            return;
+        }
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        document.getElementById('price-24k').innerText = "Loading...";
+        document.getElementById('price-22k').innerText = "Loading...";
+
+        const price24k = await fetchLiveGoldPrice();
+        const price22k = calculate22KPrice(price24k);
+
+        document.getElementById('price-24k').innerText = '₹' + price24k.toLocaleString('en-IN');
+        document.getElementById('price-22k').innerText = '₹' + price22k.toLocaleString('en-IN');
+
+        document.getElementById('city-select').value = 'Surat';
+        updateCityDisplay('Surat', price22k, price24k);
+    }
+
+    function updateCityDisplay(city, base22k, base24k) {
+        const cityPremium = {
+            "Surat": 0, "Delhi": 150, "Mumbai": 200, "Ahmedabad": -50,
+            "Chennai": 300, "Bangalore": 250, "Hyderabad": 100, "Jaipur": -150,
+            "Lucknow": -100, "Patna": -200, "Ranchi": -180,
+            "Colombo": -1200, "Dubai": -800
+        };
+
+        const premium = cityPremium[city] || 0;
+        const final22k = base22k + premium;
+        const final24k = base24k + premium;
+
+        document.getElementById('price-22k').innerText = '₹' + final22k.toLocaleString('en-IN');
+        document.getElementById('price-24k').innerText = '₹' + final24k.toLocaleString('en-IN');
+        document.getElementById('location-city').innerText = city;
+    }
+
+    function updateGoldPriceForCity() {
+        const city = document.getElementById('city-select').value;
+        const price24k = parseInt(document.getElementById('price-24k').innerText.replace(/[₹,]/g, '')) || 78200;
+        const price22k = parseInt(document.getElementById('price-22k').innerText.replace(/[₹,]/g, '')) || 71700;
+        updateCityDisplay(city, price22k, price24k);
+    }
+
+    function closeGoldPriceModal() {
+        const modal = document.getElementById('gold-price-modal');
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+
+    function lookupByPincode() {
+        const pin = document.getElementById('pincode-input').value.trim();
+        if (!pin) return alert("Please enter a PIN code");
+
+        const pinMap = {
+            "395": "Surat", "110": "Delhi", "400": "Mumbai", "380": "Ahmedabad",
+            "600": "Chennai", "560": "Bangalore", "500": "Hyderabad", "302": "Jaipur",
+            "226": "Lucknow", "800": "Patna", "834": "Ranchi"
+        };
+
+        let city = "Surat";
+        for (let prefix in pinMap) {
+            if (pin.startsWith(prefix)) { city = pinMap[prefix]; break; }
+        }
+        document.getElementById('city-select').value = city;
+        updateGoldPriceForCity();
+        document.getElementById('pincode-input').value = '';
+    }
+
+    function detectCurrentLocation() {
+        document.getElementById('location-city').innerText = "Detecting...";
+        setTimeout(() => {
+            document.getElementById('location-city').innerText = "Surat, Gujarat";
+            updateGoldPriceForCity();
+        }, 600);
+    }
+</script>
+    
+</body>
+</html>

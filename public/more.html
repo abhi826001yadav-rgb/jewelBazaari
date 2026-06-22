@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>More Collections • jewelBazaari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <style>
+        html, body { overflow-x: hidden; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div id="announcement-placeholder"></div>
+    <div id="header-placeholder"></div>
+    <div id="category-placeholder"></div>
+
+    <main class="max-w-7xl mx-auto px-4 py-12 text-center">
+        <h1 class="text-4xl font-serif text-gray-800">More Collections</h1>
+        <p class="text-gray-500 mt-4">Discover unique pieces and specialty treasures.</p>
+        <a href="vendor-upload.html" class="inline-block mt-8 px-6 py-3 bg-[#4A0E17] text-white rounded-full text-sm font-medium hover:bg-[#3A0A12]">
+            Become a Vendor
+        </a>
+    </main>
+
+    <script type="module">
+        import { loadPageLayout } from './js/product-ui.js';
+        loadPageLayout();
+    </script>
+</body>
+</html>

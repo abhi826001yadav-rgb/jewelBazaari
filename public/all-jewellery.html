@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Jewellery • jewelBazaari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <style>
+        html { overflow-x: clip; }
+        body { background-color: #FAF7F2; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+        .luxury-card { transition: all 0.3s ease; }
+        .luxury-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .section-title { font-family: 'Playfair Display', Georgia, serif; }
+        #announcement-placeholder, #header-placeholder, #category-placeholder { position: relative; z-index: 40; }
+        main { position: relative; z-index: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="announcement-placeholder"></div>
+    <div id="header-placeholder"></div>
+    <div id="category-placeholder"></div>
+
+    <section class="jb-category-hero">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 jb-category-hero-inner">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <p class="jb-category-hero-eyebrow">jewelBazaari Collection</p>
+                    <h1 class="jb-category-hero-title">All Jewellery</h1>
+                    <div class="jb-category-hero-line"></div>
+                    <p class="jb-category-hero-sub">Explore our complete collection from verified sellers</p>
+                </div>
+                <div id="product-count" class="text-sm text-[#C5A880]"></div>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <div class="mb-6">
+            <input type="text" id="search-input" placeholder="Search jewellery..."
+                class="w-full md:w-80 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#9B7E4B]">
+        </div>
+
+        <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+
+        <div id="no-products" class="hidden text-center py-16">
+            <p class="text-gray-500 text-lg">No products found.</p>
+            <a href="vendor-upload.html" class="inline-block mt-4 text-[#9B7E4B] hover:underline">Become a vendor</a>
+        </div>
+    </main>
+
+    <script type="module">
+        import { getAllProducts } from './js/firebase-product-service.js';
+        import { loadPageLayout, renderProducts, setupSearch, showLoading, showError } from './js/product-ui.js';
+        import { initCartUI } from './js/cart-ui.js';
+        import { initWishlistUI } from './js/wishlist-ui.js';
+
+        initCartUI();
+        initWishlistUI();
+
+        let allProducts = [];
+
+        async function initPage() {
+            await loadPageLayout();
+            showLoading('products-grid');
+
+            try {
+                allProducts = await getAllProducts();
+                renderProducts(allProducts);
+                setupSearch(allProducts, renderProducts);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showError('products-grid');
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

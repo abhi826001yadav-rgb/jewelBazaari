@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Upload • jewelBazaari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <style>
+        html, body {
+            margin: 0;
+            min-height: 100vh;
+        }
+        body {
+            background: linear-gradient(135deg, #1F1A17 0%, #2C211F 100%);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        body.vendor-locked {
+            overflow: hidden;
+        }
+        .luxury-card {
+            background: #FAF7F2;
+            border: 2px solid #9B7E4B;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+        h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.25rem;
+            color: #4A0E17;
+        }
+        input, select, textarea {
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #9B7E4B;
+            box-shadow: 0 0 0 4px rgba(155, 126, 75, 0.25);
+            outline: none;
+        }
+        .upload-btn {
+            background: #9B7E4B;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .upload-btn:hover:not(:disabled) {
+            background: #4A0E17;
+            transform: translateY(-2px);
+        }
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .image-preview {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 1rem;
+            border: 2px solid #E5E7EB;
+        }
+        .progress-track {
+            width: 100%;
+            height: 0.5rem;
+            background: #E5E7EB;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #9B7E4B, #4A0E17);
+            transition: width 0.2s ease;
+        }
+        .status-message {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        .status-success {
+            color: #166534;
+        }
+        .status-error {
+            color: #B91C1C;
+        }
+        .status-info {
+            color: #4A0E17;
+        }
+        #password-section {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: #2C1810;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        #password-section.is-hidden {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+        .vendor-home-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4A0E17;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            z-index: 10;
+        }
+        .vendor-home-btn:hover {
+            color: #9B7E4B;
+        }
+        @media (max-width: 640px) {
+            .vendor-home-btn {
+                top: 0.75rem;
+                left: 0.75rem;
+                font-size: 0.8125rem;
+            }
+        }
+        #upload-section {
+            display: none;
+            min-height: 100vh;
+            padding: 3rem 1rem;
+        }
+        #upload-section.is-visible {
+            display: block;
+        }
+    </style>
+</head>
+<body class="vendor-locked">
+
+    <div id="announcement-placeholder"></div>
+
+    <div id="password-section" role="dialog" aria-label="Vendor login">
+        <div class="max-w-md w-full mx-4">
+            <div class="bg-white rounded-3xl p-8 shadow-xl relative">
+                <a href="index.html" class="vendor-home-btn" aria-label="Return to homepage">🏠 Home</a>
+                <div class="text-center mb-6">
+                    <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-3xl">🔐</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-[#4A0E17]">Vendor Access</h2>
+                    <p class="text-gray-600 mt-2 text-sm">Enter the vendor password to continue</p>
+                </div>
+                <div class="space-y-4">
+                    <input
+                        type="password"
+                        id="vendor-password"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-amber-700"
+                        placeholder="Enter Password"
+                        autocomplete="current-password"
+                    >
+                    <button
+                        id="login-btn"
+                        type="button"
+                        class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition"
+                    >
+                        Access Vendor Portal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="upload-section">
+        <div class="max-w-lg mx-auto mb-6 flex justify-between items-center px-2">
+            <a href="index.html" class="flex items-center gap-2 text-[#EAB308] hover:text-[#F4C95F] transition font-semibold text-sm">
+                🏠 Back to Home
+            </a>
+            <span class="text-xs text-gray-400">jewelBazaari Vendor Portal</span>
+        </div>
+
+        <div class="max-w-lg mx-auto p-10 bg-[#FAF7F2] rounded-3xl shadow-2xl border-2 border-[#9B7E4B] luxury-card">
+            <h2 class="text-center mb-3 tracking-tight">Vendor Product Upload</h2>
+            <p class="text-center text-[#4A0E17] mb-8 text-sm">
+                One product record appears across all matching sections automatically.
+            </p>
+
+            <form id="product-form" class="space-y-4">
+                <div>
+                    <label for="p-category" class="block text-sm font-medium text-gray-700 mb-1">Jewellery Category *</label>
+                    <select id="p-category" required class="w-full p-4 border-2 border-gray-300 rounded-2xl text-lg">
+                        <option value="">-- Select Category --</option>
+                        <option value="gold">Gold</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="gemstone">Gemstone</option>
+                        <option value="earrings">Earrings</option>
+                        <option value="rings">Rings</option>
+                        <option value="wedding">Wedding</option>
+                        <option value="combos">Combos</option>
+                        <option value="all-jewellery">All Jewellery</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="p-metal" class="block text-sm font-medium text-gray-700 mb-1">Metal Type *</label>
+                    <select id="p-metal" required class="w-full p-4 border-2 border-gray-300 rounded-2xl text-lg">
+                        <option value="">-- Select Metal --</option>
+                        <option value="gold">Gold</option>
+                        <option value="silver">Silver</option>
+                        <option value="platinum">Platinum</option>
+                        <option value="none">No Metal / Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="p-stone" class="block text-sm font-medium text-gray-700 mb-1">Stone Type</label>
+                    <select id="p-stone" class="w-full p-4 border-2 border-gray-300 rounded-2xl text-lg">
+                        <option value="">No Stone</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="emerald">Emerald</option>
+                        <option value="sapphire">Sapphire</option>
+                        <option value="pearl">Pearl</option>
+                        <option value="topaz">Topaz</option>
+                        <option value="amethyst">Amethyst</option>
+                        <option value="citrine">Citrine</option>
+                        <option value="garnet">Garnet</option>
+                        <option value="aquamarine">Aquamarine</option>
+                    </select>
+                </div>
+
+                <input type="text" id="p-name" required placeholder="Product Name *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                <textarea id="p-description" rows="3" placeholder="Description" class="w-full p-4 border-2 border-gray-300 rounded-2xl resize-none"></textarea>
+                <div>
+                    <label for="p-image-url-1" class="block text-sm font-medium text-gray-700 mb-1">Image URL 1 *</label>
+                    <input type="url" id="p-image-url-1" required placeholder="Direct link of first image🔗" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                </div>
+                <div>
+                    <label for="p-image-url-2" class="block text-sm font-medium text-gray-700 mb-1">Image URL 2 (Optional)</label>
+                    <input type="url" id="p-image-url-2" placeholder="Direct link of second image🔗" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                </div>
+                <div>
+                    <label for="p-image-url-3" class="block text-sm font-medium text-gray-700 mb-1">Image URL 3 (Optional)</label>
+                    <input type="url" id="p-image-url-3" placeholder="Direct link of third image🔗" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                </div>
+                <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17] leading-relaxed">
+                    <p class="font-semibold mb-2">IMPORTANT:</p>
+                    <p>Upload your jewellery photos first to <a href="https://postimages.org" target="_blank" rel="noopener noreferrer" class="text-[#9B7E4B] underline hover:text-[#4A0E17]">https://postimages.org</a></p>
+                    <p class="mt-2">Copy the Direct Link provided by Postimages and paste it here.</p>
+                    <p class="mt-2">Maximum 3 jewellery photos are allowed per product.</p>
+                </div>
+                <p id="upload-status" class="status-message hidden" role="status" aria-live="polite"></p>
+                <input type="number" id="p-price" required min="1" placeholder="Price (₹) *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                <input type="text" id="p-vendor" placeholder="Vendor / Shop Name" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+
+                <button type="submit" id="upload-btn" class="w-full upload-btn py-4 mt-4 rounded-2xl text-lg tracking-wider shadow-lg">
+                    ✨ Upload Product to jewelBazaari
+                </button>
+            </form>
+
+            <p class="text-center text-xs text-gray-500 mt-6">
+                Example: Diamond + Gold Ring → appears in All Jewellery, Diamond, Gold, and Rings.
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { addProduct } from './js/firebase-product-service.js';
+
+        const passwordSection = document.getElementById('password-section');
+        const uploadSection = document.getElementById('upload-section');
+        const passwordInput = document.getElementById('vendor-password');
+        const loginBtn = document.getElementById('login-btn');
+        const productForm = document.getElementById('product-form');
+        const imageUrl1Input = document.getElementById('p-image-url-1');
+        const imageUrl2Input = document.getElementById('p-image-url-2');
+        const imageUrl3Input = document.getElementById('p-image-url-3');
+        const uploadStatus = document.getElementById('upload-status');
+
+        function showUploadPortal() {
+            passwordSection.classList.add('is-hidden');
+            passwordSection.setAttribute('aria-hidden', 'true');
+            uploadSection.classList.add('is-visible');
+            document.body.classList.remove('vendor-locked');
+            passwordSection.remove();
+        }
+
+        function checkVendorPassword() {
+            const password = passwordInput.value;
+
+            if (password === '8917219139') {
+                showUploadPortal();
+                return;
+            }
+
+            alert('Incorrect password. Please try again.');
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+
+        loginBtn.addEventListener('click', checkVendorPassword);
+        passwordInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                checkVendorPassword();
+            }
+        });
+
+        function setUploadStatus(message, type = 'info') {
+            uploadStatus.textContent = message;
+            uploadStatus.classList.remove('hidden', 'status-success', 'status-error', 'status-info');
+            uploadStatus.classList.add(`status-${type}`);
+        }
+
+        function clearUploadStatus() {
+            uploadStatus.textContent = '';
+            uploadStatus.classList.add('hidden');
+            uploadStatus.classList.remove('status-success', 'status-error', 'status-info');
+        }
+
+        function collectImageUrls() {
+            return [
+                imageUrl1Input.value.trim(),
+                imageUrl2Input.value.trim(),
+                imageUrl3Input.value.trim()
+            ];
+        }
+
+        productForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearUploadStatus();
+
+            const metalValue = document.getElementById('p-metal').value;
+            const stoneValue = document.getElementById('p-stone').value;
+            const [imageUrl, imageUrl2, imageUrl3] = collectImageUrls();
+
+            const product = {
+                name: document.getElementById('p-name').value,
+                description: document.getElementById('p-description').value,
+                price: document.getElementById('p-price').value,
+                category: document.getElementById('p-category').value,
+                metalType: metalValue,
+                stoneType: stoneValue,
+                vendor: document.getElementById('p-vendor').value,
+                imageUrl,
+                imageUrl2,
+                imageUrl3
+            };
+
+            if (!imageUrl) {
+                setUploadStatus('Image URL 1 is required.', 'error');
+                imageUrl1Input.focus();
+                return;
+            }
+
+            if (!product.category) {
+                setUploadStatus('Please select a jewellery category.', 'error');
+                return;
+            }
+
+            if (!metalValue) {
+                setUploadStatus('Please select a metal type.', 'error');
+                return;
+            }
+
+            if (!confirm('Upload this product to jewelBazaari?')) {
+                return;
+            }
+
+            const uploadBtn = document.getElementById('upload-btn');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Saving product...';
+
+            try {
+                setUploadStatus('Saving product...', 'info');
+                const saved = await addProduct(product);
+                setUploadStatus(`"${saved.name}" is now live across all matching sections.`, 'success');
+                productForm.reset();
+            } catch (error) {
+                console.error('Upload error:', error);
+                setUploadStatus(error.message || 'Saving the product failed. Please try again.', 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '✨ Upload Product to jewelBazaari';
+            }
+        });
+    </script>
+    <script type="module">
+        fetch('components/announcement.html')
+            .then((res) => res.text())
+            .then((html) => {
+                document.getElementById('announcement-placeholder').innerHTML = html;
+            });
+    </script>
+</body>
+</html>

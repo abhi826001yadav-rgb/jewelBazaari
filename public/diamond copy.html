@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemstones | jewelBazaari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div data-include="components/announcement.html"></div>
+    <div data-include="components/header.html"></div>
+
+    <div data-include="components/category-bar.html"></div>
+
+    <main class="py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <h1 class="text-4xl font-bold text-center mb-8">Gemstones Collection</h1>
+            <p class="text-center text-gray-600 mb-12">Explore our exquisite selection of handcrafted gemstone jewellery.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="border p-4 rounded-lg">
+                    <img src="images/photo1.jpg" alt="Gemstone Ring" class="w-full h-64 object-cover mb-4">
+                    <h2 class="text-lg font-bold">Ruby Elegance Ring</h2>
+                    <p class="text-gray-500">$299</p>
+                </div>
+                </div>
+        </div>
+    </main>
+
+    <div data-include="components/footer.html"></div>
+
+    <script>
+        // This script fetches your header, menu, and footer
+        document.querySelectorAll('[data-include]').forEach(el => {
+            fetch(el.getAttribute('data-include'))
+                .then(res => res.text())
+                .then(data => { el.outerHTML = data; });
+        });
+        // Initializes Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
