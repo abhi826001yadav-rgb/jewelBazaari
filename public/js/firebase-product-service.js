@@ -10,6 +10,7 @@ import {
     setDoc,
     getDoc,
     updateDoc,
+    deleteDoc,
     increment
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -266,6 +267,70 @@ export async function getProductsByCategory(category) {
  * Gemstones page: stoneType is set AND stoneType is not "diamond".
  * Uses Firestore `in` query for efficiency; falls back to client-side filter.
  */
+export async function updateProduct(productId, product) {
+    const id = String(productId || '').trim();
+    if (!id) {
+        throw new Error('Product ID is required.');
+    }
+
+    const metalType = (product.metalType || '').trim().toLowerCase();
+    const stoneType = (product.stoneType || '').trim().toLowerCase();
+    const imageUrl = String(product.imageUrl || '').trim();
+    const imageUrl2 = String(product.imageUrl2 || '').trim();
+    const imageUrl3 = String(product.imageUrl3 || '').trim();
+
+    const updateData = {
+        name: (product.name || '').trim(),
+        description: (product.description || '').trim(),
+        price: Number(product.price) || 0,
+        category: (product.category || '').trim().toLowerCase(),
+        metalType: metalType === 'none' ? '' : metalType,
+        stoneType,
+        vendor: (product.vendor || 'Verified Vendor').trim(),
+        imageUrl
+    };
+
+    if (!updateData.name) {
+        throw new Error('Product name is required.');
+    }
+    if (!updateData.category) {
+        throw new Error('Jewellery category is required.');
+    }
+    if (!updateData.imageUrl) {
+        throw new Error('Product image is required.');
+    }
+    if (!updateData.price || updateData.price <= 0) {
+        throw new Error('Valid price is required.');
+    }
+
+    if (imageUrl2) {
+        updateData.imageUrl2 = imageUrl2;
+    }
+    if (imageUrl3) {
+        updateData.imageUrl3 = imageUrl3;
+    }
+
+    await updateDoc(doc(db, PRODUCTS_COLLECTION, id), updateData);
+    return { id, productId: id, productCode: id, ...updateData };
+}
+
+export async function deleteProduct(productId) {
+    const id = String(productId || '').trim();
+    if (!id) {
+        throw new Error('Product ID is required.');
+    }
+
+    const productRef = doc(db, PRODUCTS_COLLECTION, id);
+    const existingDoc = await getDoc(productRef);
+
+    if (!existingDoc.exists()) {
+        throw new Error('Product not found.');
+    }
+
+    await deleteDoc(productRef);
+    return { id };
+}
+
 export async function incrementAddToCartCount(productId) {
     const id = String(productId || '').trim();
     if (!id) return;

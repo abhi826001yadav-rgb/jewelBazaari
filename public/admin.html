@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin • jewelBazaari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <style>
+        html, body {
+            margin: 0;
+            min-height: 100vh;
+        }
+        body {
+            background: #FAF7F2;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        body.admin-locked {
+            overflow: hidden;
+        }
+        .admin-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #4A0E17;
+        }
+        #password-section {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1F1A17 0%, #2C211F 100%);
+        }
+        #password-section.is-hidden {
+            display: none;
+        }
+        #admin-section {
+            display: none;
+        }
+        #admin-section.is-visible {
+            display: block;
+        }
+        .admin-table-wrap {
+            overflow-x: auto;
+            border: 1px solid rgba(155, 126, 75, 0.35);
+            border-radius: 0.75rem;
+            background: #fff;
+            box-shadow: 0 10px 30px -12px rgba(74, 14, 23, 0.15);
+        }
+        .admin-table {
+            width: 100%;
+            min-width: 40rem;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+            table-layout: fixed;
+        }
+        .admin-table th,
+        .admin-table td {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 0.75rem 0.875rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        .admin-table th {
+            position: sticky;
+            top: 0;
+            background: #4A0E17;
+            color: #C5A880;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 1;
+        }
+        .admin-table tbody tr:hover {
+            background: #fdf8f3;
+        }
+        .admin-table th:nth-child(1),
+        .admin-table td:nth-child(1) {
+            width: 2.5rem;
+            max-width: 2.5rem;
+            padding: 0.75rem 0.175rem 0.75rem 0.5rem;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .admin-table th:nth-child(2),
+        .admin-table td:nth-child(2) {
+            width: 4.85rem;
+            max-width: 4.85rem;
+            padding: 0.75rem 0.5rem 0.75rem 0.175rem;
+        }
+        .admin-table th:nth-child(3),
+        .admin-table td:nth-child(3) {
+            width: 14%;
+            max-width: 10rem;
+            padding-right: 0.525rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .admin-table th:nth-child(4),
+        .admin-table td:nth-child(4) {
+            padding-left: 0.525rem;
+        }
+        .admin-table td:nth-child(2) a {
+            display: block;
+            line-height: 0;
+        }
+        .admin-photo {
+            width: 4.5rem;
+            height: 4.5rem;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            display: block;
+        }
+
+        .admin-home-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.875rem;
+            color: #9B7E4B;
+            text-decoration: none;
+        }
+        .admin-home-btn:hover {
+            color: #4A0E17;
+        }
+        .admin-modify-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.65rem;
+            border-radius: 0.375rem;
+            border: 1px solid #9B7E4B;
+            background: #fff;
+            color: #4A0E17;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .admin-modify-btn:hover {
+            background: #4A0E17;
+            color: #C5A880;
+        }
+        #modify-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: rgba(31, 26, 23, 0.72);
+        }
+        #modify-modal.is-open {
+            display: flex;
+        }
+        .modify-modal-card {
+            width: 100%;
+            max-width: 32rem;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+            background: #FAF7F2;
+            border: 2px solid #9B7E4B;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.45);
+        }
+        .modify-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+        }
+        .modify-field:focus {
+            outline: none;
+            border-color: #9B7E4B;
+            box-shadow: 0 0 0 3px rgba(155, 126, 75, 0.2);
+        }
+        .modify-delete-btn {
+            width: 100%;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #b91c1c;
+            background: #fff;
+            color: #b91c1c;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .modify-delete-btn:hover:not(:disabled) {
+            background: #b91c1c;
+            color: #fff;
+        }
+        .modify-delete-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .admin-search-wrap {
+            margin-bottom: 1.25rem;
+        }
+        .admin-search-input {
+            width: 100%;
+            max-width: 28rem;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid rgba(155, 126, 75, 0.45);
+            border-radius: 9999px;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239B7E4B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat 0.9rem center;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+        .admin-search-input:focus {
+            outline: none;
+            border-color: #9B7E4B;
+            box-shadow: 0 0 0 3px rgba(155, 126, 75, 0.18);
+        }
+
+    </style>
+</head>
+<body class="admin-locked">
+
+    <div id="password-section" role="dialog" aria-label="Admin login">
+        <div class="max-w-md w-full mx-4">
+            <div class="bg-white rounded-3xl p-8 shadow-xl relative">
+                <a href="index.html" class="admin-home-btn" aria-label="Return to homepage">🏠 Home</a>
+                <div class="text-center mb-6">
+                    <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-3xl">🔐</span>
+                    </div>
+                    <h1 class="admin-title text-2xl font-bold">Admin Access</h1>
+                    <p class="text-gray-600 mt-2 text-sm">Enter the admin password to view all uploaded jewellery</p>
+                </div>
+                <div class="space-y-4">
+                    <input
+                        type="password"
+                        id="admin-password"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-amber-700"
+                        placeholder="Enter Password"
+                        autocomplete="current-password"
+                    >
+                    <button
+                        id="login-btn"
+                        type="button"
+                        class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition"
+                    >
+                        View Jewellery Records
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-section">
+        <div class="max-w-[96rem] mx-auto px-4 sm:px-6 py-8">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+                <div>
+                    <a href="index.html" class="inline-flex items-center gap-2 text-[#9B7E4B] hover:text-[#4A0E17] transition font-semibold text-sm mb-3">
+                        🏠 Back to Home
+                    </a>
+                    <h1 class="admin-title text-3xl font-bold">Admin Dashboard</h1>
+                    <p class="text-gray-500 text-sm mt-1"></p>
+                </div>
+            </div>
+
+            <div id="search-wrap" class="admin-search-wrap hidden">
+                <input
+                    type="search"
+                    id="admin-search"
+                    class="admin-search-input"
+                    placeholder="Search by Name, ID, Vendor Name etc"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div id="loading-state" class="text-center py-16 text-gray-500">Loading jewellery records...</div>
+            <div id="error-state" class="hidden text-center py-16 text-red-600"></div>
+            <div id="empty-state" class="hidden text-center py-16 text-gray-500">No jewellery has been uploaded yet.</div>
+            <div id="no-search-results" class="hidden text-center py-16 text-gray-500">No products match your search.</div>
+
+            <div id="table-container" class="admin-table-wrap hidden">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Modify</th>
+                            <th>Product ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modify-modal" role="dialog" aria-modal="true" aria-labelledby="modify-modal-title">
+        <div class="modify-modal-card">
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                    <h2 id="modify-modal-title" class="admin-title text-xl font-bold">Modify Product</h2>
+                    <p id="modify-product-id-label" class="text-xs text-gray-500 mt-1"></p>
+                </div>
+                <button type="button" id="modify-close-btn" class="text-gray-500 hover:text-[#4A0E17] text-2xl leading-none" aria-label="Close">&times;</button>
+            </div>
+            <form id="modify-form" class="space-y-3">
+                <input type="hidden" id="m-id">
+                <div>
+                    <label for="m-category" class="block text-xs font-semibold text-gray-600 mb-1">Category *</label>
+                    <select id="m-category" required class="modify-field">
+                        <option value="gold">Gold</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="gemstone">Gemstone</option>
+                        <option value="earrings">Earrings</option>
+                        <option value="rings">Rings</option>
+                        <option value="wedding">Wedding</option>
+                        <option value="combos">Combos</option>
+                        <option value="all-jewellery">All Jewellery</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="m-metal" class="block text-xs font-semibold text-gray-600 mb-1">Metal *</label>
+                    <select id="m-metal" required class="modify-field">
+                        <option value="gold">Gold</option>
+                        <option value="silver">Silver</option>
+                        <option value="platinum">Platinum</option>
+                        <option value="none">No Metal / Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="m-stone" class="block text-xs font-semibold text-gray-600 mb-1">Stone</label>
+                    <select id="m-stone" class="modify-field">
+                        <option value="">No Stone</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="emerald">Emerald</option>
+                        <option value="sapphire">Sapphire</option>
+                        <option value="pearl">Pearl</option>
+                        <option value="topaz">Topaz</option>
+                        <option value="amethyst">Amethyst</option>
+                        <option value="citrine">Citrine</option>
+                        <option value="garnet">Garnet</option>
+                        <option value="aquamarine">Aquamarine</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="m-name" class="block text-xs font-semibold text-gray-600 mb-1">Name *</label>
+                    <input type="text" id="m-name" required class="modify-field">
+                </div>
+                <div>
+                    <label for="m-description" class="block text-xs font-semibold text-gray-600 mb-1">Description</label>
+                    <textarea id="m-description" rows="3" class="modify-field resize-none"></textarea>
+                </div>
+                <div>
+                    <label for="m-image-url-1" class="block text-xs font-semibold text-gray-600 mb-1">Image URL 1 *</label>
+                    <input type="url" id="m-image-url-1" required class="modify-field">
+                </div>
+                <div>
+                    <label for="m-image-url-2" class="block text-xs font-semibold text-gray-600 mb-1">Image URL 2</label>
+                    <input type="url" id="m-image-url-2" class="modify-field">
+                </div>
+                <div>
+                    <label for="m-image-url-3" class="block text-xs font-semibold text-gray-600 mb-1">Image URL 3</label>
+                    <input type="url" id="m-image-url-3" class="modify-field">
+                </div>
+                <div>
+                    <label for="m-price" class="block text-xs font-semibold text-gray-600 mb-1">Price (₹) *</label>
+                    <input type="number" id="m-price" required min="1" class="modify-field">
+                </div>
+                <div>
+                    <label for="m-vendor" class="block text-xs font-semibold text-gray-600 mb-1">Vendor</label>
+                    <input type="text" id="m-vendor" class="modify-field">
+                </div>
+                <p id="modify-status" class="text-sm hidden" role="status"></p>
+                <button type="submit" id="modify-save-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-xl font-semibold transition">
+                    Save Changes
+                </button>
+                <button type="button" id="modify-delete-btn" class="modify-delete-btn">
+                    Delete Product
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getAllProducts, updateProduct, deleteProduct } from './js/firebase-product-service.js';
+        import { getProductImages } from './js/product-images.js';
+
+        const ADMIN_PASSWORD = '7338917927';
+        const passwordSection = document.getElementById('password-section');
+        const adminSection = document.getElementById('admin-section');
+        const passwordInput = document.getElementById('admin-password');
+        const loginBtn = document.getElementById('login-btn');
+        const loadingState = document.getElementById('loading-state');
+        const errorState = document.getElementById('error-state');
+        const emptyState = document.getElementById('empty-state');
+        const tableContainer = document.getElementById('table-container');
+        const tableBody = document.getElementById('products-table-body');
+        const modifyModal = document.getElementById('modify-modal');
+        const modifyForm = document.getElementById('modify-form');
+        const modifyCloseBtn = document.getElementById('modify-close-btn');
+        const modifyStatus = document.getElementById('modify-status');
+        const modifyProductIdLabel = document.getElementById('modify-product-id-label');
+        const searchWrap = document.getElementById('search-wrap');
+        const searchInput = document.getElementById('admin-search');
+        const noSearchResults = document.getElementById('no-search-results');
+        let productsCache = [];
+
+        function unlockAdmin() {
+            document.body.classList.remove('admin-locked');
+            passwordSection.classList.add('is-hidden');
+            passwordSection.setAttribute('aria-hidden', 'true');
+            adminSection.classList.add('is-visible');
+            loadProducts();
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function renderRow(product, index) {
+            const images = getProductImages(product);
+            const cover = images[0] || '';
+            const productId = product.productId || product.productCode || product.id || '—';
+
+            return `
+                <tr>
+                    <td class="font-semibold text-[#4A0E17]">${index}</td>
+                    <td>
+                        ${cover
+                            ? `<a href="${escapeHtml(cover)}" target="_blank" rel="noopener noreferrer">
+                                <img src="${escapeHtml(cover)}" alt="${escapeHtml(product.name)}" class="admin-photo">
+                               </a>`
+                            : '—'}
+                    </td>
+                    <td class="font-semibold text-gray-800" title="${escapeHtml(product.name || '')}">${escapeHtml(product.name || '—')}</td>
+                    <td>
+                        <button type="button" class="admin-modify-btn" data-modify-id="${escapeHtml(product.id)}">Modify</button>
+                    </td>
+                    <td class="text-xs text-gray-600 whitespace-nowrap">${escapeHtml(productId)}</td>
+                </tr>
+            `;
+        }
+
+        function getCreatedAtMillis(product) {
+            const ts = product?.createdAt;
+            if (!ts) return 0;
+            if (typeof ts.toMillis === 'function') return ts.toMillis();
+            if (ts.seconds) return ts.seconds * 1000;
+            return 0;
+        }
+
+        function getProductSearchText(product) {
+            const images = getProductImages(product);
+            return [
+                product.id,
+                product.productId,
+                product.productCode,
+                product.name,
+                product.vendor,
+                product.category,
+                product.metalType,
+                product.stoneType,
+                product.description,
+                product.price,
+                product.addToCartCount,
+                product.cartCount,
+                ...images
+            ]
+                .filter((value) => value !== undefined && value !== null && value !== '')
+                .join(' ')
+                .toLowerCase();
+        }
+
+        function filterProducts(query) {
+            const normalized = query.trim().toLowerCase();
+            if (!normalized) return productsCache;
+
+            return productsCache.filter((product) =>
+                getProductSearchText(product).includes(normalized)
+            );
+        }
+
+        function renderProductsTable(products) {
+            const query = searchInput.value.trim();
+
+            emptyState.classList.add('hidden');
+            noSearchResults.classList.add('hidden');
+            tableContainer.classList.add('hidden');
+
+            if (!productsCache.length) {
+                emptyState.classList.remove('hidden');
+                searchWrap.classList.add('hidden');
+                return;
+            }
+
+            searchWrap.classList.remove('hidden');
+
+            if (!products.length) {
+                noSearchResults.classList.remove('hidden');
+                return;
+            }
+
+            tableBody.innerHTML = products.map((product, index) => renderRow(product, index + 1)).join('');
+            tableContainer.classList.remove('hidden');
+            bindModifyButtons();
+        }
+
+        async function loadProducts() {
+            try {
+                const products = await getAllProducts();
+                const sorted = [...products].sort(
+                    (a, b) => getCreatedAtMillis(a) - getCreatedAtMillis(b)
+                );
+
+                loadingState.classList.add('hidden');
+                productsCache = sorted;
+                searchInput.value = '';
+                renderProductsTable(sorted);
+            } catch (error) {
+                console.error('Failed to load admin products:', error);
+                loadingState.classList.add('hidden');
+                errorState.textContent = 'Failed to load jewellery records. Please refresh and try again.';
+                errorState.classList.remove('hidden');
+            }
+        }
+
+        function setModifyStatus(message, type = 'info') {
+            modifyStatus.textContent = message;
+            modifyStatus.classList.remove('hidden', 'text-green-700', 'text-red-600', 'text-gray-600');
+            if (type === 'success') modifyStatus.classList.add('text-green-700');
+            else if (type === 'error') modifyStatus.classList.add('text-red-600');
+            else modifyStatus.classList.add('text-gray-600');
+        }
+
+        function openModifyModal(product) {
+            const productId = product.productId || product.productCode || product.id || '';
+            document.getElementById('m-id').value = product.id;
+            document.getElementById('m-category').value = product.category || 'all-jewellery';
+            document.getElementById('m-metal').value = product.metalType || 'none';
+            document.getElementById('m-stone').value = product.stoneType || '';
+            document.getElementById('m-name').value = product.name || '';
+            document.getElementById('m-description').value = product.description || '';
+            document.getElementById('m-image-url-1').value = product.imageUrl || '';
+            document.getElementById('m-image-url-2').value = product.imageUrl2 || '';
+            document.getElementById('m-image-url-3').value = product.imageUrl3 || '';
+            document.getElementById('m-price').value = product.price || '';
+            document.getElementById('m-vendor').value = product.vendor || '';
+            modifyProductIdLabel.textContent = `Product ID: ${productId}`;
+            modifyStatus.classList.add('hidden');
+            modifyModal.classList.add('is-open');
+        }
+
+        function closeModifyModal() {
+            modifyModal.classList.remove('is-open');
+            modifyForm.reset();
+        }
+
+        function bindModifyButtons() {
+            tableBody.querySelectorAll('[data-modify-id]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const product = productsCache.find((item) => item.id === button.dataset.modifyId);
+                    if (product) openModifyModal(product);
+                });
+            });
+        }
+
+        modifyCloseBtn.addEventListener('click', closeModifyModal);
+        modifyModal.addEventListener('click', (event) => {
+            if (event.target === modifyModal) closeModifyModal();
+        });
+
+        document.getElementById('modify-delete-btn').addEventListener('click', async () => {
+            const productId = document.getElementById('m-id').value;
+            const productName = document.getElementById('m-name').value.trim() || 'this product';
+            const deleteBtn = document.getElementById('modify-delete-btn');
+            const saveBtn = document.getElementById('modify-save-btn');
+
+            const confirmed = window.confirm(
+                `Delete "${productName}" permanently?\n\nThis will remove the product from the website and Firebase database. This cannot be undone.`
+            );
+            if (!confirmed) return;
+
+            try {
+                deleteBtn.disabled = true;
+                saveBtn.disabled = true;
+                setModifyStatus('Deleting product...', 'info');
+
+                await deleteProduct(productId);
+
+                closeModifyModal();
+                await loadProducts();
+            } catch (error) {
+                console.error('Failed to delete product:', error);
+                setModifyStatus(error.message || 'Failed to delete product.', 'error');
+            } finally {
+                deleteBtn.disabled = false;
+                saveBtn.disabled = false;
+            }
+        });
+
+        modifyForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const productId = document.getElementById('m-id').value;
+            const saveBtn = document.getElementById('modify-save-btn');
+
+            try {
+                saveBtn.disabled = true;
+                setModifyStatus('Saving changes...', 'info');
+
+                await updateProduct(productId, {
+                    name: document.getElementById('m-name').value,
+                    description: document.getElementById('m-description').value,
+                    price: document.getElementById('m-price').value,
+                    category: document.getElementById('m-category').value,
+                    metalType: document.getElementById('m-metal').value,
+                    stoneType: document.getElementById('m-stone').value,
+                    imageUrl: document.getElementById('m-image-url-1').value,
+                    imageUrl2: document.getElementById('m-image-url-2').value,
+                    imageUrl3: document.getElementById('m-image-url-3').value,
+                    vendor: document.getElementById('m-vendor').value
+                });
+
+                setModifyStatus('Product updated successfully.', 'success');
+                closeModifyModal();
+                await loadProducts();
+            } catch (error) {
+                console.error('Failed to update product:', error);
+                setModifyStatus(error.message || 'Failed to update product.', 'error');
+            } finally {
+                saveBtn.disabled = false;
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            renderProductsTable(filterProducts(searchInput.value));
+        });
+
+        loginBtn.addEventListener('click', () => {
+            if (passwordInput.value === ADMIN_PASSWORD) {
+                unlockAdmin();
+                return;
+            }
+            alert('Incorrect password. Please try again.');
+            passwordInput.value = '';
+            passwordInput.focus();
+        });
+
+        passwordInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

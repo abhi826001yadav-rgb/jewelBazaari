@@ -55,6 +55,59 @@
             padding: 1.5rem 0 2rem;
         }
 
+        .jb-trending-section {
+            padding-top: 4rem;
+            padding-bottom: 1.2rem;
+        }
+
+        .jb-new-arrivals-section {
+            padding-top: 1.2rem;
+            padding-bottom: 4rem;
+        }
+
+        #trending-featured-carousel.jb-shadow-carousel {
+            padding-bottom: 0.6rem;
+        }
+
+        @media (min-width: 1024px) {
+            .jb-trending-section {
+                padding-top: 6rem;
+                padding-bottom: 1.8rem;
+            }
+
+            .jb-new-arrivals-section {
+                padding-top: 1.8rem;
+                padding-bottom: 6rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .jb-trending-section {
+                padding-bottom: 1.2rem;
+            }
+
+            .jb-new-arrivals-section {
+                padding-top: 1.2rem;
+            }
+
+            #trending-featured-carousel.jb-shadow-carousel {
+                padding-top: 0.45rem;
+                padding-bottom: 0.6rem;
+            }
+
+            #new-arrivals-featured-carousel.jb-shadow-carousel {
+                padding-top: 0.45rem;
+            }
+
+            .jb-trending-section .jb-trending-header {
+                margin-bottom: 0.9rem;
+            }
+
+            .jb-new-arrivals-section .jb-new-arrivals-header {
+                margin-bottom: 0.9rem;
+            }
+        }
+
         .jb-shadow-carousel-stage {
             position: relative;
             min-height: 24rem;
@@ -186,6 +239,80 @@
                 font-size: 1.25rem;
             }
         }
+
+        /* Why jewelBazaari — one-at-a-time left-to-right carousel */
+        .jb-why-header {
+            margin-bottom: 0.96rem;
+        }
+
+        .jb-why-carousel-wrap {
+            max-width: 22rem;
+            margin-inline: auto;
+        }
+
+        .jb-why-swiper {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .jb-why-swiper .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            height: auto;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .jb-why-swiper .swiper-slide-active,
+        .jb-why-swiper .swiper-slide-next,
+        .jb-why-swiper .swiper-slide-prev {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .jb-why-feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 1.5rem;
+            text-align: center;
+            background: transparent;
+            border-radius: 0.5rem;
+            cursor: default;
+        }
+
+        .jb-why-feature-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 9999px;
+            background: transparent;
+            color: #C5A880;
+        }
+
+        .jb-why-feature-icon svg {
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+        }
+
+        .jb-why-feature-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .jb-why-feature-desc {
+            font-size: 0.75rem;
+            line-height: 1.5;
+            font-weight: 300;
+            color: #d1d5db;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="css/mobile-responsive.css">
@@ -229,9 +356,9 @@
         });
     </script>
 
-    <section class="bg-white py-16 lg:py-24">
+    <section class="jb-trending-section bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div class="jb-trending-header flex flex-col md:flex-row md:items-end justify-between mb-12">
                 <div>
                     <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Trending Now</h2>
                     <p class="text-gray-500 text-xs mt-1">Jewelry pieces everyone’s loving right now</p>
@@ -252,8 +379,8 @@
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div class="text-center max-w-xl mx-auto mb-12">
+    <section class="jb-new-arrivals-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="jb-new-arrivals-header text-center max-w-xl mx-auto mb-12">
             <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">New Arrivals</h2>
             <div class="h-[1px] w-20 bg-luxuryGold mx-auto my-3"></div>
             <p class="text-gray-500 text-xs tracking-wider uppercase">Fresh drops from verified sellers this week</p>
@@ -269,94 +396,57 @@
         </div>
     </section>
 
+
+
+
+
     <section class="bg-luxuryMaroon text-white py-16 lg:py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-xl mx-auto mb-16">
+            <div class="jb-why-header text-center max-w-xl mx-auto">
                 <h2 class="font-luxury text-3xl font-bold text-luxuryGoldLight">Why jewelBazaari?</h2>
-                <div class="h-[1px] w-20 bg-luxuryGoldLight mx-auto my-3"></div>
-                <p class="text-gray-300 text-xs tracking-wider uppercase">Redefining Premium Marketplace Trust</p>
+                <div class="h-[1px] w-20 bg-luxuryGoldLight mx-auto my-[0.45rem]"></div>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
-                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
-                        <i data-lucide="shield-check" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="font-luxury font-semibold text-lg">Absolute Trust</h3>
-                    <p class="text-gray-300 text-xs leading-relaxed font-light">Every single vendor goes through strict background and hallmark documentation verifications.</p>
-                </div>
-                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
-                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
-                        <i data-lucide="sparkles" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="font-luxury font-semibold text-lg">Affordable Luxury</h3>
-                    <p class="text-gray-300 text-xs leading-relaxed font-light">By cutting out middle-tier distributor channels, we bring fair prices straight from the creators.</p>
-                </div>
-                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
-                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
-                        <i data-lucide="package" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="font-luxury font-semibold text-lg">Unmatched Selection</h3>
-                    <p class="text-gray-300 text-xs leading-relaxed font-light">Discover unique regional designs from local jewelry hubs across India in one single place.</p>
-                </div>
-                <div class="space-y-3 p-6 bg-white/5 rounded-lg transition-transform duration-300 hover:-translate-y-2 hover:bg-white/10 cursor-default">
-                    <div class="mx-auto bg-white/10 w-12 h-12 flex items-center justify-center rounded-full text-luxuryGoldLight">
-                        <i data-lucide="heart" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="font-luxury font-semibold text-lg">Buyer Protection</h3>
-                    <p class="text-gray-300 text-xs leading-relaxed font-light">Your money is entirely safe with secure escrows until your verified product arrives safely at your doorstep.</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div class="text-center max-w-xl mx-auto mb-12">
-            <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Featured Sellers</h2>
-            <div class="h-[1px] w-20 bg-luxuryGold mx-auto my-3"></div>
-            <p class="text-gray-500 text-xs tracking-wider uppercase">Sellers celebrated for legacy and quality</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white border border-gray-100 overflow-hidden relative group">
-                <div class="h-48 bg-luxuryMaroon overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80" alt="Seller Banner" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-60">
-                </div>
-                <div class="p-6 text-center relative -mt-12">
-                    <div class="w-20 h-20 bg-white border-2 border-luxuryGold mx-auto rounded-full flex items-center justify-center overflow-hidden shadow-md">
-                        <span class="font-luxury font-bold text-luxuryMaroon text-xl">TD</span>
+            <div class="jb-why-carousel-wrap">
+                <div class="swiper jb-why-swiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="jb-why-feature">
+                                <div class="jb-why-feature-icon">
+                                    <i data-lucide="shield-check"></i>
+                                </div>
+                                <h3 class="jb-why-feature-title">Absolute Trust</h3>
+                                <p class="jb-why-feature-desc">Every single vendor goes through strict background and hallmark documentation verifications.</p>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="jb-why-feature">
+                                <div class="jb-why-feature-icon">
+                                    <i data-lucide="sparkles"></i>
+                                </div>
+                                <h3 class="jb-why-feature-title">Affordable Luxury</h3>
+                                <p class="jb-why-feature-desc">By cutting out middle-tier distributor channels, we bring fair prices straight from the creators.</p>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="jb-why-feature">
+                                <div class="jb-why-feature-icon">
+                                    <i data-lucide="package"></i>
+                                </div>
+                                <h3 class="jb-why-feature-title">Unmatched Selection</h3>
+                                <p class="jb-why-feature-desc">Discover unique regional designs from local jewelry hubs across India in one single place.</p>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="jb-why-feature">
+                                <div class="jb-why-feature-icon">
+                                    <i data-lucide="heart"></i>
+                                </div>
+                                <h3 class="jb-why-feature-title">Buyer Protection</h3>
+                                <p class="jb-why-feature-desc">Your money is entirely safe with secure escrows until your verified product arrives safely at your doorstep.</p>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="font-luxury font-bold text-lg text-luxuryDark mt-4">Tarika Diamonds</h3>
-                    <p class="text-xs text-luxuryGold font-semibold uppercase tracking-wider mb-2">Signature Partner</p>
-                    <p class="text-gray-500 text-xs line-clamp-2 px-4 mb-4">Renowned curated diamond architectures certified by global standards and crafted with absolute meticulous precision.</p>
-                    <a href="#" class="inline-block text-xs uppercase font-semibold tracking-widest text-luxuryMaroon border-b border-luxuryGold pb-1 hover:text-luxuryGold transition">Visit Store</a>
-                </div>
-            </div>
-            <div class="bg-white border border-gray-100 overflow-hidden relative group">
-                <div class="h-48 bg-luxuryMaroon overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=600&q=80" alt="Seller Banner" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-60">
-                </div>
-                <div class="p-6 text-center relative -mt-12">
-                    <div class="w-20 h-20 bg-white border-2 border-luxuryGold mx-auto rounded-full flex items-center justify-center overflow-hidden shadow-md">
-                        <span class="font-luxury font-bold text-luxuryMaroon text-xl">JG</span>
-                    </div>
-                    <h3 class="font-luxury font-bold text-lg text-luxuryDark mt-4">Jaipur Gem House</h3>
-                    <p class="text-xs text-luxuryGold font-semibold uppercase tracking-wider mb-2">Verified Antique Seller</p>
-                    <p class="text-gray-500 text-xs line-clamp-2 px-4 mb-4">Bringing traditional Rajasthan heritage, timeless Kundan, and Meenakari treasures straight to global collectors.</p>
-                    <a href="#" class="inline-block text-xs uppercase font-semibold tracking-widest text-luxuryMaroon border-b border-luxuryGold pb-1 hover:text-luxuryGold transition">Visit Store</a>
-                </div>
-            </div>
-            <div class="bg-white border border-gray-100 overflow-hidden relative group">
-                <div class="h-48 bg-luxuryMaroon overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80" alt="Seller Banner" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-60">
-                </div>
-                <div class="p-6 text-center relative -mt-12">
-                    <div class="w-20 h-20 bg-white border-2 border-luxuryGold mx-auto rounded-full flex items-center justify-center overflow-hidden shadow-md">
-                        <span class="font-luxury font-bold text-luxuryMaroon text-xl">MA</span>
-                    </div>
-                    <h3 class="font-luxury font-bold text-lg text-luxuryDark mt-4">Malabar Artisans</h3>
-                    <p class="text-xs text-luxuryGold font-semibold uppercase tracking-wider mb-2">Gold Expert</p>
-                    <p class="text-gray-500 text-xs line-clamp-2 px-4 mb-4">Preserving traditional lightweight and heavy bridal pure gold artistry handed down through generations of masters.</p>
-                    <a href="#" class="inline-block text-xs uppercase font-semibold tracking-widest text-luxuryMaroon border-b border-luxuryGold pb-1 hover:text-luxuryGold transition">Visit Store</a>
                 </div>
             </div>
         </div>
@@ -406,65 +496,9 @@
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div class="grid grid-cols-1 lg:grid-cols-2 bg-luxuryMaroon text-white overflow-hidden shadow-xl">
-            <div class="p-8 sm:p-12 lg:p-16 flex flex-col justify-center space-y-6">
-                <span class="text-luxuryGoldLight text-xs uppercase tracking-widest font-bold">Smart Smart Upgrades</span>
-                <h2 class="font-luxury text-3xl sm:text-4xl font-bold">The Luxury Gold Exchange Program</h2>
-                <p class="text-gray-300 text-xs sm:text-sm font-light leading-relaxed">
-                    Ready to upgrade your old jewelry? Bring your ancestral gold or old pieces to any of our verified partner showrooms (including Tarika Diamonds centers) across India. Secure the absolute best valuation market rates and instantly exchange it for modern marketplace selections.
-                </p>
-                <div class="pt-2">
-                    <a href="#" class="inline-block bg-white text-luxuryMaroon hover:bg-luxuryGoldLight hover:text-white px-6 py-3 text-xs tracking-widest uppercase font-semibold transition duration-300">
-                        Book An Appointment
-                    </a>
-                </div>
-            </div>
-            <div class="h-64 lg:h-auto min-h-[350px] relative">
-                <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80" alt="Gold melt exchange program" class="w-full h-full object-cover">
-            </div>
-        </div>
-    </section>
 
-    <section class="bg-white py-16 lg:py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-xl mx-auto mb-16">
-                <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Curated Collections</h2>
-                <div class="h-[1px] w-20 bg-luxuryGold mx-auto my-3"></div>
-                <p class="text-gray-500 text-xs tracking-wider uppercase">Shop by Occasion & Milestone</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=500&q=80" alt="Wedding" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
-                        <h3 class="font-luxury font-bold text-xl text-white">The Wedding Gala</h3>
-                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Regal Heavyweight Masterpieces</p>
-                    </div>
-                </div>
-                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=500&q=80" alt="Festive" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
-                        <h3 class="font-luxury font-bold text-xl text-white">Festive Radiance</h3>
-                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Celebrate Heritage Designs</p>
-                    </div>
-                </div>
-                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=500&q=80" alt="Daily Minimal" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
-                        <h3 class="font-luxury font-bold text-xl text-white">Modern Minimalist</h3>
-                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Office & Daily Wear Gems</p>
-                    </div>
-                </div>
-                <div class="h-80 bg-gray-100 relative group overflow-hidden cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=500&q=80" alt="Gifting" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
-                        <h3 class="font-luxury font-bold text-xl text-white">Luxury Gifting</h3>
-                        <p class="text-luxuryGoldLight text-[11px] uppercase tracking-wider mt-1">Tokens of Eternal Love</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
+
 
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 border-t border-gray-100">
         <div class="text-center max-w-xl mx-auto mb-12">
@@ -494,7 +528,7 @@
                     <div class="w-10 h-10 bg-luxuryGold rounded-full flex items-center justify-center text-white text-xs font-semibold">F</div>
                     <div>
                         <h4 class="text-xs font-bold text-luxuryDark">Abhishek Yadav</h4>
-                        <p class="text-[10px] text-luxuryGold font-medium uppercase tracking-wider">Founders, jewelBazaari</p>
+                        <p class="text-[10px] text-luxuryGold font-medium uppercase tracking-wider">Founder, jewelBazaari</p>
                     </div>
                 </div>
             </div>
@@ -516,6 +550,21 @@
 
     <script>
         lucide.createIcons();
+
+        if (document.querySelector('.jb-why-swiper')) {
+            new Swiper('.jb-why-swiper', {
+                loop: true,
+                slidesPerView: 1,
+                speed: 1866,
+                autoplay: {
+                    delay: 2334,
+                    reverseDirection: true,
+                    disableOnInteraction: false
+                },
+                allowTouchMove: true,
+                watchSlidesProgress: true
+            });
+        }
     </script>
     <script>
         document.querySelectorAll('[data-include]').forEach(el => {

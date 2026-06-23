@@ -465,8 +465,30 @@ video {
 }
 
 @media (min-width: 768px) {
+    .jb-header-nav {
+        gap: 2.5rem;
+    }
+
     .jb-header-nav-item {
-        font-size: 1rem;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .jb-header-nav-label {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+    }
+
+    .jb-header-nav-label > span[aria-hidden="true"] {
+        font-size: 1.125rem;
+        line-height: 1;
+        text-transform: none;
     }
 }
 
@@ -750,7 +772,7 @@ video {
     }
 
     .jb-header-standard .jb-header-nav {
-        gap: 1ch;
+        gap: 2.5rem;
         justify-content: flex-end;
     }
 }
