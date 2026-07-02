@@ -157,6 +157,7 @@ function normalizeProductData(product) {
         metalType: metalType === 'none' ? '' : metalType,
         stoneType,
         vendor: (product.vendor || 'Verified Vendor').trim(),
+        vendorId: (product.vendorId || '').trim().toLowerCase(),
         addToCartCount: 0,
         createdAt: serverTimestamp()
     };
@@ -287,6 +288,7 @@ export async function updateProduct(productId, product) {
         metalType: metalType === 'none' ? '' : metalType,
         stoneType,
         vendor: (product.vendor || 'Verified Vendor').trim(),
+        vendorId: (product.vendorId || '').trim().toLowerCase(),
         imageUrl
     };
 
@@ -312,6 +314,43 @@ export async function updateProduct(productId, product) {
 
     await updateDoc(doc(db, PRODUCTS_COLLECTION, id), updateData);
     return { id, productId: id, productCode: id, ...updateData };
+}
+
+export async function getProductsByVendorId(vendorId, shopName = '') {
+    const normalizedVendorId = String(vendorId || '').trim().toLowerCase();
+    const normalizedShopName = String(shopName || '').trim().toLowerCase();
+
+    if (!normalizedVendorId && !normalizedShopName) {
+        return [];
+    }
+
+    try {
+        if (normalizedVendorId) {
+            const q = query(
+                collection(db, PRODUCTS_COLLECTION),
+                where('vendorId', '==', normalizedVendorId)
+            );
+            const snapshot = await getDocs(q);
+            const products = sortByNewest(snapshot.docs.map(mapDoc));
+            if (products.length > 0) {
+                return products;
+            }
+        }
+    } catch (error) {
+        console.warn('Vendor product query failed, falling back to client filter.', error);
+    }
+
+    const all = await getAllProducts();
+    return all.filter((product) => {
+        const productVendorId = String(product.vendorId || '').trim().toLowerCase();
+        const productShopName = String(product.vendor || '').trim().toLowerCase();
+
+        if (normalizedVendorId && productVendorId) {
+            return productVendorId === normalizedVendorId;
+        }
+
+        return normalizedShopName && productShopName === normalizedShopName;
+    });
 }
 
 export async function deleteProduct(productId) {

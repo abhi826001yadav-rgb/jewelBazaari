@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Vendors • jewelBazaari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css">
+    <style>
+        html, body { margin: 0; min-height: 100vh; }
+        body {
+            background: linear-gradient(135deg, #1F1A17 0%, #2C211F 100%);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        body.vendor-locked { overflow: hidden; }
+        .luxury-card {
+            background: #FAF7F2;
+            border: 2px solid #9B7E4B;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+        h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #4A0E17;
+        }
+        input, select, textarea {
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #9B7E4B;
+            box-shadow: 0 0 0 4px rgba(155, 126, 75, 0.25);
+            outline: none;
+        }
+        .upload-btn {
+            background: #9B7E4B;
+            color: white;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .upload-btn:hover:not(:disabled) {
+            background: #4A0E17;
+            transform: translateY(-2px);
+        }
+        .upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .status-message { font-size: 0.875rem; line-height: 1.4; }
+        .status-success { color: #166534; }
+        .status-error { color: #B91C1C; }
+        .status-info { color: #4A0E17; }
+        #auth-section {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: #2C1810;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+        }
+        #auth-section.is-hidden {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+        #dashboard-section { display: none; min-height: 100vh; padding: 2rem 1rem 3rem; }
+        #dashboard-section.is-visible { display: block; }
+        .vendor-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .logout-btn {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .logout-btn:hover { color: #4A0E17; }
+        .dashboard-tab {
+            padding: 0.65rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .dashboard-tab.is-active {
+            background: #4A0E17;
+            color: #fff;
+            border-color: #4A0E17;
+        }
+        .dashboard-panel { display: none; }
+        .dashboard-panel.is-active { display: block; }
+        .product-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+        .product-card:hover { box-shadow: 0 8px 24px rgba(74, 14, 23, 0.12); }
+        .product-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #f3f4f6;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .edit-btn {
+            background: #FAF7F2;
+            color: #4A0E17;
+            border: 1px solid rgba(155, 126, 75, 0.45);
+        }
+        .edit-btn:hover { background: #4A0E17; color: #fff; }
+        .delete-btn {
+            background: #fef2f2;
+            color: #B91C1C;
+            border: 1px solid #fecaca;
+        }
+        .delete-btn:hover { background: #B91C1C; color: #fff; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: #6b7280;
+        }
+        select {
+            appearance: auto;
+            -webkit-appearance: menulist;
+            background-color: #fff;
+        }
+        .edit-banner {
+            display: none;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .edit-banner.is-visible { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    </style>
+</head>
+<body class="vendor-locked">
+
+    <div id="announcement-placeholder"></div>
+
+    <div id="auth-section" role="dialog" aria-label="Registered vendor login">
+        <div class="max-w-md w-full mx-4">
+            <div class="bg-white rounded-3xl p-8 shadow-xl relative luxury-card">
+                <a href="index.html" class="absolute top-4 left-4 text-sm text-[#4A0E17] hover:text-[#9B7E4B]">🏠 Home</a>
+                <div class="text-center mb-6 pt-6">
+                    <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-3xl">🔐</span>
+                    </div>
+                    <h2 class="text-2xl font-bold">Registered Vendors</h2>
+                    <p class="text-gray-600 mt-2 text-sm">Login with your Vendor ID and password to manage your jewellery uploads.</p>
+                </div>
+
+                <form id="vendor-login-form" class="space-y-3">
+                    <input type="text" id="login-vendor-id" required placeholder="Vendor ID *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="username">
+                    <input type="password" id="login-vendor-password" required placeholder="Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="current-password">
+                    <p class="text-xs text-gray-500">Only approved vendors can access this portal.</p>
+                    <p id="vendor-login-status" class="status-message hidden" role="status"></p>
+                    <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
+                        Login to Vendor Dashboard
+                    </button>
+                </form>
+
+                <p class="text-center text-sm text-gray-500 mt-6">
+                    Not registered yet?
+                    <a href="vendor-upload.html" class="text-[#9B7E4B] underline hover:text-[#4A0E17]">Become a Vendor</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-section">
+        <div class="max-w-5xl mx-auto mb-6 flex flex-wrap justify-between items-center gap-3 px-2">
+            <a href="index.html" class="flex items-center gap-2 text-[#EAB308] hover:text-[#F4C95F] transition font-semibold text-sm">
+                🏠 Back to Home
+            </a>
+            <div class="text-right">
+                <div id="vendor-session-badge" class="vendor-badge mb-1"></div>
+                <button type="button" id="logout-btn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-[#FAF7F2] mb-2">Vendor Dashboard</h2>
+                <p class="text-[#C5A880] text-sm">Upload new jewellery or manage your existing listings.</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+                <button type="button" class="dashboard-tab is-active" data-tab="upload">Upload Jewellery</button>
+                <button type="button" class="dashboard-tab" data-tab="listings">My Uploads</button>
+            </div>
+
+            <div id="panel-upload" class="dashboard-panel is-active">
+                <div class="max-w-lg mx-auto p-8 luxury-card rounded-3xl">
+                    <div id="edit-banner" class="edit-banner">
+                        <span>Editing: <strong id="edit-product-name"></strong></span>
+                        <button type="button" id="cancel-edit-btn" class="text-sm underline">Cancel</button>
+                    </div>
+
+                    <form id="product-form" class="space-y-4">
+                        <div>
+                            <label for="p-category" class="block text-sm font-medium text-gray-700 mb-1">Jewellery Category *</label>
+                            <select id="p-category" required class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                                <option value="">-- Select Category --</option>
+                                <option value="gold">Gold</option>
+                                <option value="diamond">Diamond</option>
+                                <option value="gemstone">Gemstone</option>
+                                <option value="earrings">Earrings</option>
+                                <option value="rings">Rings</option>
+                                <option value="wedding">Wedding</option>
+                                <option value="combos">Combos</option>
+                                <option value="all-jewellery">All Jewellery</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="p-metal" class="block text-sm font-medium text-gray-700 mb-1">Metal Type *</label>
+                            <select id="p-metal" required class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                                <option value="">-- Select Metal --</option>
+                                <option value="gold">Gold</option>
+                                <option value="silver">Silver</option>
+                                <option value="platinum">Platinum</option>
+                                <option value="none">No Metal / Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="p-stone" class="block text-sm font-medium text-gray-700 mb-1">Stone Type</label>
+                            <select id="p-stone" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                                <option value="">No Stone</option>
+                                <option value="diamond">Diamond</option>
+                                <option value="ruby">Ruby</option>
+                                <option value="emerald">Emerald</option>
+                                <option value="sapphire">Sapphire</option>
+                                <option value="pearl">Pearl</option>
+                                <option value="topaz">Topaz</option>
+                                <option value="amethyst">Amethyst</option>
+                                <option value="citrine">Citrine</option>
+                                <option value="garnet">Garnet</option>
+                                <option value="aquamarine">Aquamarine</option>
+                            </select>
+                        </div>
+                        <input type="text" id="p-name" required placeholder="Product Name *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                        <textarea id="p-description" rows="3" placeholder="Description" class="w-full p-4 border-2 border-gray-300 rounded-2xl resize-none"></textarea>
+                        <div>
+                            <label for="p-image-url-1" class="block text-sm font-medium text-gray-700 mb-1">Image URL 1 *</label>
+                            <input type="url" id="p-image-url-1" required placeholder="Direct link of first image" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                        </div>
+                        <div>
+                            <label for="p-image-url-2" class="block text-sm font-medium text-gray-700 mb-1">Image URL 2 (Optional)</label>
+                            <input type="url" id="p-image-url-2" placeholder="Direct link of second image" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                        </div>
+                        <div>
+                            <label for="p-image-url-3" class="block text-sm font-medium text-gray-700 mb-1">Image URL 3 (Optional)</label>
+                            <input type="url" id="p-image-url-3" placeholder="Direct link of third image" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                        </div>
+                        <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17]">
+                            <p class="font-semibold mb-1">Image hosting tip</p>
+                            <p>Upload photos to <a href="https://postimages.org" target="_blank" rel="noopener noreferrer" class="text-[#9B7E4B] underline">postimages.org</a> and paste the Direct Link here (max 3 images).</p>
+                        </div>
+                        <input type="number" id="p-price" required min="1" placeholder="Price (₹) *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                        <p id="upload-status" class="status-message hidden" role="status" aria-live="polite"></p>
+                        <button type="submit" id="submit-btn" class="w-full upload-btn py-4 rounded-2xl text-lg shadow-lg">
+                            ✨ Upload Product
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="panel-listings" class="dashboard-panel">
+                <div class="luxury-card rounded-3xl p-6">
+                    <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+                        <h3 class="text-xl font-bold text-[#4A0E17]">Your Uploads</h3>
+                        <button type="button" id="refresh-listings-btn" class="text-sm text-[#9B7E4B] underline hover:text-[#4A0E17]">Refresh</button>
+                    </div>
+                    <p id="listings-status" class="status-message hidden mb-4" role="status"></p>
+                    <div id="listings-loading" class="text-center py-12 text-gray-500 hidden">Loading your uploads...</div>
+                    <div id="listings-empty" class="empty-state hidden">
+                        <p class="text-4xl mb-3">📦</p>
+                        <p class="font-medium text-gray-700">No uploads yet</p>
+                        <p class="text-sm mt-1">Switch to Upload Jewellery to add your first product.</p>
+                    </div>
+                    <div id="listings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            addProduct,
+            updateProduct,
+            deleteProduct,
+            getProductsByVendorId
+        } from './js/firebase-product-service.js';
+        import {
+            loginVendor,
+            logoutVendor,
+            getCurrentApprovedVendor
+        } from './js/vendor-service.js';
+
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const vendorLoginForm = document.getElementById('vendor-login-form');
+        const vendorLoginStatus = document.getElementById('vendor-login-status');
+        const vendorSessionBadge = document.getElementById('vendor-session-badge');
+        const productForm = document.getElementById('product-form');
+        const uploadStatus = document.getElementById('upload-status');
+        const submitBtn = document.getElementById('submit-btn');
+        const editBanner = document.getElementById('edit-banner');
+        const editProductName = document.getElementById('edit-product-name');
+        const listingsGrid = document.getElementById('listings-grid');
+        const listingsEmpty = document.getElementById('listings-empty');
+        const listingsLoading = document.getElementById('listings-loading');
+        const listingsStatus = document.getElementById('listings-status');
+
+        let currentVendor = null;
+        let editingProductId = null;
+        let vendorProducts = [];
+
+        function setStatus(element, message, type = 'info') {
+            element.textContent = message;
+            element.classList.remove('hidden', 'status-success', 'status-error', 'status-info');
+            element.classList.add(`status-${type}`);
+        }
+
+        function clearStatus(element) {
+            element.textContent = '';
+            element.classList.add('hidden');
+            element.classList.remove('status-success', 'status-error', 'status-info');
+        }
+
+        function formatPrice(value) {
+            const amount = Number(value) || 0;
+            return `₹${amount.toLocaleString('en-IN')}`;
+        }
+
+        function productBelongsToVendor(product) {
+            if (!currentVendor) return false;
+            const vendorId = String(currentVendor.vendorId || '').trim().toLowerCase();
+            const shopName = String(currentVendor.shopName || '').trim().toLowerCase();
+            const productVendorId = String(product.vendorId || '').trim().toLowerCase();
+            const productShopName = String(product.vendor || '').trim().toLowerCase();
+
+            if (vendorId && productVendorId) {
+                return productVendorId === vendorId;
+            }
+            return shopName && productShopName === shopName;
+        }
+
+        function showDashboard(vendor) {
+            currentVendor = vendor;
+            authSection.classList.add('is-hidden');
+            dashboardSection.classList.add('is-visible');
+            document.body.classList.remove('vendor-locked');
+            vendorSessionBadge.textContent = `${vendor.shopName} (${vendor.vendorId})`;
+            loadVendorListings();
+        }
+
+        function showLogin() {
+            currentVendor = null;
+            editingProductId = null;
+            vendorProducts = [];
+            authSection.classList.remove('is-hidden');
+            dashboardSection.classList.remove('is-visible');
+            document.body.classList.add('vendor-locked');
+            vendorSessionBadge.textContent = '';
+            resetProductForm();
+            listingsGrid.innerHTML = '';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.dashboard-tab').forEach((tab) => {
+                tab.classList.toggle('is-active', tab.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.dashboard-panel').forEach((panel) => {
+                panel.classList.toggle('is-active', panel.id === `panel-${tabName}`);
+            });
+            if (tabName === 'listings') {
+                loadVendorListings();
+            }
+        }
+
+        function resetProductForm() {
+            productForm.reset();
+            editingProductId = null;
+            editBanner.classList.remove('is-visible');
+            submitBtn.textContent = '✨ Upload Product';
+            clearStatus(uploadStatus);
+        }
+
+        function fillProductForm(product) {
+            document.getElementById('p-category').value = product.category || '';
+            document.getElementById('p-metal').value = product.metalType || 'none';
+            document.getElementById('p-stone').value = product.stoneType || '';
+            document.getElementById('p-name').value = product.name || '';
+            document.getElementById('p-description').value = product.description || '';
+            document.getElementById('p-image-url-1').value = product.imageUrl || '';
+            document.getElementById('p-image-url-2').value = product.imageUrl2 || '';
+            document.getElementById('p-image-url-3').value = product.imageUrl3 || '';
+            document.getElementById('p-price').value = product.price || '';
+        }
+
+        function collectProductPayload() {
+            const metalValue = document.getElementById('p-metal').value;
+            const stoneValue = document.getElementById('p-stone').value;
+            return {
+                name: document.getElementById('p-name').value,
+                description: document.getElementById('p-description').value,
+                price: document.getElementById('p-price').value,
+                category: document.getElementById('p-category').value,
+                metalType: metalValue,
+                stoneType: stoneValue,
+                vendor: currentVendor?.shopName || '',
+                vendorId: currentVendor?.vendorId || '',
+                imageUrl: document.getElementById('p-image-url-1').value.trim(),
+                imageUrl2: document.getElementById('p-image-url-2').value.trim(),
+                imageUrl3: document.getElementById('p-image-url-3').value.trim()
+            };
+        }
+
+        function renderListings() {
+            listingsGrid.innerHTML = '';
+
+            if (!vendorProducts.length) {
+                listingsEmpty.classList.remove('hidden');
+                return;
+            }
+
+            listingsEmpty.classList.add('hidden');
+
+            vendorProducts.forEach((product) => {
+                const card = document.createElement('article');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.imageUrl || ''}" alt="${product.name || 'Product'}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22400%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%239ca3af%22 text-anchor=%22middle%22 dy=%22.3em%22%3ENo image%3C/text%3E%3C/svg%3E'">
+                    <div class="p-4">
+                        <h4 class="font-semibold text-[#4A0E17] truncate">${product.name || 'Unnamed'}</h4>
+                        <p class="text-sm text-gray-500 capitalize mt-1">${product.category || '—'} · ${formatPrice(product.price)}</p>
+                        <p class="text-xs text-gray-400 mt-1 truncate">${product.id}</p>
+                        <div class="flex gap-2 mt-4">
+                            <button type="button" class="action-btn edit-btn" data-edit="${product.id}">Edit</button>
+                            <button type="button" class="action-btn delete-btn" data-delete="${product.id}">Delete</button>
+                        </div>
+                    </div>
+                `;
+                listingsGrid.appendChild(card);
+            });
+
+            listingsGrid.querySelectorAll('[data-edit]').forEach((button) => {
+                button.addEventListener('click', () => startEditProduct(button.dataset.edit));
+            });
+
+            listingsGrid.querySelectorAll('[data-delete]').forEach((button) => {
+                button.addEventListener('click', () => removeProduct(button.dataset.delete));
+            });
+        }
+
+        async function loadVendorListings() {
+            if (!currentVendor) return;
+
+            listingsLoading.classList.remove('hidden');
+            listingsEmpty.classList.add('hidden');
+            clearStatus(listingsStatus);
+
+            try {
+                vendorProducts = await getProductsByVendorId(currentVendor.vendorId, currentVendor.shopName);
+                renderListings();
+            } catch (error) {
+                console.error('Listings load error:', error);
+                setStatus(listingsStatus, error.message || 'Could not load your uploads.', 'error');
+            } finally {
+                listingsLoading.classList.add('hidden');
+            }
+        }
+
+        function startEditProduct(productId) {
+            const product = vendorProducts.find((item) => item.id === productId);
+            if (!product || !productBelongsToVendor(product)) {
+                setStatus(listingsStatus, 'You can only edit your own uploads.', 'error');
+                return;
+            }
+
+            editingProductId = productId;
+            fillProductForm(product);
+            editProductName.textContent = product.name || 'Product';
+            editBanner.classList.add('is-visible');
+            submitBtn.textContent = '💾 Save Changes';
+            switchTab('upload');
+            clearStatus(uploadStatus);
+        }
+
+        async function removeProduct(productId) {
+            const product = vendorProducts.find((item) => item.id === productId);
+            if (!product || !productBelongsToVendor(product)) {
+                setStatus(listingsStatus, 'You can only delete your own uploads.', 'error');
+                return;
+            }
+
+            if (!confirm(`Delete "${product.name}"? This cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                await deleteProduct(productId);
+                if (editingProductId === productId) {
+                    resetProductForm();
+                }
+                setStatus(listingsStatus, `"${product.name}" was deleted.`, 'success');
+                await loadVendorListings();
+            } catch (error) {
+                console.error('Delete error:', error);
+                setStatus(listingsStatus, error.message || 'Delete failed.', 'error');
+            }
+        }
+
+        vendorLoginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearStatus(vendorLoginStatus);
+
+            const vendorId = document.getElementById('login-vendor-id').value.trim();
+            const password = document.getElementById('login-vendor-password').value;
+            const loginBtn = document.getElementById('vendor-login-btn');
+
+            try {
+                loginBtn.disabled = true;
+                setStatus(vendorLoginStatus, 'Signing in...', 'info');
+                const vendor = await loginVendor({ vendorId, password });
+                vendorLoginForm.reset();
+                showDashboard(vendor);
+            } catch (error) {
+                console.error('Vendor login error:', error);
+                if (error.code === 'vendor/pending-approval') {
+                    setStatus(vendorLoginStatus, error.message, 'info');
+                } else {
+                    setStatus(vendorLoginStatus, error.message || 'Login failed.', 'error');
+                }
+            } finally {
+                loginBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await logoutVendor();
+            showLogin();
+        });
+
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+            resetProductForm();
+        });
+
+        document.getElementById('refresh-listings-btn').addEventListener('click', () => {
+            loadVendorListings();
+        });
+
+        document.querySelectorAll('.dashboard-tab').forEach((tab) => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        productForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearStatus(uploadStatus);
+
+            const product = collectProductPayload();
+
+            if (!product.imageUrl) {
+                setStatus(uploadStatus, 'Image URL 1 is required.', 'error');
+                return;
+            }
+            if (!product.category) {
+                setStatus(uploadStatus, 'Please select a jewellery category.', 'error');
+                return;
+            }
+            if (!product.metalType) {
+                setStatus(uploadStatus, 'Please select a metal type.', 'error');
+                return;
+            }
+
+            const isEditing = Boolean(editingProductId);
+            const confirmMessage = isEditing
+                ? 'Save changes to this product?'
+                : 'Upload this product to jewelBazaari?';
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = isEditing ? 'Saving changes...' : 'Uploading...';
+
+            try {
+                if (isEditing) {
+                    const existing = vendorProducts.find((item) => item.id === editingProductId);
+                    if (!existing || !productBelongsToVendor(existing)) {
+                        throw new Error('You can only edit your own uploads.');
+                    }
+                    const saved = await updateProduct(editingProductId, product);
+                    setStatus(uploadStatus, `"${saved.name}" was updated successfully.`, 'success');
+                    resetProductForm();
+                    await loadVendorListings();
+                    switchTab('listings');
+                } else {
+                    const saved = await addProduct(product);
+                    setStatus(uploadStatus, `"${saved.name}" is now live across all matching sections.`, 'success');
+                    productForm.reset();
+                    await loadVendorListings();
+                }
+            } catch (error) {
+                console.error('Product save error:', error);
+                setStatus(uploadStatus, error.message || 'Could not save product.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = editingProductId ? '💾 Save Changes' : '✨ Upload Product';
+            }
+        });
+
+        (async function restoreSession() {
+            try {
+                const approvedVendor = await getCurrentApprovedVendor();
+                if (approvedVendor) {
+                    showDashboard(approvedVendor);
+                }
+            } catch (error) {
+                console.error('Session restore failed:', error);
+            }
+        })();
+    </script>
+    <script type="module">
+        import { loadPageComponents } from './js/load-components.js';
+        document.getElementById('announcement-placeholder').setAttribute('data-include', 'components/announcement.html');
+        loadPageComponents('#announcement-placeholder');
+    </script>
+</body>
+</html>
