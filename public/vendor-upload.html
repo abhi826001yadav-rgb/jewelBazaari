@@ -85,7 +85,7 @@
         .status-info {
             color: #4A0E17;
         }
-        #password-section {
+        #auth-section {
             position: fixed;
             inset: 0;
             z-index: 100;
@@ -94,11 +94,87 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
         }
-        #password-section.is-hidden {
+        #auth-section.is-hidden {
             display: none !important;
             visibility: hidden !important;
             pointer-events: none !important;
+        }
+        .auth-page {
+            display: none;
+        }
+        .auth-page.is-active {
+            display: block;
+        }
+        .page-label {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9B7E4B;
+            margin-bottom: 0.35rem;
+        }
+        .page-title {
+            text-align: center;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #4A0E17;
+            margin-bottom: 1rem;
+        }
+        .auth-switch-link {
+            display: block;
+            width: 100%;
+            margin-top: 0.75rem;
+            text-align: center;
+            font-size: 0.8125rem;
+            color: #9B7E4B;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .auth-switch-link:hover {
+            color: #4A0E17;
+        }
+        .authenticated-email {
+            text-align: center;
+            font-size: 0.8125rem;
+            color: #166534;
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            border-radius: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .auth-note {
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        .vendor-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .logout-btn {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .logout-btn:hover {
+            color: #4A0E17;
         }
         .vendor-home-btn {
             position: absolute;
@@ -132,49 +208,219 @@
         #upload-section.is-visible {
             display: block;
         }
+        #auth-loading {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #4A0E17;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        #auth-card.is-loading #auth-card-body {
+            display: none;
+        }
+        select {
+            appearance: auto;
+            -webkit-appearance: menulist;
+            background-color: #fff;
+        }
+        select option {
+            color: #111827;
+            background: #fff;
+        }
+        .google-signin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid #dadce0;
+            border-radius: 1rem;
+            background: #fff;
+            color: #3c4043;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+        .google-signin-btn:hover:not(:disabled) {
+            background: #f8f9fa;
+            box-shadow: 0 1px 3px rgba(60, 64, 67, 0.2);
+        }
+        .google-signin-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+        .google-signin-btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+        }
+        .google-user-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            background: #FAF7F2;
+            border: 1px solid rgba(155, 126, 75, 0.25);
+        }
+        .google-user-chip img {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            object-fit: cover;
+        }
+        .vendor-choice-btn {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .vendor-register-btn {
+            background: #4A0E17;
+            color: #fff;
+            border: 1px solid #4A0E17;
+        }
+        .vendor-register-btn:hover {
+            background: #000;
+        }
+        .vendor-login-choice-btn {
+            background: #fff;
+            color: #4A0E17;
+            border: 1px solid rgba(155, 126, 75, 0.45);
+        }
+        .vendor-login-choice-btn:hover {
+            background: #FAF7F2;
+        }
+        .auth-back-link {
+            display: block;
+            width: 100%;
+            margin-top: 0.75rem;
+            text-align: center;
+            font-size: 0.8125rem;
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .auth-back-link:hover {
+            color: #4A0E17;
+        }
     </style>
 </head>
 <body class="vendor-locked">
 
     <div id="announcement-placeholder"></div>
 
-    <div id="password-section" role="dialog" aria-label="Vendor login">
+    <div id="auth-section" role="dialog" aria-label="Vendor registration and login">
         <div class="max-w-md w-full mx-4">
-            <div class="bg-white rounded-3xl p-8 shadow-xl relative">
+            <div id="auth-card" class="bg-white rounded-3xl p-8 shadow-xl relative is-loading">
+                <div id="auth-loading">Loading vendor portal...</div>
+                <div id="auth-card-body">
                 <a href="index.html" class="vendor-home-btn" aria-label="Return to homepage">🏠 Home</a>
                 <div class="text-center mb-6">
                     <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                        <span class="text-3xl">🔐</span>
+                        <span class="text-3xl">🏪</span>
                     </div>
-                    <h2 class="text-2xl font-bold text-[#4A0E17]">Vendor Access</h2>
-                    <p class="text-gray-600 mt-2 text-sm">Enter the vendor password to continue</p>
+                    <h2 class="text-2xl font-bold text-[#4A0E17]">Vendor Portal</h2>
+                    <p class="text-gray-600 mt-2 text-sm">Register as a new vendor or login to upload jewellery.</p>
                 </div>
-                <div class="space-y-4">
-                    <input
-                        type="password"
-                        id="vendor-password"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-amber-700"
-                        placeholder="Enter Password"
-                        autocomplete="current-password"
-                    >
-                    <button
-                        id="login-btn"
-                        type="button"
-                        class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition"
-                    >
-                        Access Vendor Portal
-                    </button>
+
+                <div id="page-welcome" class="auth-page is-active">
+                    <p class="page-label">Page 1 of 3</p>
+                    <p class="page-title">Welcome</p>
+                    <p class="auth-note text-center mb-4">New vendor? Register with Google. Already approved? Login with your Vendor ID.</p>
+                    <div class="space-y-3">
+                        <button type="button" id="go-register-btn" class="vendor-choice-btn vendor-register-btn">Register</button>
+                        <button type="button" id="go-login-btn" class="vendor-choice-btn vendor-login-choice-btn">Login</button>
+                    </div>
+                </div>
+
+                <div id="page-google-auth" class="auth-page">
+                    <p class="page-label">Page 2 of 3</p>
+                    <p class="page-title">Google Authentication</p>
+                    <p id="google-auth-status" class="status-message hidden mb-3" role="status"></p>
+
+                    <div id="google-auth-new" class="space-y-3">
+                        <p class="auth-note text-center">Sign in with your real Google account to continue registration.</p>
+                        <button type="button" id="google-signin-btn" class="google-signin-btn">
+                            <svg viewBox="0 0 48 48" aria-hidden="true">
+                                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                            </svg>
+                            Sign in with Google
+                        </button>
+                    </div>
+
+                    <div id="google-auth-resume" class="hidden space-y-3">
+                        <div id="google-user-chip" class="google-user-chip hidden">
+                            <img id="google-user-photo" src="" alt="" width="40" height="40">
+                            <div class="min-w-0">
+                                <p id="google-user-name" class="text-sm font-semibold text-[#4A0E17] truncate"></p>
+                                <p id="resume-email-label" class="text-xs text-gray-500 truncate"></p>
+                            </div>
+                        </div>
+                        <p class="auth-note text-center">Google sign-in complete. Continue to Page 3.</p>
+                        <button type="button" id="go-page3-setup-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
+                            Continue to Page 3
+                        </button>
+                        <button type="button" id="google-signout-btn" class="w-full text-sm text-[#9B7E4B] underline">Use a different Google account</button>
+                    </div>
+
+                    <button type="button" id="back-to-welcome-from-google" class="auth-back-link">← Back to Page 1</button>
+                </div>
+
+                <div id="page-vendor-setup" class="auth-page">
+                    <p class="page-label">Page 3 of 3</p>
+                    <p class="page-title">Create Vendor Credentials</p>
+                    <p id="authenticated-email-label" class="authenticated-email"></p>
+                    <form id="vendor-setup-form" class="space-y-3">
+                        <input type="text" id="vendor-shop-name" required placeholder="Shop Name *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="organization">
+                        <input type="text" id="vendor-id" required placeholder="Vendor ID * (unique, not your email)" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="username">
+                        <input type="password" id="vendor-password" required minlength="6" placeholder="Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="new-password">
+                        <input type="password" id="vendor-password-confirm" required minlength="6" placeholder="Confirm Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="new-password">
+                        <p class="auth-note">Vendor ID and Vendor Password are unique to you and used for jewellery upload login after admin approval.</p>
+                        <p id="vendor-setup-status" class="status-message hidden" role="status"></p>
+                        <button type="submit" id="vendor-setup-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
+                            Submit for Admin Approval
+                        </button>
+                    </form>
+                    <button type="button" id="back-to-google-from-setup" class="auth-back-link">← Back to Page 2</button>
+                </div>
+
+                <div id="page-vendor-login" class="auth-page">
+                    <p class="page-label">Page 3 of 3</p>
+                    <p class="page-title">Vendor Login</p>
+                    <form id="vendor-login-form" class="space-y-3">
+                        <input type="text" id="login-vendor-id" required placeholder="Vendor ID *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="username">
+                        <input type="password" id="login-vendor-password" required placeholder="Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="current-password">
+                        <p class="auth-note">Login only works after admin approves your vendor application.</p>
+                        <p id="vendor-login-status" class="status-message hidden" role="status"></p>
+                        <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
+                            Login &amp; Upload Jewellery
+                        </button>
+                    </form>
+                    <button type="button" id="back-to-welcome-from-login" class="auth-back-link">← Back to Page 1</button>
+                </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="upload-section">
-        <div class="max-w-lg mx-auto mb-6 flex justify-between items-center px-2">
+        <div class="max-w-lg mx-auto mb-6 flex justify-between items-center px-2 gap-3">
             <a href="index.html" class="flex items-center gap-2 text-[#EAB308] hover:text-[#F4C95F] transition font-semibold text-sm">
                 🏠 Back to Home
             </a>
-            <span class="text-xs text-gray-400">jewelBazaari Vendor Portal</span>
+            <div class="text-right">
+                <div id="vendor-session-badge" class="vendor-badge mb-1"></div>
+                <button type="button" id="logout-btn" class="logout-btn">Logout</button>
+            </div>
         </div>
 
         <div class="max-w-lg mx-auto p-10 bg-[#FAF7F2] rounded-3xl shadow-2xl border-2 border-[#9B7E4B] luxury-card">
@@ -249,7 +495,7 @@
                 </div>
                 <p id="upload-status" class="status-message hidden" role="status" aria-live="polite"></p>
                 <input type="number" id="p-price" required min="1" placeholder="Price (₹) *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                <input type="text" id="p-vendor" placeholder="Vendor / Shop Name" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                <input type="text" id="p-vendor" placeholder="Vendor / Shop Name" readonly class="w-full p-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
 
                 <button type="submit" id="upload-btn" class="w-full upload-btn py-4 mt-4 rounded-2xl text-lg tracking-wider shadow-lg">
                     ✨ Upload Product to jewelBazaari
@@ -264,44 +510,309 @@
 
     <script type="module">
         import { addProduct } from './js/firebase-product-service.js';
+        import {
+            signInWithGoogle,
+            completeVendorProfile,
+            loginVendor,
+            logoutVendor,
+            getCurrentApprovedVendor,
+            getRegistrationProgress,
+            watchVendorAuth
+        } from './js/vendor-service.js';
+        import { auth } from './js/firebase-config.js';
+        import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-        const passwordSection = document.getElementById('password-section');
+        const authSection = document.getElementById('auth-section');
         const uploadSection = document.getElementById('upload-section');
-        const passwordInput = document.getElementById('vendor-password');
-        const loginBtn = document.getElementById('login-btn');
+        const pageWelcome = document.getElementById('page-welcome');
+        const pageGoogleAuth = document.getElementById('page-google-auth');
+        const pageVendorSetup = document.getElementById('page-vendor-setup');
+        const pageVendorLogin = document.getElementById('page-vendor-login');
+        const googleAuthNew = document.getElementById('google-auth-new');
+        const googleAuthResume = document.getElementById('google-auth-resume');
+        const googleUserChip = document.getElementById('google-user-chip');
+        const googleUserPhoto = document.getElementById('google-user-photo');
+        const googleUserName = document.getElementById('google-user-name');
+        const resumeEmailLabel = document.getElementById('resume-email-label');
+        const vendorSetupForm = document.getElementById('vendor-setup-form');
+        const vendorLoginForm = document.getElementById('vendor-login-form');
+        const googleAuthStatus = document.getElementById('google-auth-status');
+        const vendorSetupStatus = document.getElementById('vendor-setup-status');
+        const vendorLoginStatus = document.getElementById('vendor-login-status');
+        const authenticatedEmailLabel = document.getElementById('authenticated-email-label');
         const productForm = document.getElementById('product-form');
         const imageUrl1Input = document.getElementById('p-image-url-1');
         const imageUrl2Input = document.getElementById('p-image-url-2');
         const imageUrl3Input = document.getElementById('p-image-url-3');
         const uploadStatus = document.getElementById('upload-status');
+        const vendorSessionBadge = document.getElementById('vendor-session-badge');
+        const vendorNameInput = document.getElementById('p-vendor');
 
-        function showUploadPortal() {
-            passwordSection.classList.add('is-hidden');
-            passwordSection.setAttribute('aria-hidden', 'true');
-            uploadSection.classList.add('is-visible');
-            document.body.classList.remove('vendor-locked');
-            passwordSection.remove();
+        let currentVendor = null;
+        const authCard = document.getElementById('auth-card');
+        let authReady = false;
+
+        function finishAuthLoading() {
+            if (authReady) return;
+            authReady = true;
+            authCard.classList.remove('is-loading');
         }
 
-        function checkVendorPassword() {
-            const password = passwordInput.value;
+        function setPanelStatus(element, message, type = 'info') {
+            element.textContent = message;
+            element.classList.remove('hidden', 'status-success', 'status-error', 'status-info');
+            element.classList.add(`status-${type}`);
+        }
 
-            if (password === '8917219139') {
-                showUploadPortal();
+        function clearPanelStatus(element) {
+            element.textContent = '';
+            element.classList.add('hidden');
+            element.classList.remove('status-success', 'status-error', 'status-info');
+        }
+
+        function showAuthPage(page) {
+            pageWelcome.classList.toggle('is-active', page === 'welcome');
+            pageGoogleAuth.classList.toggle('is-active', page === 'google');
+            pageVendorSetup.classList.toggle('is-active', page === 'setup');
+            pageVendorLogin.classList.toggle('is-active', page === 'login');
+        }
+
+        function showUploadPortal(vendor) {
+            currentVendor = vendor;
+            authSection.classList.add('is-hidden');
+            authSection.setAttribute('aria-hidden', 'true');
+            uploadSection.classList.add('is-visible');
+            document.body.classList.remove('vendor-locked');
+            vendorSessionBadge.textContent = `${vendor.shopName} (${vendor.vendorId})`;
+            vendorNameInput.value = vendor.shopName;
+        }
+
+        function showAuthPortal(page = 'welcome') {
+            currentVendor = null;
+            authSection.classList.remove('is-hidden');
+            authSection.setAttribute('aria-hidden', 'false');
+            uploadSection.classList.remove('is-visible');
+            document.body.classList.add('vendor-locked');
+            vendorSessionBadge.textContent = '';
+            vendorNameInput.value = '';
+            showAuthPage(page);
+        }
+
+        function showGoogleSignInForm() {
+            googleAuthNew.classList.remove('hidden');
+            googleAuthResume.classList.add('hidden');
+            googleUserChip.classList.add('hidden');
+        }
+
+        function showGoogleResumePanel({ email, displayName = '', photoURL = '' }, message = '', messageType = 'info') {
+            googleAuthNew.classList.add('hidden');
+            googleAuthResume.classList.remove('hidden');
+            googleUserChip.classList.remove('hidden');
+            googleUserName.textContent = displayName || email;
+            resumeEmailLabel.textContent = email;
+            if (photoURL) {
+                googleUserPhoto.src = photoURL;
+                googleUserPhoto.alt = displayName || 'Google account';
+            } else {
+                googleUserPhoto.removeAttribute('src');
+                googleUserPhoto.alt = '';
+            }
+            if (message) {
+                setPanelStatus(googleAuthStatus, message, messageType);
+            }
+        }
+
+        async function openVendorSetupPage(progress = {}) {
+            const email = progress.email || auth.currentUser?.email || '';
+            const displayName = progress.displayName || auth.currentUser?.displayName || '';
+            authenticatedEmailLabel.textContent = displayName
+                ? `Signed in as ${displayName} (${email})`
+                : `Signed in as ${email}`;
+            showAuthPage('setup');
+            clearPanelStatus(vendorSetupStatus);
+        }
+
+        async function resumeRegistrationIfNeeded() {
+            const progress = await getRegistrationProgress();
+
+            if (progress.step === 2) {
+                showAuthPage('google');
+                showGoogleResumePanel(progress, 'Continue registration on Page 3.', 'info');
                 return;
             }
 
-            alert('Incorrect password. Please try again.');
-            passwordInput.value = '';
-            passwordInput.focus();
+            if (progress.step === 3) {
+                showAuthPage('login');
+                setPanelStatus(vendorLoginStatus, 'Application submitted. Login with Vendor ID after admin approval.', 'info');
+                return;
+            }
         }
 
-        loginBtn.addEventListener('click', checkVendorPassword);
-        passwordInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                checkVendorPassword();
+        async function handleGoogleSignIn(autoContinue = true) {
+            clearPanelStatus(googleAuthStatus);
+            const signInBtn = document.getElementById('google-signin-btn');
+
+            try {
+                signInBtn.disabled = true;
+                setPanelStatus(googleAuthStatus, 'Opening Google sign-in...', 'info');
+
+                const result = await signInWithGoogle();
+
+                if (result.profileCompleted) {
+                    showAuthPage('login');
+                    setPanelStatus(
+                        vendorLoginStatus,
+                        'This Google account already submitted an application. Login with Vendor ID after admin approval.',
+                        'info'
+                    );
+                    return;
+                }
+
+                if (autoContinue) {
+                    await openVendorSetupPage(result);
+                    return;
+                }
+
+                showGoogleResumePanel(result, 'Google sign-in successful. Continue to Page 3.', 'success');
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                setPanelStatus(googleAuthStatus, error.message || 'Google sign-in failed.', 'error');
+            } finally {
+                signInBtn.disabled = false;
             }
+        }
+
+        document.getElementById('go-register-btn').addEventListener('click', async () => {
+            clearPanelStatus(googleAuthStatus);
+            showAuthPage('google');
+            showGoogleSignInForm();
+
+            const progress = await getRegistrationProgress();
+            if (progress.step === 2) {
+                showGoogleResumePanel(progress, 'You already signed in with Google.', 'info');
+            } else if (progress.step === 3) {
+                showAuthPage('login');
+                setPanelStatus(vendorLoginStatus, 'You already registered. Login with Vendor ID after admin approval.', 'info');
+            }
+        });
+
+        document.getElementById('go-login-btn').addEventListener('click', () => {
+            clearPanelStatus(vendorLoginStatus);
+            showAuthPage('login');
+        });
+
+        document.getElementById('back-to-welcome-from-google').addEventListener('click', () => {
+            clearPanelStatus(googleAuthStatus);
+            showAuthPage('welcome');
+        });
+
+        document.getElementById('back-to-welcome-from-login').addEventListener('click', () => {
+            clearPanelStatus(vendorLoginStatus);
+            showAuthPage('welcome');
+        });
+
+        document.getElementById('back-to-google-from-setup').addEventListener('click', () => {
+            clearPanelStatus(vendorSetupStatus);
+            showAuthPage('google');
+        });
+
+        document.getElementById('google-signin-btn').addEventListener('click', () => handleGoogleSignIn(true));
+
+        document.getElementById('go-page3-setup-btn').addEventListener('click', async () => {
+            const continueBtn = document.getElementById('go-page3-setup-btn');
+            try {
+                continueBtn.disabled = true;
+                const progress = await getRegistrationProgress();
+                if (!progress.user) {
+                    setPanelStatus(googleAuthStatus, 'Please sign in with Google first.', 'error');
+                    showGoogleSignInForm();
+                    return;
+                }
+                await openVendorSetupPage(progress);
+            } catch (error) {
+                setPanelStatus(googleAuthStatus, error.message || 'Could not continue to Page 3.', 'error');
+            } finally {
+                continueBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('google-signout-btn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                showGoogleSignInForm();
+                clearPanelStatus(googleAuthStatus);
+                setPanelStatus(googleAuthStatus, 'Signed out. Choose another Google account.', 'info');
+            } catch (error) {
+                setPanelStatus(googleAuthStatus, error.message || 'Could not sign out.', 'error');
+            }
+        });
+
+        vendorSetupForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearPanelStatus(vendorSetupStatus);
+
+            const shopName = document.getElementById('vendor-shop-name').value.trim();
+            const vendorId = document.getElementById('vendor-id').value.trim();
+            const vendorPassword = document.getElementById('vendor-password').value;
+            const vendorPasswordConfirm = document.getElementById('vendor-password-confirm').value;
+            const submitBtn = document.getElementById('vendor-setup-btn');
+
+            try {
+                submitBtn.disabled = true;
+                setPanelStatus(vendorSetupStatus, 'Submitting vendor application...', 'info');
+
+                const result = await completeVendorProfile({
+                    shopName,
+                    vendorId,
+                    vendorPassword,
+                    vendorPasswordConfirm
+                });
+
+                vendorSetupForm.reset();
+                showAuthPage('login');
+                setPanelStatus(
+                    vendorLoginStatus,
+                    `Application submitted for "${result.shopName}" (${result.vendorId}). Wait for admin approval, then login with Vendor ID and Vendor Password.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Vendor setup error:', error);
+                setPanelStatus(vendorSetupStatus, error.message || 'Could not submit vendor application.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        vendorLoginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearPanelStatus(vendorLoginStatus);
+
+            const vendorId = document.getElementById('login-vendor-id').value.trim();
+            const password = document.getElementById('login-vendor-password').value;
+            const loginBtn = document.getElementById('vendor-login-btn');
+
+            try {
+                loginBtn.disabled = true;
+                setPanelStatus(vendorLoginStatus, 'Signing in...', 'info');
+
+                const vendor = await loginVendor({ vendorId, password });
+                showUploadPortal(vendor);
+            } catch (error) {
+                console.error('Vendor login error:', error);
+
+                if (error.code === 'vendor/pending-approval') {
+                    setPanelStatus(vendorLoginStatus, error.message, 'info');
+                } else {
+                    setPanelStatus(vendorLoginStatus, error.message || 'Login failed.', 'error');
+                }
+            } finally {
+                loginBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await logoutVendor();
+            showAuthPortal('welcome');
         });
 
         function setUploadStatus(message, type = 'info') {
@@ -339,7 +850,7 @@
                 category: document.getElementById('p-category').value,
                 metalType: metalValue,
                 stoneType: stoneValue,
-                vendor: document.getElementById('p-vendor').value,
+                vendor: vendorNameInput.value || currentVendor?.shopName || '',
                 imageUrl,
                 imageUrl2,
                 imageUrl3
@@ -374,6 +885,7 @@
                 const saved = await addProduct(product);
                 setUploadStatus(`"${saved.name}" is now live across all matching sections.`, 'success');
                 productForm.reset();
+                vendorNameInput.value = currentVendor?.shopName || '';
             } catch (error) {
                 console.error('Upload error:', error);
                 setUploadStatus(error.message || 'Saving the product failed. Please try again.', 'error');
@@ -382,13 +894,31 @@
                 uploadBtn.textContent = '✨ Upload Product to jewelBazaari';
             }
         });
+
+        watchVendorAuth(async () => {
+            try {
+                const approvedVendor = await getCurrentApprovedVendor();
+                if (approvedVendor) {
+                    finishAuthLoading();
+                    showUploadPortal(approvedVendor);
+                    return;
+                }
+
+                showAuthPage('welcome');
+                await resumeRegistrationIfNeeded();
+            } catch (error) {
+                console.error('Session restore failed:', error);
+                showAuthPage('welcome');
+            } finally {
+                finishAuthLoading();
+            }
+        });
     </script>
     <script type="module">
-        fetch('components/announcement.html')
-            .then((res) => res.text())
-            .then((html) => {
-                document.getElementById('announcement-placeholder').innerHTML = html;
-            });
+        import { loadPageComponents } from './js/load-components.js';
+
+        document.getElementById('announcement-placeholder').setAttribute('data-include', 'components/announcement.html');
+        loadPageComponents('#announcement-placeholder');
     </script>
 </body>
 </html>

@@ -566,27 +566,18 @@
             });
         }
     </script>
-    <script>
-        document.querySelectorAll('[data-include]').forEach(el => {
-            fetch(el.getAttribute('data-include'))
-                .then(res => res.text())
-                .then(data => {
-                    el.outerHTML = data;
-                    if (window.jewelBazaariCart && window.jewelBazaariCart.updateCartBadge) {
-                        window.jewelBazaariCart.updateCartBadge();
-                    }
-                    import('./js/wishlist-ui.js').then(({ updateWishlistBadge }) => updateWishlistBadge());
-                });
-        });
-    </script>
     <script type="module">
+        import { loadPageComponents } from './js/load-components.js';
         import { initCartUI, updateCartBadge, syncCartButtonStates } from './js/cart-ui.js';
         import { initWishlistUI, updateWishlistBadge, syncWishlistHeartStates, buildWishlistHeartButton } from './js/wishlist-ui.js';
-        import './js/category-nav.js';
+        import { initCategoryNav } from './js/category-nav.js';
         import { getTrendingProducts, getAllProducts } from './js/firebase-product-service.js';
         import { getCoverImage, getProductImages } from './js/product-images.js';
         import { initProductGalleryUI } from './js/product-ui.js';
         import { initShadowCarousel, destroyShadowCarousel } from './js/home-featured-carousel.js';
+
+        await loadPageComponents();
+        initCategoryNav();
 
         window.jewelBazaariCart = { updateCartBadge };
         initCartUI();

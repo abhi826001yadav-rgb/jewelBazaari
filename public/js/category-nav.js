@@ -219,8 +219,3 @@ export function initCategoryNav() {
     }, { passive: true });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCategoryNav);
-} else {
-    initCategoryNav();
-}

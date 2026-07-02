@@ -7,7 +7,6 @@ import {
     getTotalItems,
     getTotalAmount
 } from './cart-service.js';
-import './category-nav.js';
 
 function formatPrice(amount) {
     return `₹${Number(amount || 0).toLocaleString('en-IN')}`;

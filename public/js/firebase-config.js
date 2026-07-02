@@ -1,18 +1,18 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB2qTMc6KyLQPQWfCk7ENJAwzS8vqobc18",
+  apiKey: "AIzaSyAgNhB28vIQRlMOrFGoV5E7FcNk3bqMjPU",
   authDomain: "jewelbazaari.firebaseapp.com",
   projectId: "jewelbazaari",
-  storageBucket: "jewelbazaari.appspot.com",
+  storageBucket: "jewelbazaari.firebasestorage.app",
   messagingSenderId: "733760448297",
-  appId: "1:733760448297:web:421633a1e0fab027007938",
-  measurementId: "G-KTJKGE3PWJ"
+  appId: "1:733760448297:web:42775cbb975bf029007938",
+  measurementId: "G-Z74N8C61NX"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+export const auth = getAuth(app);
 export const db = getFirestore(app);

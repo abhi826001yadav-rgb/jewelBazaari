@@ -153,37 +153,16 @@ if (document.readyState === 'loading') {
 }
 
 export async function loadPageLayout() {
+    const { loadPageComponents } = await import('./load-components.js');
     const announcementEl = document.getElementById('announcement-placeholder');
     const headerEl = document.getElementById('header-placeholder');
     const categoryEl = document.getElementById('category-placeholder');
 
-    const requests = [];
+    if (announcementEl) announcementEl.setAttribute('data-include', 'components/announcement.html');
+    if (headerEl) headerEl.setAttribute('data-include', 'components/header.html');
+    if (categoryEl) categoryEl.setAttribute('data-include', 'components/category-bar.html');
 
-    if (announcementEl) {
-        requests.push(
-            fetch('components/announcement.html')
-                .then((res) => res.text())
-                .then((html) => { announcementEl.innerHTML = html; })
-        );
-    }
-
-    if (headerEl) {
-        requests.push(
-            fetch('components/header.html')
-                .then((res) => res.text())
-                .then((html) => { headerEl.innerHTML = html; })
-        );
-    }
-
-    if (categoryEl) {
-        requests.push(
-            fetch('components/category-bar.html')
-                .then((res) => res.text())
-                .then((html) => { categoryEl.innerHTML = html; })
-        );
-    }
-
-    await Promise.all(requests);
+    await loadPageComponents('#announcement-placeholder, #header-placeholder, #category-placeholder');
 
     if (window.lucide) {
         window.lucide.createIcons();
