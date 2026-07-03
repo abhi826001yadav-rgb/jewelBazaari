@@ -1,4 +1,34 @@
 let initialized = false;
+let mobileMenuScrollY = 0;
+
+function isMobileMenuOpen() {
+    return document.getElementById('jb-mobile-menu')?.classList.contains('jb-mobile-menu-open') ?? false;
+}
+
+function lockMobileMenuScroll() {
+    mobileMenuScrollY = window.scrollY || window.pageYOffset || 0;
+    document.documentElement.classList.add('jb-mobile-menu-body-lock');
+    document.body.classList.add('jb-mobile-menu-body-lock');
+    document.body.style.top = `-${mobileMenuScrollY}px`;
+}
+
+function unlockMobileMenuScroll() {
+    document.documentElement.classList.remove('jb-mobile-menu-body-lock');
+    document.body.classList.remove('jb-mobile-menu-body-lock');
+    document.body.style.top = '';
+    window.scrollTo(0, mobileMenuScrollY);
+}
+
+function preventBackgroundScroll(event) {
+    if (!isMobileMenuOpen()) return;
+
+    const menu = document.getElementById('jb-mobile-menu');
+    if (menu?.contains(event.target)) {
+        return;
+    }
+
+    event.preventDefault();
+}
 
 function isMobileNav() {
     return window.matchMedia('(max-width: 767px)').matches;
@@ -124,7 +154,7 @@ function closeMobileMenu() {
     toggle?.setAttribute('aria-expanded', 'false');
     menu?.setAttribute('aria-hidden', 'true');
     backdrop?.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
+    unlockMobileMenuScroll();
 }
 
 function openMobileMenu() {
@@ -140,7 +170,7 @@ function openMobileMenu() {
     toggle?.setAttribute('aria-expanded', 'true');
     menu?.setAttribute('aria-hidden', 'false');
     backdrop?.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    lockMobileMenuScroll();
 }
 
 function handleMobileGoldPrice(event) {
@@ -160,6 +190,9 @@ export function initCategoryNav() {
     initialized = true;
 
     ensureMoreBackdrop();
+
+    document.addEventListener('touchmove', preventBackgroundScroll, { passive: false });
+    document.addEventListener('wheel', preventBackgroundScroll, { passive: false });
 
     document.addEventListener('click', (event) => {
         const mobileToggle = event.target.closest('#jb-mobile-menu-toggle');

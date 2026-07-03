@@ -193,18 +193,35 @@ video {
     transform: translateY(-7px) rotate(-45deg);
 }
 
+html.jb-mobile-menu-body-lock,
+body.jb-mobile-menu-body-lock {
+    overflow: hidden !important;
+    height: 100%;
+}
+
+body.jb-mobile-menu-body-lock {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    right: 0;
+    touch-action: none;
+}
+
 .jb-mobile-menu-backdrop {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
     z-index: 255;
+    touch-action: none;
+    overscroll-behavior: none;
 }
 
 .jb-mobile-menu {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
     width: min(85vw, 300px);
     background: linear-gradient(180deg, #4A0E17 0%, #3A0A12 55%, #2A0A0F 100%);
     color: #fff;
@@ -212,6 +229,10 @@ video {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
 }
 
