@@ -1,4 +1,5 @@
 import { db } from './firebase-config.js';
+import { validateProductImageUrls } from './image-url-utils.js';
 import {
     collection,
     getDocs,
@@ -144,9 +145,15 @@ function buildProductId(categoryPrefix, yyyymmdd, hhmmss, serial) {
 function normalizeProductData(product) {
     const metalType = (product.metalType || '').trim().toLowerCase();
     const stoneType = (product.stoneType || '').trim().toLowerCase();
-    const imageUrl = String(product.imageUrl || '').trim();
-    const imageUrl2 = String(product.imageUrl2 || '').trim();
-    const imageUrl3 = String(product.imageUrl3 || '').trim();
+    const {
+        imageUrl,
+        imageUrl2,
+        imageUrl3
+    } = validateProductImageUrls({
+        imageUrl: product.imageUrl,
+        imageUrl2: product.imageUrl2,
+        imageUrl3: product.imageUrl3
+    });
 
     const normalized = {
         name: (product.name || '').trim(),
@@ -276,9 +283,15 @@ export async function updateProduct(productId, product) {
 
     const metalType = (product.metalType || '').trim().toLowerCase();
     const stoneType = (product.stoneType || '').trim().toLowerCase();
-    const imageUrl = String(product.imageUrl || '').trim();
-    const imageUrl2 = String(product.imageUrl2 || '').trim();
-    const imageUrl3 = String(product.imageUrl3 || '').trim();
+    const {
+        imageUrl,
+        imageUrl2,
+        imageUrl3
+    } = validateProductImageUrls({
+        imageUrl: product.imageUrl,
+        imageUrl2: product.imageUrl2,
+        imageUrl3: product.imageUrl3
+    });
 
     const updateData = {
         name: (product.name || '').trim(),
