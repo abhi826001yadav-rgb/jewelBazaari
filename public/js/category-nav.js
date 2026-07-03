@@ -65,20 +65,51 @@ function openMoreMenu(group) {
 function collapseMobileSubmenus() {
     document.querySelectorAll('.jb-mobile-menu-group.jb-mobile-submenu-open').forEach((group) => {
         group.classList.remove('jb-mobile-submenu-open');
+        setMobileSubmenuExpanded(group, false);
     });
 }
 
 function toggleMobileSubmenu(expandBtn) {
-    const group = expandBtn.closest('.jb-mobile-menu-group');
+    const group = expandBtn?.closest('.jb-mobile-menu-group');
     if (!group) return;
 
     const willOpen = !group.classList.contains('jb-mobile-submenu-open');
 
     document.querySelectorAll('.jb-mobile-menu-group.jb-mobile-submenu-open').forEach((openGroup) => {
-        if (openGroup !== group) openGroup.classList.remove('jb-mobile-submenu-open');
+        if (openGroup !== group) {
+            openGroup.classList.remove('jb-mobile-submenu-open');
+            setMobileSubmenuExpanded(openGroup, false);
+        }
     });
 
     group.classList.toggle('jb-mobile-submenu-open', willOpen);
+    setMobileSubmenuExpanded(group, willOpen);
+}
+
+function setMobileSubmenuExpanded(group, isOpen) {
+    const expanded = String(isOpen);
+    group.querySelector('.jb-mobile-menu-expand')?.setAttribute('aria-expanded', expanded);
+    group.querySelector('.jb-mobile-menu-trigger')?.setAttribute('aria-expanded', expanded);
+}
+
+function handleMobileMenuRowTap(event) {
+    const row = event.target.closest('.jb-mobile-menu-row');
+    if (!row || event.target.closest('.jb-mobile-submenu')) {
+        return false;
+    }
+
+    const group = row.closest('.jb-mobile-menu-group');
+    const submenu = group?.querySelector('.jb-mobile-submenu');
+    const expandBtn = group?.querySelector('.jb-mobile-menu-expand');
+
+    if (!group || !submenu || !expandBtn) {
+        return false;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    toggleMobileSubmenu(expandBtn);
+    return true;
 }
 
 function closeMobileMenu() {
@@ -134,10 +165,8 @@ export function initCategoryNav() {
         const mobileToggle = event.target.closest('#jb-mobile-menu-toggle');
         const mobileClose = event.target.closest('#jb-mobile-menu-close');
         const mobileBackdrop = event.target.id === 'jb-mobile-menu-backdrop';
-        const mobileExpand = event.target.closest('.jb-mobile-menu-expand');
         const mobileGoldPrice = event.target.closest('[data-mobile-gold-price]');
         const mobileSubLink = event.target.closest('.jb-mobile-submenu-link');
-        const mobileLink = event.target.closest('.jb-mobile-menu-link:not([data-mobile-gold-price])');
         const moreToggle = event.target.closest('.jb-more-toggle');
 
         if (mobileToggle) {
@@ -156,10 +185,7 @@ export function initCategoryNav() {
             return;
         }
 
-        if (mobileExpand) {
-            event.preventDefault();
-            event.stopPropagation();
-            toggleMobileSubmenu(mobileExpand);
+        if (handleMobileMenuRowTap(event)) {
             return;
         }
 
@@ -169,11 +195,6 @@ export function initCategoryNav() {
         }
 
         if (mobileSubLink) {
-            closeMobileMenu();
-            return;
-        }
-
-        if (mobileLink) {
             closeMobileMenu();
             return;
         }
