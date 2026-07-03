@@ -10,6 +10,27 @@ service cloud.firestore {
         ];
     }
 
+    function vendorData(vendorId) {
+      return get(/databases/$(database)/documents/vendors/$(vendorId)).data;
+    }
+
+    function isApprovedVendorOwner(vendorId) {
+      return request.auth != null
+        && vendorId is string
+        && vendorId.size() > 0
+        && exists(/databases/$(database)/documents/vendors/$(vendorId))
+        && vendorData(vendorId).uid == request.auth.uid
+        && vendorData(vendorId).status == 'approved';
+    }
+
+    function hasValidProductFields(data) {
+      return data.name is string && data.name.size() > 0
+        && data.price is number && data.price > 0
+        && data.category is string && data.category.size() > 0
+        && data.imageUrl is string && data.imageUrl.size() > 0
+        && data.vendorId is string && data.vendorId.size() > 0;
+    }
+
     match /vendors/{vendorId} {
       allow read: if true;
       allow create: if request.auth != null
@@ -21,10 +42,16 @@ service cloud.firestore {
 
     match /products/{productId} {
       allow read: if true;
-      allow create: if true;
+      allow create: if isAdmin()
+        || (hasValidProductFields(request.resource.data)
+          && isApprovedVendorOwner(request.resource.data.vendorId));
       allow update: if isAdmin()
-        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['addToCartCount']);
-      allow delete: if isAdmin();
+        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['addToCartCount'])
+        || (hasValidProductFields(request.resource.data)
+          && resource.data.vendorId == request.resource.data.vendorId
+          && isApprovedVendorOwner(resource.data.vendorId));
+      allow delete: if isAdmin()
+        || isApprovedVendorOwner(resource.data.vendorId);
     }
 
     match /customerQueries/{queryId} {

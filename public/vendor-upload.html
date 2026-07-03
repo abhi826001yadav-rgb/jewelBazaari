@@ -793,7 +793,7 @@
 
             try {
                 loginBtn.disabled = true;
-                setPanelStatus(vendorLoginStatus, 'Signing in...', 'info');
+                setPanelStatus(vendorLoginStatus, 'Checking credentials, then Google sign-in...', 'info');
 
                 const vendor = await loginVendor({ vendorId, password });
                 showUploadPortal(vendor);

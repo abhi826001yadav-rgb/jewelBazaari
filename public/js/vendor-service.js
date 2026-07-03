@@ -102,6 +102,32 @@ async function verifyVendorPassword(vendor, password) {
     return expected === vendor.vendorPasswordHash;
 }
 
+async function ensureVendorFirebaseSession(vendor) {
+    if (!vendor?.uid) {
+        throw new Error('Vendor account is missing Google login. Contact jewelBazaari support.');
+    }
+
+    const user = auth.currentUser;
+    if (user?.uid === vendor.uid) {
+        return;
+    }
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    let userCredential;
+    try {
+        userCredential = await signInWithPopup(auth, provider);
+    } catch (error) {
+        throw new Error(getAuthErrorMessage(error));
+    }
+
+    if (userCredential.user.uid !== vendor.uid) {
+        await signOut(auth).catch(() => {});
+        throw new Error('Use the same Google account you used when registering as a vendor.');
+    }
+}
+
 export function saveVendorSession(vendor) {
     sessionStorage.setItem(VENDOR_SESSION_KEY, JSON.stringify({
         vendorId: vendor.vendorId,
@@ -355,6 +381,7 @@ export async function loginVendor({ vendorId, password }) {
         emailVerified: true
     };
 
+    await ensureVendorFirebaseSession(sessionVendor);
     saveVendorSession(sessionVendor);
     return sessionVendor;
 }
@@ -460,6 +487,12 @@ export async function getCurrentApprovedVendor() {
 
     const vendor = await getVendorByVendorId(session.vendorId);
     if (!vendor || vendor.status !== VENDOR_STATUS.APPROVED) {
+        clearVendorSession();
+        return null;
+    }
+
+    const user = auth.currentUser;
+    if (!user || user.uid !== vendor.uid) {
         clearVendorSession();
         return null;
     }
