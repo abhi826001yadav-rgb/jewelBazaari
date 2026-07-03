@@ -102,29 +102,14 @@ async function verifyVendorPassword(vendor, password) {
     return expected === vendor.vendorPasswordHash;
 }
 
-async function ensureVendorFirebaseSession(vendor) {
-    if (!vendor?.uid) {
-        throw new Error('Vendor account is missing Google login. Contact jewelBazaari support.');
-    }
-
-    const user = auth.currentUser;
-    if (user?.uid === vendor.uid) {
-        return;
-    }
-
+async function signInVendorWithGoogle() {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    let userCredential;
     try {
-        userCredential = await signInWithPopup(auth, provider);
+        return await signInWithPopup(auth, provider);
     } catch (error) {
         throw new Error(getAuthErrorMessage(error));
-    }
-
-    if (userCredential.user.uid !== vendor.uid) {
-        await signOut(auth).catch(() => {});
-        throw new Error('Use the same Google account you used when registering as a vendor.');
     }
 }
 
@@ -212,7 +197,7 @@ export async function signInWithGoogle() {
     const existingByEmail = await getVendorProfileByEmail(email);
     if (existingByEmail?.profileCompleted && existingByEmail.uid !== user.uid) {
         await signOut(auth).catch(() => {});
-        throw new Error('This Google email already has a vendor application. Login with your Vendor ID after approval.');
+        throw new Error('This Google email already has a vendor application. Login with your vendor password after approval.');
     }
 
     return {
@@ -328,34 +313,30 @@ export async function completeVendorProfile({ shopName, vendorId, vendorPassword
     };
 }
 
-export async function loginVendor({ vendorId, password }) {
-    const cleanVendorId = validateVendorId(vendorId);
-    const normalizedVendorId = normalizeVendorId(cleanVendorId);
-    const cleanPassword = String(password || '');
+export async function loginVendor({ password }) {
+    const cleanPassword = validateVendorPassword(password);
 
-    if (!cleanPassword) {
-        throw new Error('Vendor password is required.');
+    const userCredential = await signInVendorWithGoogle();
+    const vendor = await getVendorProfileByUid(userCredential.user.uid);
+
+    if (!vendor) {
+        await signOut(auth).catch(() => {});
+        throw new Error('No vendor account found for this Google account. Register first or use the Google account from registration.');
     }
-
-    const vendorRef = doc(db, VENDORS_COLLECTION, normalizedVendorId);
-    const vendorSnap = await getDoc(vendorRef);
-
-    if (!vendorSnap.exists()) {
-        throw new Error('Invalid vendor ID or vendor password.');
-    }
-
-    const vendor = mapVendorDoc(vendorSnap);
 
     if (!vendor.profileCompleted) {
-        throw new Error('Vendor registration is incomplete. Finish Step 2 of registration first.');
+        await signOut(auth).catch(() => {});
+        throw new Error('Vendor registration is incomplete. Finish vendor registration first.');
     }
 
     const passwordValid = await verifyVendorPassword(vendor, cleanPassword);
     if (!passwordValid) {
-        throw new Error('Invalid vendor ID or vendor password.');
+        await signOut(auth).catch(() => {});
+        throw new Error('Invalid vendor password.');
     }
 
     if (!vendor.emailVerified) {
+        await signOut(auth).catch(() => {});
         const verificationError = new Error('Please verify your email before logging in.');
         verificationError.code = 'auth/email-not-verified';
         verificationError.email = vendor.email;
@@ -363,14 +344,17 @@ export async function loginVendor({ vendorId, password }) {
     }
 
     if (vendor.status === VENDOR_STATUS.REJECTED) {
+        await signOut(auth).catch(() => {});
         throw new Error('Your vendor application was not approved. Contact jewelBazaari support for help.');
     }
 
     if (vendor.status === VENDOR_STATUS.DISCONTINUED) {
+        await signOut(auth).catch(() => {});
         throw new Error('Your vendor account has been discontinued by admin. Contact jewelBazaari support for help.');
     }
 
     if (vendor.status === VENDOR_STATUS.PENDING) {
+        await signOut(auth).catch(() => {});
         const pendingError = new Error('Your application is under admin review. You can upload jewellery after approval.');
         pendingError.code = 'vendor/pending-approval';
         throw pendingError;
@@ -381,7 +365,6 @@ export async function loginVendor({ vendorId, password }) {
         emailVerified: true
     };
 
-    await ensureVendorFirebaseSession(sessionVendor);
     saveVendorSession(sessionVendor);
     return sessionVendor;
 }
