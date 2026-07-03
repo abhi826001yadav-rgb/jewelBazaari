@@ -35,13 +35,17 @@ service cloud.firestore {
       return int(request.time.toMillis() / 86400000);
     }
 
-    function isValidCustomerQuery(data, queryId) {
+    function hasValidCustomerQueryFields(data) {
       return data.name is string && data.name.size() >= 2
         && data.email is string
         && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
         && data.phone is string && data.phone.size() >= 10
         && data.subject is string && data.subject.size() >= 3
-        && data.message is string && data.message.size() >= 10
+        && data.message is string && data.message.size() >= 10;
+    }
+
+    function isValidCustomerQuery(data, queryId) {
+      return hasValidCustomerQueryFields(data)
         && data.epochDay is int
         && data.epochDay == currentEpochDay()
         && data.createdAt == request.time
@@ -75,7 +79,8 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isValidCustomerQuery(request.resource.data, queryId)
         && !exists(/databases/$(database)/documents/customerQueries/$(queryId));
-      allow update, delete: if false;
+      allow update: if isAdmin() && hasValidCustomerQueryFields(request.resource.data);
+      allow delete: if isAdmin();
     }
   }
 }
