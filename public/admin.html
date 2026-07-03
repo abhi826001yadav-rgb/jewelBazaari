@@ -562,14 +562,13 @@
             VENDOR_STATUS
         } from './js/vendor-service.js';
         import { auth } from './js/firebase-config.js';
+        import { isAdminEmail } from './js/admin-config.js';
         import {
             GoogleAuthProvider,
             signInWithPopup,
             signOut,
             onAuthStateChanged
         } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-
-        const ADMIN_EMAIL = 'abhi826001yadav@gmail.com';
         const passwordSection = document.getElementById('password-section');
         const adminSection = document.getElementById('admin-section');
         const loginBtn = document.getElementById('login-btn');
@@ -602,7 +601,7 @@
         let vendorsCache = [];
 
         function isAdminUser(user) {
-            return String(user?.email || '').trim().toLowerCase() === ADMIN_EMAIL;
+            return isAdminEmail(user?.email);
         }
 
         function showLoginError(message) {
