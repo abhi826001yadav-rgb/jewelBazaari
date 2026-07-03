@@ -31,6 +31,23 @@ service cloud.firestore {
         && data.vendorId is string && data.vendorId.size() > 0;
     }
 
+    function currentEpochDay() {
+      return int(request.time.toMillis() / 86400000);
+    }
+
+    function isValidCustomerQuery(data, queryId) {
+      return data.name is string && data.name.size() >= 2
+        && data.email is string
+        && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+        && data.phone is string && data.phone.size() >= 10
+        && data.subject is string && data.subject.size() >= 3
+        && data.message is string && data.message.size() >= 10
+        && data.epochDay is int
+        && data.epochDay == currentEpochDay()
+        && data.createdAt == request.time
+        && queryId == data.email.lower() + '_' + string(data.epochDay);
+    }
+
     match /vendors/{vendorId} {
       allow read: if true;
       allow create: if request.auth != null
@@ -56,7 +73,8 @@ service cloud.firestore {
 
     match /customerQueries/{queryId} {
       allow read: if isAdmin();
-      allow create: if true;
+      allow create: if isValidCustomerQuery(request.resource.data, queryId)
+        && !exists(/databases/$(database)/documents/customerQueries/$(queryId));
       allow update, delete: if false;
     }
   }

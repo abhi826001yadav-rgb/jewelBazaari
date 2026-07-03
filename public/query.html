@@ -307,7 +307,14 @@
            FIREBASE CONFIGURATION — Paste your config below
            ============================================================ */
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
-        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+        import {
+            buildQueryDocId,
+            getEpochDay,
+            isBlockedByClientRateLimit,
+            markClientRateLimitUsed,
+            QUERY_RATE_LIMIT_MESSAGE
+        } from './js/query-rate-limit.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyB2qTMc6KyLQPQWfCk7ENJAwzS8vqobc18",
@@ -420,24 +427,39 @@
 
             if (!validateForm()) return;
 
+            if (isBlockedByClientRateLimit()) {
+                showToast(QUERY_RATE_LIMIT_MESSAGE, 'error');
+                return;
+            }
+
             setLoading(true);
 
+            const email = fields.email.value.trim();
+            const epochDay = getEpochDay();
+            const queryDocId = buildQueryDocId(email, epochDay);
+
             try {
-                await addDoc(collection(db, 'customerQueries'), {
+                await setDoc(doc(db, 'customerQueries', queryDocId), {
                     name: fields.name.value.trim(),
-                    email: fields.email.value.trim(),
+                    email,
                     phone: fields.phone.value.trim(),
                     subject: fields.subject.value.trim(),
                     message: fields.message.value.trim(),
+                    epochDay,
                     createdAt: serverTimestamp()
                 });
 
+                markClientRateLimitUsed();
                 form.reset();
                 clearErrors();
                 showToast('Your query has been submitted successfully. We will get back to you soon!', 'success');
             } catch (error) {
                 console.error('Firestore submission error:', error);
-                showToast('Something went wrong. Please try again or contact us directly.', 'error');
+                const isRateLimited = error?.code === 'permission-denied';
+                showToast(
+                    isRateLimited ? QUERY_RATE_LIMIT_MESSAGE : 'Something went wrong. Please try again or contact us directly.',
+                    'error'
+                );
             } finally {
                 setLoading(false);
             }
