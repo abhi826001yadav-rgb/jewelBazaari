@@ -696,7 +696,7 @@
         import { auth } from './js/firebase-config.js';
         import { isAdminEmail } from './js/admin-config.js';
         import { getAuthErrorMessage } from './js/auth-error-messages.js';
-        import { escapeHtml } from './js/security-utils.js';
+        import { escapeHtml, sanitizeImageUrl } from './js/security-utils.js';
         import {
             GoogleAuthProvider,
             signInWithPopup,
@@ -923,8 +923,9 @@
                 rejected: 'Rejected',
                 discontinued: 'Discontinued'
             };
-            const label = labels[normalized] || normalized.charAt(0).toUpperCase() + normalized.slice(1);
-            return `<span class="vendor-status-badge vendor-status-${normalized}">${label}</span>`;
+            const safeKey = labels[normalized] ? normalized : 'pending';
+            const label = labels[safeKey];
+            return `<span class="vendor-status-badge vendor-status-${escapeHtml(safeKey)}">${escapeHtml(label)}</span>`;
         }
 
         function renderVendorActions(vendor) {
@@ -1064,7 +1065,7 @@
 
         function renderRow(product, index) {
             const images = getProductImages(product);
-            const cover = images[0] || '';
+            const cover = sanitizeImageUrl(images[0] || '', '');
             const productId = product.productId || product.productCode || product.id || '—';
 
             return `

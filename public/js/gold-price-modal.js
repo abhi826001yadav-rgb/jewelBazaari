@@ -108,7 +108,7 @@ export function closeGoldPriceModal() {
 function lookupByPincode() {
     const pin = document.getElementById('pincode-input').value.trim();
     if (!pin) {
-        alert('Please enter a PIN code');
+        window.jbA11y?.announce('Please enter a PIN code', 'assertive');
         return;
     }
 

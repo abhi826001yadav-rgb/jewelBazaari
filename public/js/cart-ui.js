@@ -8,7 +8,7 @@ import {
     getTotalAmount
 } from './cart-service.js';
 import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
-import { escapeHtml } from './security-utils.js';
+import { escapeHtml, sanitizeImageUrl, IMAGE_FALLBACK_DATA_URI } from './security-utils.js';
 import { formatCartPrice } from './format-utils.js';
 
 function ensureCartDrawer() {
@@ -68,7 +68,7 @@ function renderCartDrawer() {
     } else {
         itemsEl.innerHTML = cart.map((item) => `
             <div class="flex gap-3 bg-white border border-gray-200 rounded-xl p-3" data-cart-item="${escapeHtml(item.id)}">
-                <img src="${escapeHtml(item.imageUrl || 'https://picsum.photos/id/1015/100/100')}" alt="${escapeHtml(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 shrink-0">
+                <img src="${escapeHtml(sanitizeImageUrl(item.imageUrl, 'https://picsum.photos/id/1015/100/100'))}" alt="${escapeHtml(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 shrink-0" width="64" height="64" loading="lazy" decoding="async">
                 <div class="flex-1 min-w-0">
                     <h3 class="font-medium text-sm text-[#2A2A2A] line-clamp-2">${escapeHtml(item.name)}</h3>
                     <p class="text-sm font-bold text-[#4A0E17] mt-1">${formatCartPrice(item.price)}</p>

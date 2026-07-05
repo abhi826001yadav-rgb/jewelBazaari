@@ -91,7 +91,9 @@ service cloud.firestore {
         || (hasValidProductFields(request.resource.data)
           && isApprovedVendorOwner(request.resource.data.vendorId));
       allow update: if isAdmin()
-        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['addToCartCount'])
+        || (request.auth != null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['addToCartCount'])
+          && request.resource.data.addToCartCount == resource.data.addToCartCount + 1)
         || (hasValidProductFields(request.resource.data)
           && resource.data.vendorId == request.resource.data.vendorId
           && isApprovedVendorOwner(resource.data.vendorId));

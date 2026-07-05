@@ -7,7 +7,7 @@ import {
 } from './wishlist-service.js';
 import { addToCart } from './cart-service.js';
 import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
-import { escapeHtml } from './security-utils.js';
+import { escapeHtml, sanitizeImageUrl } from './security-utils.js';
 import { formatProductPrice } from './format-utils.js';
 
 const WISHLIST_PINK = '#E75480';
@@ -23,7 +23,7 @@ export function buildWishlistHeartButton(product, positionClass = 'absolute top-
     const id = String(product.id || '').trim();
     if (!id) return '';
 
-    const imageSrc = product.imageUrl || 'https://picsum.photos/id/1015/400/400';
+    const imageSrc = sanitizeImageUrl(product.imageUrl, 'https://picsum.photos/id/1015/400/400');
     const liked = isInWishlist(id);
     const activeClass = liked
         ? 'border-[#E75480]/40 text-[#E75480] bg-white'
@@ -112,7 +112,7 @@ function renderWishlistDrawer() {
     itemsEl.innerHTML = wishlist.map((item) => `
         <div class="bg-white border border-gray-200 rounded-xl p-3" data-wishlist-item="${escapeHtml(item.id)}">
             <div class="flex gap-3">
-                <img src="${escapeHtml(item.imageUrl || 'https://picsum.photos/id/1015/100/100')}" alt="${escapeHtml(item.name)}" class="w-20 h-20 object-cover rounded-lg bg-gray-100 shrink-0">
+                <img src="${escapeHtml(sanitizeImageUrl(item.imageUrl, 'https://picsum.photos/id/1015/100/100'))}" alt="${escapeHtml(item.name)}" class="w-20 h-20 object-cover rounded-lg bg-gray-100 shrink-0" width="80" height="80" loading="lazy" decoding="async">
                 <div class="flex-1 min-w-0">
                     <h3 class="font-medium text-sm text-[#2A2A2A] line-clamp-2">${escapeHtml(item.name)}</h3>
                     <p class="text-[10px] uppercase text-[#9B7E4B] font-semibold tracking-wider mt-1">${escapeHtml(item.vendor || 'Verified Vendor')}</p>

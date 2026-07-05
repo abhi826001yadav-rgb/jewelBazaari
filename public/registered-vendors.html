@@ -295,8 +295,14 @@
                                 <option value="aquamarine">Aquamarine</option>
                             </select>
                         </div>
-                        <input type="text" id="p-name" required placeholder="Product Name *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                        <textarea id="p-description" rows="3" placeholder="Description" class="w-full p-4 border-2 border-gray-300 rounded-2xl resize-none"></textarea>
+                        <div>
+                            <label for="p-name" class="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+                            <input type="text" id="p-name" required placeholder="Product Name *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                        </div>
+                        <div>
+                            <label for="p-description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="p-description" rows="3" placeholder="Description" class="w-full p-4 border-2 border-gray-300 rounded-2xl resize-none"></textarea>
+                        </div>
                         <div>
                             <label for="p-image-url-1" class="block text-sm font-medium text-gray-700 mb-1">Image URL 1 *</label>
                             <input type="url" id="p-image-url-1" required placeholder="Direct link of first image" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
@@ -353,7 +359,7 @@
             logoutVendor,
             getCurrentApprovedVendor
         } from './js/vendor-service.js';
-        import { escapeHtml, bindImageFallback } from './js/security-utils.js';
+        import { escapeHtml, bindImageFallback, sanitizeImageUrl } from './js/security-utils.js';
         import { formatCartPrice } from './js/format-utils.js';
 
         const authSection = document.getElementById('auth-section');
@@ -485,7 +491,7 @@
                 const card = document.createElement('article');
                 card.className = 'product-card';
                 card.innerHTML = `
-                    <img src="${escapeHtml(product.imageUrl || '')}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy">
+                    <img src="${escapeHtml(sanitizeImageUrl(product.imageUrl || '', ''))}" alt="${escapeHtml(product.name || 'Product')}" width="80" height="80" loading="lazy" decoding="async">
                     <div class="p-4">
                         <h4 class="font-semibold text-[#4A0E17] truncate">${escapeHtml(product.name || 'Unnamed')}</h4>
                         <p class="text-sm text-gray-500 capitalize mt-1">${escapeHtml(product.category || '—')} · ${formatCartPrice(product.price)}</p>

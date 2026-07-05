@@ -27,7 +27,9 @@ export function initLucideIcons(root = document) {
 }
 
 export function scheduleStorefrontUiInit() {
-    import('./accessibility.js');
+    import('./accessibility.js').then(() => {
+        window.jbA11y?.ensureSkipLink?.();
+    });
     import('./mobile-perf.js').then(({ initMobilePerfHints }) => initMobilePerfHints());
     scheduleIdleTask(() => {
         import('./cart-ui.js').then(({ initCartUI }) => initCartUI());

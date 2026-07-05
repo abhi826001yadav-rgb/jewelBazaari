@@ -164,12 +164,37 @@ function buildProductSchema(product) {
     return schema;
 }
 
+export function injectContactPageSchema() {
+    upsertJsonLd('jb-schema-contact', {
+        '@context': 'https://schema.org',
+        '@type': 'ContactPage',
+        name: 'Contact jewelBazaari',
+        url: absoluteUrl('/query.html'),
+        mainEntity: {
+            '@type': 'Organization',
+            name: SITE_NAME,
+            contactPoint: [{
+                '@type': 'ContactPoint',
+                telephone: '+91-8917219139',
+                contactType: 'customer service',
+                areaServed: 'IN',
+                availableLanguage: 'English'
+            }]
+        }
+    });
+}
+
 export function initPageSchemas(options = {}) {
-    const seo = options.pageSeo || getPageSeo(options.pageKey);
+    const pageKey = options.pageKey || getCurrentPageKey();
+    const seo = options.pageSeo || getPageSeo(pageKey);
     injectOrganizationSchema();
 
-    if ((options.pageKey || getCurrentPageKey()) === 'index.html') {
+    if (pageKey === 'index.html') {
         injectWebsiteSchema();
+    }
+
+    if (pageKey === 'query.html') {
+        injectContactPageSchema();
     }
 
     if (seo.breadcrumb?.length) {

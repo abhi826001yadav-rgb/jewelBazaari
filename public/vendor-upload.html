@@ -397,10 +397,22 @@
                     <p class="page-title">Create Vendor Credentials</p>
                     <p id="authenticated-email-label" class="authenticated-email"></p>
                     <form id="vendor-setup-form" class="space-y-3">
-                        <input type="text" id="vendor-shop-name" required placeholder="Shop Name *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="organization">
-                        <input type="text" id="vendor-id" required placeholder="Vendor ID * (unique, not your email)" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="username">
-                        <input type="password" id="vendor-password" required minlength="6" placeholder="Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="new-password">
-                        <input type="password" id="vendor-password-confirm" required minlength="6" placeholder="Confirm Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="new-password">
+                        <div>
+                            <label for="vendor-shop-name" class="block text-sm font-medium text-gray-700 mb-1">Shop Name *</label>
+                            <input type="text" id="vendor-shop-name" required placeholder="Shop Name *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="organization">
+                        </div>
+                        <div>
+                            <label for="vendor-id" class="block text-sm font-medium text-gray-700 mb-1">Vendor ID *</label>
+                            <input type="text" id="vendor-id" required placeholder="Unique ID (not your email)" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="username">
+                        </div>
+                        <div>
+                            <label for="vendor-password" class="block text-sm font-medium text-gray-700 mb-1">Vendor Password *</label>
+                            <input type="password" id="vendor-password" required minlength="6" placeholder="Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="new-password">
+                        </div>
+                        <div>
+                            <label for="vendor-password-confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Vendor Password *</label>
+                            <input type="password" id="vendor-password-confirm" required minlength="6" placeholder="Confirm Vendor Password *" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="new-password">
+                        </div>
                         <p class="auth-note">Vendor ID is your public shop identifier. Your vendor password is used with Google sign-in to upload jewellery after admin approval.</p>
                         <p id="vendor-setup-status" class="status-message hidden" role="status"></p>
                         <button type="submit" id="vendor-setup-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
@@ -503,8 +515,14 @@
                     </select>
                 </div>
 
-                <input type="text" id="p-name" required placeholder="Product Name *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                <textarea id="p-description" rows="3" placeholder="Description" class="w-full p-4 border-2 border-gray-300 rounded-2xl resize-none"></textarea>
+                <div>
+                    <label for="p-name" class="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+                    <input type="text" id="p-name" required placeholder="Product Name *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
+                </div>
+                <div>
+                    <label for="p-description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="p-description" rows="3" placeholder="Description" class="w-full p-4 border-2 border-gray-300 rounded-2xl resize-none"></textarea>
+                </div>
                 <div>
                     <label for="p-image-url-1" class="block text-sm font-medium text-gray-700 mb-1">Image URL 1 *</label>
                     <input type="url" id="p-image-url-1" required placeholder="Direct link of first image🔗" class="w-full p-4 border-2 border-gray-300 rounded-2xl">

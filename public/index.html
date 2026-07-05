@@ -325,13 +325,13 @@
 
     <h1 class="sr-only">jewelBazaari — Premium Jewellery Marketplace India</h1>
 
-    <header class="sticky top-0 z-50 bg-white">
+    <div class="sticky top-0 z-50 bg-white" role="banner">
         <div data-include="components/announcement.html"></div>
         
         <div data-include="components/header-home.html"></div>
         
         <div data-include="components/category-bar.html"></div>
-    </header>
+    </div>
 
     <main id="main-content">
 
@@ -379,7 +379,7 @@
                     <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Trending Now</h2>
                     <p class="text-gray-500 text-xs mt-1">Jewelry pieces everyone’s loving right now</p>
                 </div>
-                <a href="#" class="text-xs font-semibold tracking-wider uppercase text-luxuryGold hover:text-luxuryMaroon transition mt-4 md:mt-0 flex items-center gap-1">
+                <a href="all-jewellery.html" class="text-xs font-semibold tracking-wider uppercase text-luxuryGold hover:text-luxuryMaroon transition mt-4 md:mt-0 flex items-center gap-1">
                     View All Trending <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </a>
             </div>
@@ -481,28 +481,28 @@
                         <div class="flex items-start gap-4">
                             <div class="text-luxuryGold mt-1"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
                             <div>
-                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">100% Verified Sellers</h4>
+                                <h3 class="font-semibold text-sm text-luxuryDark mb-1">100% Verified Sellers</h3>
                                 <p class="text-gray-500 text-xs leading-relaxed">Only licensed boutique businesses and certified legacy stores are permitted to sell.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4">
                             <div class="text-luxuryGold mt-1"><i data-lucide="award" class="w-5 h-5"></i></div>
                             <div>
-                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">Hallmark Certified Jewelry</h4>
+                                <h3 class="font-semibold text-sm text-luxuryDark mb-1">Hallmark Certified Jewelry</h3>
                                 <p class="text-gray-500 text-xs leading-relaxed">Every piece carries official government hallmarking specifications or authorized laboratory certificates.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4">
                             <div class="text-luxuryGold mt-1"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div>
                             <div>
-                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">Easy Returns & Exchange</h4>
+                                <h3 class="font-semibold text-sm text-luxuryDark mb-1">Easy Returns &amp; Exchange</h3>
                                 <p class="text-gray-500 text-xs leading-relaxed">No hassles, simple return pathways if you are not fully in love with your purchase.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4">
                             <div class="text-luxuryGold mt-1"><i data-lucide="lock" class="w-5 h-5"></i></div>
                             <div>
-                                <h4 class="font-semibold text-sm text-luxuryDark mb-1">Buyer Protection Escrow</h4>
+                                <h3 class="font-semibold text-sm text-luxuryDark mb-1">Buyer Protection Escrow</h3>
                                 <p class="text-gray-500 text-xs leading-relaxed">Funds are securely processed and held until transit delivery confirmation protects against fraud.</p>
                             </div>
                         </div>
@@ -571,20 +571,18 @@
         import { updateCartBadge, syncCartButtonStates } from './js/cart-ui.js';
         import { updateWishlistBadge, syncWishlistHeartStates, buildWishlistHeartButton } from './js/wishlist-ui.js';
         import { initCategoryNav } from './js/category-nav.js';
-        import { getTrendingProducts, getAllProducts } from './js/firebase-product-service.js';
+        import { getTrendingProducts, getNewArrivals } from './js/firebase-product-service.js';
         import { getCoverImage, getProductImages } from './js/product-images.js';
         import { initProductGalleryUI } from './js/product-ui.js';
         import { initShadowCarousel, destroyShadowCarousel } from './js/home-featured-carousel.js';
         import { initLucideIcons, initLinkPrefetch, scheduleStorefrontUiInit } from './js/performance-boot.js';
         import { initPageSchemas } from './js/seo-schema.js';
-        import './js/accessibility.js';
-        import { escapeHtml } from './js/security-utils.js';
+        import { escapeHtml, sanitizeImageUrl } from './js/security-utils.js';
         import { formatProductPrice } from './js/format-utils.js';
         import { initGoldPriceModal } from './js/gold-price-modal.js';
-        import { getSwiperAutoplayOptions, initMobilePerfHints } from './js/mobile-perf.js';
+        import { getSwiperAutoplayOptions } from './js/mobile-perf.js';
 
         initPageSchemas({ pageKey: 'index.html' });
-        initMobilePerfHints();
 
         let swipersInitialized = false;
 
@@ -615,6 +613,9 @@
                 });
             }
 
+            document.querySelector('.mySwiper .swiper-button-next')?.setAttribute('aria-label', 'Next slide');
+            document.querySelector('.mySwiper .swiper-button-prev')?.setAttribute('aria-label', 'Previous slide');
+
             swipersInitialized = true;
             return true;
         }
@@ -640,7 +641,7 @@
 
         function buildTrendingCard(product, slot, index) {
             const images = getProductImages(product);
-            const imageSrc = getCoverImage(product);
+            const imageSrc = sanitizeImageUrl(getCoverImage(product));
             const vendor = product.vendor || 'Verified Vendor';
             const bestSellerBadge = slot === 'center' && index === 0 && (Number(product.addToCartCount) || 0) > 0
                 ? '<span class="absolute top-2 left-2 bg-luxuryGold text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-medium">Best Seller</span>'
@@ -675,7 +676,7 @@
 
         function buildNewArrivalCard(product, slot) {
             const images = getProductImages(product);
-            const imageSrc = getCoverImage(product);
+            const imageSrc = sanitizeImageUrl(getCoverImage(product));
             const vendor = product.vendor || 'Verified Vendor';
 
             return `
@@ -743,7 +744,7 @@
             destroyShadowCarousel(carouselEl);
 
             try {
-                const products = await getAllProducts();
+                const products = await getNewArrivals(10);
 
                 if (!products.length) {
                     stage.innerHTML = '<p class="text-center text-gray-500 py-10">No new arrivals yet.</p>';
@@ -784,7 +785,7 @@
                     <i data-lucide="trending-up" class="w-5 h-5 text-[#4A0E17]"></i>
                 </div>
                 <div>
-                    <h3 id="gold-price-modal-title" class="font-serif text-2xl text-white tracking-tight">Live Gold Price</h3>
+                    <h2 id="gold-price-modal-title" class="font-serif text-2xl text-white tracking-tight">Live Gold Price</h2>
                     <p class="text-[#C5A880] text-xs tracking-wider">TODAY'S RATE • VERIFIED</p>
                 </div>
             </div>

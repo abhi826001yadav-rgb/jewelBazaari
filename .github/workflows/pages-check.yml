@@ -1,0 +1,36 @@
+name: Cloudflare Pages Pre-deploy Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate Cloudflare Pages config
+        run: node scripts/validate-cf-pages.js
+
+      - name: Check required deploy files exist
+        run: |
+          test -f public/_headers
+          test -f public/_redirects
+          test -f wrangler.toml
+          test -f public/robots.txt
+          test -f public/sitemap.xml
+
+      - name: Scan for debug console.log in client code
+        run: |
+          if rg "console\.log\(" public/ scripts/ --glob '!node_modules/**'; then
+            echo "Found console.log in production paths"
+            exit 1
+          fi
+          echo "No console.log found"

@@ -1,4 +1,5 @@
-import { db } from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
+import { signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { validateProductImageUrls } from './image-url-utils.js';
 import {
     collection,
@@ -16,6 +17,10 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const PRODUCTS_COLLECTION = 'products';
+
+let productsCache = null;
+let productsCacheTime = 0;
+const PRODUCTS_CACHE_TTL_MS = 60_000;
 
 const GEMSTONE_STONE_TYPES = [
     'ruby',
@@ -220,18 +225,35 @@ export async function addProduct(product) {
     }
 }
 
-export async function getAllProducts() {
+export async function getAllProducts(options = {}) {
+    const { forceRefresh = false } = options;
+    const now = Date.now();
+
+    if (!forceRefresh && productsCache && (now - productsCacheTime) < PRODUCTS_CACHE_TTL_MS) {
+        return productsCache;
+    }
+
+    let products;
     try {
         const q = query(
             collection(db, PRODUCTS_COLLECTION),
             orderBy('createdAt', 'desc')
         );
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(mapDoc);
+        products = snapshot.docs.map(mapDoc);
     } catch (error) {
         const snapshot = await getDocs(collection(db, PRODUCTS_COLLECTION));
-        return sortByNewest(snapshot.docs.map(mapDoc));
+        products = sortByNewest(snapshot.docs.map(mapDoc));
     }
+
+    productsCache = products;
+    productsCacheTime = now;
+    return products;
+}
+
+export async function getNewArrivals(limit = 10) {
+    const products = await getAllProducts();
+    return products.slice(0, limit);
 }
 
 export async function getProductsByMetal(metalType) {
@@ -376,9 +398,16 @@ export async function deleteProduct(productId) {
     return { id };
 }
 
+async function ensureClientAuth() {
+    if (auth.currentUser) return;
+    await signInAnonymously(auth);
+}
+
 export async function incrementAddToCartCount(productId) {
     const id = String(productId || '').trim();
     if (!id) return;
+
+    await ensureClientAuth();
 
     const productRef = doc(db, PRODUCTS_COLLECTION, id);
     await updateDoc(productRef, {
@@ -387,11 +416,8 @@ export async function incrementAddToCartCount(productId) {
 }
 
 export async function getTrendingProducts(limit = 10) {
-    const snapshot = await getDocs(collection(db, PRODUCTS_COLLECTION));
-    const products = snapshot.docs.map(mapDoc);
-
-    const sorted = sortByAddToCartCount(products);
-    return sorted.slice(0, limit);
+    const products = await getAllProducts();
+    return sortByAddToCartCount(products).slice(0, limit);
 }
 
 export async function getGemstoneProducts() {

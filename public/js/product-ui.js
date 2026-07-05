@@ -1,6 +1,6 @@
 import { getCoverImage, getProductImages } from './product-images.js';
 
-import { escapeHtml } from './security-utils.js';
+import { escapeHtml, sanitizeImageUrl, IMAGE_FALLBACK_DATA_URI } from './security-utils.js';
 import { initLucideIcons, initLinkPrefetch, scheduleIdleTask } from './performance-boot.js';
 import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
 import { formatProductPrice } from './format-utils.js';
@@ -22,7 +22,7 @@ function ensureProductGalleryModal() {
 
     document.body.insertAdjacentHTML('beforeend', `
         <div id="product-gallery-overlay" class="hidden fixed inset-0 bg-black/70 z-[250]" aria-hidden="true"></div>
-        <div id="product-gallery-modal" class="hidden fixed inset-0 z-[251] flex items-center justify-center p-4 pointer-events-none" aria-labelledby="product-gallery-title">
+        <div id="product-gallery-modal" class="hidden fixed inset-0 z-[251] flex items-center justify-center p-4 pointer-events-none" role="dialog" aria-modal="false" aria-labelledby="product-gallery-title">
             <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl pointer-events-auto">
                 <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <h3 id="product-gallery-title" class="font-semibold text-[#4A0E17] text-sm sm:text-base line-clamp-1"></h3>
@@ -47,7 +47,7 @@ function renderGalleryView() {
 
     if (!mainImage || !galleryImages.length) return;
 
-    mainImage.src = galleryImages[galleryIndex];
+    mainImage.src = sanitizeImageUrl(galleryImages[galleryIndex], IMAGE_FALLBACK_DATA_URI);
     const title = document.getElementById('product-gallery-title')?.textContent || 'Product';
     mainImage.alt = `${title} — image ${galleryIndex + 1} of ${galleryImages.length}`;
     const hasMultiple = galleryImages.length > 1;
@@ -69,7 +69,7 @@ function renderGalleryView() {
             aria-selected="${index === galleryIndex ? 'true' : 'false'}"
             aria-label="View image ${index + 1}"
             class="w-16 h-16 rounded-lg overflow-hidden border-2 ${index === galleryIndex ? 'border-[#9B7E4B]' : 'border-gray-200'}">
-            <img src="${escapeHtml(url)}" alt="" class="w-full h-full object-cover" aria-hidden="true">
+            <img src="${escapeHtml(sanitizeImageUrl(url))}" alt="" class="w-full h-full object-cover" aria-hidden="true">
         </button>
     `).join('');
 }
@@ -156,20 +156,26 @@ export function initProductGalleryUI() {
 
 export async function loadPageLayout() {
     const { loadPageComponents } = await import('./load-components.js');
+    const { scheduleStorefrontUiInit } = await import('./performance-boot.js');
     const announcementEl = document.getElementById('announcement-placeholder');
     const headerEl = document.getElementById('header-placeholder');
     const categoryEl = document.getElementById('category-placeholder');
+    const footerEl = document.getElementById('footer-placeholder');
 
     if (announcementEl) announcementEl.setAttribute('data-include', 'components/announcement.html');
     if (headerEl) headerEl.setAttribute('data-include', 'components/header.html');
     if (categoryEl) categoryEl.setAttribute('data-include', 'components/category-bar.html');
+    if (footerEl) footerEl.setAttribute('data-include', 'components/footer.html');
 
     initLinkPrefetch();
 
-    await loadPageComponents('#announcement-placeholder, #header-placeholder, #category-placeholder');
+    const selectors = ['#announcement-placeholder', '#header-placeholder', '#category-placeholder'];
+    if (footerEl) selectors.push('#footer-placeholder');
+    await loadPageComponents(selectors.join(', '));
 
     window.dispatchEvent(new CustomEvent('jewelbazaari:components-loaded'));
     initLucideIcons();
+    scheduleStorefrontUiInit();
 
     const { initCategoryNav } = await import('./category-nav.js');
     initCategoryNav();
@@ -212,7 +218,7 @@ export async function renderProducts(products, gridId = 'products-grid', countId
         card.className = 'luxury-card bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 min-w-0';
 
         const images = getProductImages(product);
-        const imageSrc = getCoverImage(product);
+        const imageSrc = sanitizeImageUrl(getCoverImage(product), IMAGE_FALLBACK_DATA_URI);
         const imageLoading = index < 4 ? 'eager' : 'lazy';
         const imagePriority = index === 0 ? ' fetchpriority="high"' : '';
         const tags = [product.category, product.metalType, product.stoneType]
@@ -293,5 +299,6 @@ export function setupSearch(allProducts, onFilter) {
         );
 
         onFilter(filtered);
+        announce(`${filtered.length} product${filtered.length === 1 ? '' : 's'} found`, 'polite');
     });
 }
