@@ -1,41 +1,18 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const {
+  loadHeaders,
+  resolveHeaders,
+  loadRedirects,
+  resolveRedirect
+} = require('./cf-pages-utils');
 
 const root = path.join(__dirname, '..', 'public');
 const port = Number(process.env.PORT || 3000);
 
-// Mirrors Cloudflare Pages: security headers are read from public/_headers.
-function loadGlobalHeaders() {
-  const headersFile = path.join(root, '_headers');
-  const headers = {};
-
-  try {
-    const content = fs.readFileSync(headersFile, 'utf8');
-    const blocks = content.split(/\n(?=\/|\S)/);
-    const globalBlock = blocks.find((block) => block.trim().startsWith('/*'));
-
-    if (!globalBlock) return headers;
-
-    for (const line of globalBlock.split('\n').slice(1)) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-
-      const separator = trimmed.indexOf(':');
-      if (separator === -1) continue;
-
-      const key = trimmed.slice(0, separator).trim();
-      const value = trimmed.slice(separator + 1).trim();
-      if (key && value) headers[key] = value;
-    }
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
-  }
-
-  return headers;
-}
-
-const globalHeaders = loadGlobalHeaders();
+const headerRules = loadHeaders(root);
+const redirects = loadRedirects(root);
 
 const types = {
   '.html': 'text/html; charset=utf-8',
@@ -44,14 +21,27 @@ const types = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.json': 'application/json',
+  '.xml': 'application/xml; charset=utf-8',
   '.woff2': 'font/woff2'
 };
 
 const server = http.createServer((req, res) => {
   let urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
+
+  const redirect = resolveRedirect(redirects, urlPath);
+  if (redirect) {
+    res.writeHead(redirect.status, {
+      Location: redirect.to,
+      ...resolveHeaders(headerRules, urlPath)
+    });
+    res.end();
+    return;
+  }
+
   if (urlPath === '/') urlPath = '/index.html';
 
   const filePath = path.normalize(path.join(root, urlPath));
@@ -63,14 +53,18 @@ const server = http.createServer((req, res) => {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      res.writeHead(404);
+      res.writeHead(404, resolveHeaders(headerRules, urlPath));
       res.end('Not found');
       return;
     }
 
+    const ext = path.extname(filePath).toLowerCase();
+    const resolved = resolveHeaders(headerRules, urlPath);
+    const contentType = resolved['Content-Type'] || types[ext] || 'application/octet-stream';
+
     res.writeHead(200, {
-      ...globalHeaders,
-      'Content-Type': types[path.extname(filePath).toLowerCase()] || 'application/octet-stream'
+      ...resolved,
+      'Content-Type': contentType
     });
     res.end(data);
   });
@@ -78,4 +72,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(port, () => {
   console.log(`jewelBazaari running at http://localhost:${port}`);
+  console.log(`Loaded ${headerRules.length} _headers rules, ${redirects.length} _redirects`);
 });
