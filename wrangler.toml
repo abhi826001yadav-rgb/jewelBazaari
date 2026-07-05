@@ -2,6 +2,9 @@ name = "jewelbazaari"
 compatibility_date = "2024-01-01"
 pages_build_output_dir = "public"
 
+# functions/_middleware.js enforces CSP on HTML (overrides conflicting zone headers).
+# If Firebase is still blocked, disable any CSP Transform Rule in Cloudflare Dashboard.
+
 # Cloudflare Pages static deploy — headers and redirects live in public/.
 # Brotli + gzip compression: automatic at the edge (Accept-Encoding: br, gzip).
 # HTTP/3 (QUIC): enable under Cloudflare Dashboard → Network → HTTP/3 (with QUIC).

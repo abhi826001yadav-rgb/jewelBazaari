@@ -17,10 +17,6 @@
 /contact/          /query.html    301
 /contact-us/       /query.html    301
 
-# Collection alias (one-way; does not conflict with .html paths)
-/jewellery         /all-jewellery.html    301
-/jewellery/        /all-jewellery.html    301
-
 # Trailing-slash normalization (.html paths only)
 /index.html/       /index.html    301
 /gold.html/        /gold.html    301
