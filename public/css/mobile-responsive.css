@@ -95,7 +95,7 @@ body.jb-category-page main {
 
 .jb-category-hero-title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: 2.25rem;
+    font-size: clamp(1.75rem, 4.5vw + 0.75rem, 2.75rem);
     font-weight: 700;
     line-height: 1.2;
 }
@@ -111,12 +111,6 @@ body.jb-category-page main {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9375rem;
     font-weight: 300;
-}
-
-@media (min-width: 640px) {
-    .jb-category-hero-title {
-        font-size: 2.75rem;
-    }
 }
 
 .jb-nav-dropdown--compact {
@@ -167,9 +161,41 @@ body {
 }
 
 img,
-video {
+video,
+picture {
     max-width: 100%;
     height: auto;
+}
+
+picture img {
+    display: block;
+    width: 100%;
+}
+
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+    touch-action: manipulation;
+}
+
+.mySwiper {
+    width: 100%;
+    height: clamp(220px, 42vw, 500px);
+}
+
+.mySwiper .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.jb-featured-carousel-wrap,
+.jb-shadow-carousel {
+    overflow-x: clip;
+    max-width: 100%;
 }
 
 .jb-announcement {
@@ -608,8 +634,8 @@ button.jb-mobile-menu-link {
         padding-right: 0.75rem;
     }
 
-    .swiper {
-        height: 280px !important;
+    .swiper:not(.jb-why-swiper) {
+        height: clamp(220px, 42vw, 280px) !important;
     }
 
     main.max-w-7xl,
@@ -725,8 +751,8 @@ button.jb-mobile-menu-link {
         letter-spacing: 0.05em;
     }
 
-    .swiper {
-        height: 220px !important;
+    .swiper:not(.jb-why-swiper) {
+        height: clamp(200px, 38vw, 240px) !important;
     }
 
     .jb-header-nav {
@@ -736,7 +762,8 @@ button.jb-mobile-menu-link {
     .jb-header-nav-item {
         font-size: 0.75rem;
         padding: 0;
-        min-height: 40px;
+        min-height: 44px;
+        min-width: 44px;
     }
 
     .jb-logo img {
@@ -859,5 +886,154 @@ button.jb-mobile-menu-link {
     .jb-header-standard .jb-header-nav {
         gap: 2.5rem;
         justify-content: flex-end;
+    }
+}
+
+/* Touch targets — minimum 44×44px on interactive controls */
+.wishlist-heart-btn,
+[data-wishlist-toggle] {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+[data-cart-decrease],
+[data-cart-increase],
+[data-cart-remove] {
+    min-height: 44px;
+}
+
+[data-cart-decrease],
+[data-cart-increase] {
+    min-width: 44px;
+}
+
+[data-gallery-thumb],
+#product-gallery-prev,
+#product-gallery-next,
+#product-gallery-close,
+#cart-drawer-close,
+#wishlist-drawer-close,
+#gold-price-modal-close {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.jb-mobile-submenu-link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.jb-mobile-nav-bar {
+    min-height: 48px;
+}
+
+footer ul a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+}
+
+/* Prevent iOS input zoom; comfortable tap targets on forms */
+@media (max-width: 767px) {
+    input,
+    select,
+    textarea,
+    .form-input,
+    .admin-search-input,
+    #search-input,
+    .home-search-input,
+    .jb-header-search {
+        font-size: 16px;
+        min-height: 44px;
+    }
+
+    .submit-btn,
+    .quick-btn,
+    #submit-btn,
+    button[data-add-cart],
+    [data-wishlist-add-cart] {
+        min-height: 44px;
+    }
+
+    .jb-shadow-card--left {
+        transform: translateX(-18%) scale(0.82);
+    }
+
+    .jb-shadow-card--right {
+        transform: translateX(18%) scale(0.82);
+    }
+
+    .jb-shadow-card {
+        will-change: auto;
+    }
+
+    .admin-tab-btn {
+        min-height: 44px;
+    }
+
+    .admin-tabs {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .admin-table-wrap {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    #cart-drawer,
+    #wishlist-drawer {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Safe-area support for notched devices */
+@supports (padding: max(0px)) {
+    header.sticky {
+        padding-top: max(0px, env(safe-area-inset-top));
+    }
+
+    .jb-mobile-menu {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    #cart-drawer,
+    #wishlist-drawer {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* Performance on slow / small screens */
+@media (max-width: 767px) {
+    .jb-trending-section,
+    .jb-new-arrivals-section,
+    .jb-why-header + .jb-why-carousel-wrap {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 480px;
+    }
+
+    .luxury-card:hover,
+    body.jb-category-page .luxury-card:hover,
+    .info-card:hover {
+        transform: none;
+        box-shadow: inherit;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .jb-shadow-card,
+    .luxury-card,
+    .info-card {
+        transition: none !important;
+    }
+
+    .swiper {
+        --swiper-autoplay-delay: 0;
     }
 }

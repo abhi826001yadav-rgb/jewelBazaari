@@ -121,8 +121,8 @@ export function initShadowCarousel(rootEl, options = {}) {
     const prevButton = resolveElement(options.prevEl);
     const nextButton = resolveElement(options.nextEl);
 
-    prevButton?.addEventListener('click', handlePrev);
-    nextButton?.addEventListener('click', handleNext);
+    prevButton?.addEventListener('click', handlePrev, { passive: true });
+    nextButton?.addEventListener('click', handleNext, { passive: true });
     stageEl.addEventListener('click', handleStageClick);
 
     const instance = {
