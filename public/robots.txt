@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /vendor-upload.html
+Disallow: /registered-vendors.html
+Disallow: /diamond%20copy.html
+
+Sitemap: https://jewelbazaari.com/sitemap.xml

@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>More Collections • jewelBazaari</title>
+    <title>More Collections | jewelBazaari</title>
+    <meta name="description" content="Discover specialty jewellery collections and vendor opportunities on jewelBazaari.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/more.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="More Collections | jewelBazaari">
+    <meta property="og:description" content="Discover specialty jewellery collections and vendor opportunities on jewelBazaari.">
+    <meta property="og:url" content="https://jewelbazaari.com/more.html">
+    <meta property="og:image" content="https://jewelbazaari.com/images/logo.png">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="More Collections | jewelBazaari">
+    <meta name="twitter:description" content="Discover specialty jewellery collections and vendor opportunities on jewelBazaari.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,6 +48,9 @@
 
     <script type="module">
         import { loadPageLayout } from './js/product-ui.js';
+        import { initPageSchemas } from './js/seo-schema.js';
+
+        initPageSchemas({ pageKey: 'more.html' });
         loadPageLayout();
     </script>
 </body>

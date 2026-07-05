@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earrings Collection • jewelBazaari</title>
+    <title>Earrings Collection | jewelBazaari</title>
+    <meta name="description" content="Discover gold, diamond, and gemstone earrings for every occasion from verified Indian jewellers.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/earrings.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="Earrings Collection | jewelBazaari">
+    <meta property="og:description" content="Discover gold, diamond, and gemstone earrings for every occasion from verified Indian jewellers.">
+    <meta property="og:url" content="https://jewelbazaari.com/earrings.html">
+    <meta property="og:image" content="https://jewelbazaari.com/images/photo2.jpg">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Earrings Collection | jewelBazaari">
+    <meta name="twitter:description" content="Discover gold, diamond, and gemstone earrings for every occasion from verified Indian jewellers.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/photo2.jpg">
     <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="modulepreload" href="js/category-page-init.js">
@@ -43,6 +57,7 @@
             <div id="product-count" class="text-sm text-gray-500 whitespace-nowrap"></div>
         </div>
 
+        <h2 class="sr-only">Earrings Listings</h2>
         <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
 
         <div id="no-products" class="hidden text-center py-16">
@@ -55,7 +70,7 @@
         import { initCategoryPageDeferred } from './js/category-page-init.js';
         import { getProductsByCategory } from './js/firebase-product-service.js';
 
-        initCategoryPageDeferred(() => getProductsByCategory('earrings'));
+        initCategoryPageDeferred(() => getProductsByCategory('earrings'), { pageKey: 'earrings.html' });
     </script>
 </body>
 </html>

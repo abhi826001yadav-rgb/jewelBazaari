@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold Jewellery • jewelBazaari</title>
+    <title>Gold Jewellery | jewelBazaari</title>
+    <meta name="description" content="Browse certified gold jewellery including rings, bangles, chains, necklaces, and bridal sets from verified sellers on jewelBazaari.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/gold.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="Gold Jewellery | jewelBazaari">
+    <meta property="og:description" content="Browse certified gold jewellery including rings, bangles, chains, necklaces, and bridal sets from verified sellers on jewelBazaari.">
+    <meta property="og:url" content="https://jewelbazaari.com/gold.html">
+    <meta property="og:image" content="https://jewelbazaari.com/images/photo2.jpg">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gold Jewellery | jewelBazaari">
+    <meta name="twitter:description" content="Browse certified gold jewellery including rings, bangles, chains, necklaces, and bridal sets from verified sellers on jewelBazaari.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/photo2.jpg">
     <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="modulepreload" href="js/category-page-init.js">
@@ -47,6 +61,7 @@
                 class="w-full md:w-80 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#9B7E4B]">
         </div>
 
+        <h2 class="sr-only">Gold Jewellery Listings</h2>
         <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
 
         <div id="no-products" class="hidden text-center py-16">
@@ -59,7 +74,7 @@
         import { initCategoryPageDeferred } from './js/category-page-init.js';
         import { getProductsByMetal } from './js/firebase-product-service.js';
 
-        initCategoryPageDeferred(() => getProductsByMetal('gold'));
+        initCategoryPageDeferred(() => getProductsByMetal('gold'), { pageKey: 'gold.html' });
     </script>
 </body>
 </html>

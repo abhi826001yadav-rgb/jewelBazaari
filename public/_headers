@@ -20,6 +20,12 @@
 /components/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 

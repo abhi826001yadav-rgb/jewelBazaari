@@ -169,7 +169,7 @@ export async function loadPageLayout() {
     });
 }
 
-export async function renderProducts(products, gridId = 'products-grid', countId = 'product-count', emptyId = 'no-products') {
+export async function renderProducts(products, gridId = 'products-grid', countId = 'product-count', emptyId = 'no-products', options = {}) {
     const grid = document.getElementById(gridId);
     const countEl = document.getElementById(countId);
     const emptyEl = document.getElementById(emptyId);
@@ -211,7 +211,7 @@ export async function renderProducts(products, gridId = 'products-grid', countId
                     data-product-gallery="${escapeHtml(JSON.stringify(images))}"
                     data-product-name="${escapeHtml(product.name || 'Product')}"
                     aria-label="View product images">
-                    <img src="${escapeHtml(imageSrc)}" class="w-full h-full object-cover" alt="${escapeHtml(product.name)}" width="400" height="400" loading="${imageLoading}" decoding="async"${imagePriority}>
+                    <img src="${escapeHtml(imageSrc)}" class="w-full h-full object-cover" alt="${escapeHtml(product.name || 'Jewellery product')}" width="400" height="400" loading="${imageLoading}" decoding="async"${imagePriority}>
                 </button>
                 ${buildWishlistHeartButton({ ...product, imageUrl: imageSrc })}
                 <div class="absolute top-3 left-3 bg-white/90 px-3 py-1 rounded-full text-xs font-medium capitalize">
@@ -219,7 +219,7 @@ export async function renderProducts(products, gridId = 'products-grid', countId
                 </div>
             </div>
             <div class="p-4">
-                <h3 class="font-semibold text-lg text-[#2A2A2A] line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h3>
+                <h2 class="font-semibold text-lg text-[#2A2A2A] line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h2>
                 ${product.description ? `<p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(product.description)}</p>` : ''}
                 ${tags ? `<p class="text-xs text-[#9B7E4B] mt-2 capitalize">${escapeHtml(tags)}</p>` : ''}
                 <div class="flex items-center justify-between mt-3 gap-2">
@@ -237,6 +237,12 @@ export async function renderProducts(products, gridId = 'products-grid', countId
 
     import('./cart-ui.js').then(({ syncCartButtonStates }) => syncCartButtonStates());
     import('./wishlist-ui.js').then(({ syncWishlistHeartStates }) => syncWishlistHeartStates());
+
+    if (options.pageSeo) {
+        import('./seo-schema.js').then(({ injectProductListSchema }) => {
+            injectProductListSchema(products, options.pageSeo);
+        });
+    }
 }
 
 export function showLoading(gridId = 'products-grid') {

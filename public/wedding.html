@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Collection - jewelBazaari.com</title>
+    <title>Wedding Jewellery | jewelBazaari</title>
+    <meta name="description" content="Explore bridal necklaces, mangalsutras, wedding bangles, and heritage marriage jewellery on jewelBazaari.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/wedding.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="Wedding Jewellery | jewelBazaari">
+    <meta property="og:description" content="Explore bridal necklaces, mangalsutras, wedding bangles, and heritage marriage jewellery on jewelBazaari.">
+    <meta property="og:url" content="https://jewelbazaari.com/wedding.html">
+    <meta property="og:image" content="https://jewelbazaari.com/images/bride.jpg">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wedding Jewellery | jewelBazaari">
+    <meta name="twitter:description" content="Explore bridal necklaces, mangalsutras, wedding bangles, and heritage marriage jewellery on jewelBazaari.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/bride.jpg">
     <link rel="preload" href="css/mobile-responsive.css" as="style">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
@@ -39,6 +53,9 @@
 
     <script type="module">
         import { loadPageLayout } from './js/product-ui.js';
+        import { initPageSchemas } from './js/seo-schema.js';
+
+        initPageSchemas({ pageKey: 'wedding.html' });
         loadPageLayout();
     </script>
 </body>

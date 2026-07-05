@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us • jewelBazaari</title>
+    <title>Contact Us | jewelBazaari</title>
+    <meta name="description" content="Contact jewelBazaari for order support, vendor enquiries, and customer assistance. We respond within one business day.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/query.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="Contact Us | jewelBazaari">
+    <meta property="og:description" content="Contact jewelBazaari for order support, vendor enquiries, and customer assistance. We respond within one business day.">
+    <meta property="og:url" content="https://jewelbazaari.com/query.html">
+    <meta property="og:image" content="https://jewelbazaari.com/images/logo.png">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contact Us | jewelBazaari">
+    <meta name="twitter:description" content="Contact jewelBazaari for order support, vendor enquiries, and customer assistance. We respond within one business day.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -317,7 +331,9 @@
 
         import { loadPageLayout } from './js/product-ui.js';
         import { scheduleStorefrontUiInit } from './js/performance-boot.js';
+        import { initPageSchemas } from './js/seo-schema.js';
 
+        initPageSchemas({ pageKey: 'query.html' });
         scheduleStorefrontUiInit();
         loadPageLayout();
 
