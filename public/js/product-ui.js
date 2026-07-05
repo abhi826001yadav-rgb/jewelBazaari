@@ -1,6 +1,7 @@
 import { getCoverImage, getProductImages } from './product-images.js';
 
 import { escapeHtml } from './security-utils.js';
+import { initLucideIcons, initLinkPrefetch, scheduleIdleTask } from './performance-boot.js';
 
 export { escapeHtml };
 
@@ -141,12 +142,6 @@ export function initProductGalleryUI() {
     });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initProductGalleryUI);
-} else {
-    initProductGalleryUI();
-}
-
 export async function loadPageLayout() {
     const { loadPageComponents } = await import('./load-components.js');
     const announcementEl = document.getElementById('announcement-placeholder');
@@ -157,19 +152,21 @@ export async function loadPageLayout() {
     if (headerEl) headerEl.setAttribute('data-include', 'components/header.html');
     if (categoryEl) categoryEl.setAttribute('data-include', 'components/category-bar.html');
 
+    initLinkPrefetch();
+
     await loadPageComponents('#announcement-placeholder, #header-placeholder, #category-placeholder');
 
-    if (window.lucide) {
-        window.lucide.createIcons();
-    }
+    initLucideIcons();
 
     const { initCategoryNav } = await import('./category-nav.js');
     initCategoryNav();
 
-    const { updateCartBadge } = await import('./cart-ui.js');
-    const { updateWishlistBadge } = await import('./wishlist-ui.js');
-    updateCartBadge();
-    updateWishlistBadge();
+    initProductGalleryUI();
+
+    scheduleIdleTask(() => {
+        import('./cart-ui.js').then(({ updateCartBadge }) => updateCartBadge());
+        import('./wishlist-ui.js').then(({ updateWishlistBadge }) => updateWishlistBadge());
+    });
 }
 
 export async function renderProducts(products, gridId = 'products-grid', countId = 'product-count', emptyId = 'no-products') {
@@ -194,12 +191,14 @@ export async function renderProducts(products, gridId = 'products-grid', countId
 
     const { buildWishlistHeartButton } = await import('./wishlist-ui.js');
 
-    products.forEach((product) => {
+    products.forEach((product, index) => {
         const card = document.createElement('article');
         card.className = 'luxury-card bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 min-w-0';
 
         const images = getProductImages(product);
         const imageSrc = getCoverImage(product);
+        const imageLoading = index < 4 ? 'eager' : 'lazy';
+        const imagePriority = index === 0 ? ' fetchpriority="high"' : '';
         const tags = [product.category, product.metalType, product.stoneType]
             .filter(Boolean)
             .map(formatLabel)
@@ -212,7 +211,7 @@ export async function renderProducts(products, gridId = 'products-grid', countId
                     data-product-gallery="${escapeHtml(JSON.stringify(images))}"
                     data-product-name="${escapeHtml(product.name || 'Product')}"
                     aria-label="View product images">
-                    <img src="${escapeHtml(imageSrc)}" class="w-full h-full object-cover" alt="${escapeHtml(product.name)}" loading="lazy">
+                    <img src="${escapeHtml(imageSrc)}" class="w-full h-full object-cover" alt="${escapeHtml(product.name)}" width="400" height="400" loading="${imageLoading}" decoding="async"${imagePriority}>
                 </button>
                 ${buildWishlistHeartButton({ ...product, imageUrl: imageSrc })}
                 <div class="absolute top-3 left-3 bg-white/90 px-3 py-1 rounded-full text-xs font-medium capitalize">
@@ -243,7 +242,7 @@ export async function renderProducts(products, gridId = 'products-grid', countId
 export function showLoading(gridId = 'products-grid') {
     const grid = document.getElementById(gridId);
     if (!grid) return;
-    grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">Loading collection...</div>';
+    grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400 min-h-[24rem]">Loading collection...</div>';
 }
 
 export function showError(gridId = 'products-grid', message = 'Failed to load products. Please refresh the page.') {

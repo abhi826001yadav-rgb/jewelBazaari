@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jewelBazaari | Premium B2C Jewelry Marketplace</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="preload" href="images/photo1.webp" as="image" type="image/webp" fetchpriority="high">
+    <link rel="preload" href="css/mobile-responsive.css" as="style">
+    <link rel="modulepreload" href="js/load-components.js">
+    <link rel="modulepreload" href="js/home-featured-carousel.js">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -316,6 +322,8 @@
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="css/mobile-responsive.css">
+    <link rel="prefetch" href="gold.html" as="document">
+    <link rel="prefetch" href="all-jewellery.html" as="document">
 </head>
 <body class="overflow-x-hidden">
 
@@ -330,10 +338,30 @@
     <section class="w-full">
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
-                <div class="swiper-slide"><img src="images/photo1.jpg"></div>
-                <div class="swiper-slide"><img src="images/photo2.jpg"></div>
-                <div class="swiper-slide"><img src="images/photo3.jpg"></div>
-                <div class="swiper-slide"><img src="images/photo4.jpg"></div>
+                <div class="swiper-slide">
+                    <picture>
+                        <source srcset="images/photo1.webp" type="image/webp">
+                        <img src="images/photo1.jpg" alt="" width="1920" height="500" fetchpriority="high" loading="eager" decoding="async">
+                    </picture>
+                </div>
+                <div class="swiper-slide">
+                    <picture>
+                        <source srcset="images/photo2.webp" type="image/webp">
+                        <img src="images/photo2.jpg" alt="" width="1920" height="500" loading="lazy" decoding="async">
+                    </picture>
+                </div>
+                <div class="swiper-slide">
+                    <picture>
+                        <source srcset="images/photo3.webp" type="image/webp">
+                        <img src="images/photo3.jpg" alt="" width="1920" height="500" loading="lazy" decoding="async">
+                    </picture>
+                </div>
+                <div class="swiper-slide">
+                    <picture>
+                        <source srcset="images/photo4.webp" type="image/webp">
+                        <img src="images/photo4.jpg" alt="" width="1920" height="500" loading="lazy" decoding="async">
+                    </picture>
+                </div>
             
             </div>
             <div class="swiper-button-next"></div>
@@ -342,19 +370,7 @@
         </div>
     </section>
     
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        var swiper = new Swiper(".mySwiper", {
-            loop: true,
-            speed: 1000, // <--- This makes the slide movement take 1 full second
-            autoplay: { 
-                delay: 6000, // <--- This keeps the image still for 6 seconds
-                disableOnInteraction: false 
-            },
-            pagination: { el: ".swiper-pagination", clickable: true },
-            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
-        });
-    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <section class="jb-trending-section bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -548,40 +564,68 @@
 
     <div data-include="components/footer.html"></div>
 
-    <script>
-        lucide.createIcons();
-
-        if (document.querySelector('.jb-why-swiper')) {
-            new Swiper('.jb-why-swiper', {
-                loop: true,
-                slidesPerView: 1,
-                speed: 1866,
-                autoplay: {
-                    delay: 2334,
-                    reverseDirection: true,
-                    disableOnInteraction: false
-                },
-                allowTouchMove: true,
-                watchSlidesProgress: true
-            });
-        }
-    </script>
     <script type="module">
         import { loadPageComponents } from './js/load-components.js';
-        import { initCartUI, updateCartBadge, syncCartButtonStates } from './js/cart-ui.js';
-        import { initWishlistUI, updateWishlistBadge, syncWishlistHeartStates, buildWishlistHeartButton } from './js/wishlist-ui.js';
+        import { updateCartBadge, syncCartButtonStates } from './js/cart-ui.js';
+        import { updateWishlistBadge, syncWishlistHeartStates, buildWishlistHeartButton } from './js/wishlist-ui.js';
         import { initCategoryNav } from './js/category-nav.js';
         import { getTrendingProducts, getAllProducts } from './js/firebase-product-service.js';
         import { getCoverImage, getProductImages } from './js/product-images.js';
         import { initProductGalleryUI } from './js/product-ui.js';
         import { initShadowCarousel, destroyShadowCarousel } from './js/home-featured-carousel.js';
+        import { initLucideIcons, initLinkPrefetch, scheduleStorefrontUiInit } from './js/performance-boot.js';
+
+        let swipersInitialized = false;
+
+        function initSwipers() {
+            if (!window.Swiper || swipersInitialized) return false;
+
+            if (document.querySelector('.mySwiper')) {
+                new Swiper('.mySwiper', {
+                    loop: true,
+                    speed: 1000,
+                    autoplay: {
+                        delay: 6000,
+                        disableOnInteraction: false
+                    },
+                    pagination: { el: '.swiper-pagination', clickable: true },
+                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
+                });
+            }
+
+            if (document.querySelector('.jb-why-swiper')) {
+                new Swiper('.jb-why-swiper', {
+                    loop: true,
+                    slidesPerView: 1,
+                    speed: 1866,
+                    autoplay: {
+                        delay: 2334,
+                        reverseDirection: true,
+                        disableOnInteraction: false
+                    },
+                    allowTouchMove: true,
+                    watchSlidesProgress: true
+                });
+            }
+
+            swipersInitialized = true;
+            return true;
+        }
+
+        function bootSwipers() {
+            if (initSwipers()) return;
+            window.addEventListener('load', initSwipers, { once: true });
+        }
+
+        bootSwipers();
 
         await loadPageComponents();
         initCategoryNav();
+        initLinkPrefetch();
+        initLucideIcons();
 
         window.jewelBazaariCart = { updateCartBadge };
-        initCartUI();
-        initWishlistUI();
+        scheduleStorefrontUiInit();
         initProductGalleryUI();
 
         function escapeHtml(value = '') {
@@ -615,7 +659,7 @@
                             data-product-gallery="${escapeHtml(JSON.stringify(images))}"
                             data-product-name="${escapeHtml(product.name || 'Product')}"
                             aria-label="View product images">
-                            <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+                            <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" width="400" height="400" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="${slot === 'center' ? 'eager' : 'lazy'}" decoding="async"${slot === 'center' ? ' fetchpriority="high"' : ''}>
                         </button>
                         ${slot === 'center' ? buildWishlistHeartButton({ ...product, imageUrl: imageSrc }, 'absolute top-2 right-2') : ''}
                         ${bestSellerBadge}
@@ -647,7 +691,7 @@
                             data-product-gallery="${escapeHtml(JSON.stringify(images))}"
                             data-product-name="${escapeHtml(product.name || 'Product')}"
                             aria-label="View product images">
-                            <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+                            <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" width="400" height="400" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="${slot === 'center' ? 'eager' : 'lazy'}" decoding="async"${slot === 'center' ? ' fetchpriority="high"' : ''}>
                         </button>
                         ${slot === 'center' ? buildWishlistHeartButton({ ...product, imageUrl: imageSrc }, 'absolute top-3 right-3') : ''}
                     </div>
@@ -730,27 +774,6 @@
         loadTrendingProducts();
         loadNewArrivals();
         window.addEventListener('jewelbazaari:add-to-cart-count-updated', loadTrendingProducts);
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        var swiper = new Swiper(".mySwiper", {
-            loop: true,
-            autoplay: {
-                delay: 3000, // Changes every 3 seconds
-                disableOnInteraction: false,
-            },
-            pagination: {
-                el: ".swiper-pagination",
-            },
-            navigation: {
-                nextEl: ".swiper-button-next",
-                prevEl: ".swiper-button-prev",
-            },
-        });
-    </script>
-    <script type="module">
-        import { db } from './js/firebase-config.js';
-        console.log('Database connected successfully!');
     </script>
 <!-- ========== LIVE GOLD PRICE MODAL + DYNAMIC JS ========== -->
 <div id="gold-price-modal" onclick="if (event.target.id === 'gold-price-modal') closeGoldPriceModal()" 

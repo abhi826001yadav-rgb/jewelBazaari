@@ -245,8 +245,3 @@ export function initWishlistUI() {
     });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initWishlistUI);
-} else {
-    initWishlistUI();
-}

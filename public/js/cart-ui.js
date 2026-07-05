@@ -266,8 +266,3 @@ export function initCartUI() {
     });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCartUI);
-} else {
-    initCartUI();
-}

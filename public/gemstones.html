@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemstones • jewelBazaari</title>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="modulepreload" href="js/category-page-init.js">
+    <link rel="preload" href="css/mobile-responsive.css" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css">
     <style>
         html { overflow-x: clip; }
@@ -48,31 +52,10 @@
     </main>
 
     <script type="module">
+        import { initCategoryPageDeferred } from './js/category-page-init.js';
         import { getGemstoneProducts } from './js/firebase-product-service.js';
-        import { loadPageLayout, renderProducts, setupSearch, showLoading, showError } from './js/product-ui.js';
-        import { initCartUI } from './js/cart-ui.js';
-        import { initWishlistUI } from './js/wishlist-ui.js';
 
-        initCartUI();
-        initWishlistUI();
-
-        let gemstoneProducts = [];
-
-        async function initPage() {
-            await loadPageLayout();
-            showLoading('products-grid');
-
-            try {
-                gemstoneProducts = await getGemstoneProducts();
-                renderProducts(gemstoneProducts);
-                setupSearch(gemstoneProducts, renderProducts);
-            } catch (error) {
-                console.error('Error loading gemstone products:', error);
-                showError('products-grid');
-            }
-        }
-
-        initPage();
+        initCategoryPageDeferred(() => getGemstoneProducts());
     </script>
 </body>
 </html>
