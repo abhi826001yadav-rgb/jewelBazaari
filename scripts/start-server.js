@@ -5,6 +5,7 @@ const path = require('path');
 const root = path.join(__dirname, '..', 'public');
 const port = Number(process.env.PORT || 3000);
 
+// Mirrors Cloudflare Pages: security headers are read from public/_headers.
 function loadGlobalHeaders() {
   const headersFile = path.join(root, '_headers');
   const headers = {};

@@ -80,7 +80,7 @@ function getAuthErrorMessage(error) {
         'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again.',
         'auth/popup-blocked': 'Pop-up blocked. Allow pop-ups for this site and try again.',
         'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
-        'auth/internal-error': 'Google sign-in failed. Hard refresh the page (Ctrl+Shift+R). If it persists, check Firebase Console → Authentication → Google is enabled, and Google Cloud → API key allows Identity Toolkit API on this domain.'
+        'auth/internal-error': 'Google sign-in failed. Hard refresh (Ctrl+Shift+R), then confirm Firebase Console → Authentication → Settings → Authorized domains includes your Cloudflare domain (e.g. jewelbazaari.com and your *.pages.dev URL), Google sign-in is enabled, and the Browser API key allows Identity Toolkit API.'
     };
     return messages[code] || error?.message || 'Something went wrong. Please try again.';
 }
