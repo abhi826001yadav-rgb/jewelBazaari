@@ -79,7 +79,8 @@ function getAuthErrorMessage(error) {
         'auth/operation-not-allowed': 'Google sign-in is disabled. In Firebase Console → Authentication → Sign-in method, enable Google.',
         'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again.',
         'auth/popup-blocked': 'Pop-up blocked. Allow pop-ups for this site and try again.',
-        'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.'
+        'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
+        'auth/internal-error': 'Google sign-in failed. Hard refresh the page (Ctrl+Shift+R). If it persists, check Firebase Console → Authentication → Google is enabled, and Google Cloud → API key allows Identity Toolkit API on this domain.'
     };
     return messages[code] || error?.message || 'Something went wrong. Please try again.';
 }
