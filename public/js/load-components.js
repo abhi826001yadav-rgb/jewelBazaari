@@ -1,12 +1,26 @@
 import { getEmbeddedComponent } from './layout-components.js';
 
+function isSameOriginUrl(url) {
+    try {
+        return new URL(url).origin === window.location.origin;
+    } catch {
+        return false;
+    }
+}
+
 export function resolveIncludePath(path) {
     const clean = String(path || '').trim();
     if (!clean) return '';
-    if (clean.startsWith('http://') || clean.startsWith('https://')) {
-        return clean;
+    if (/^[a-z]+:/i.test(clean)) {
+        return '';
     }
-    return new URL(clean.replace(/^\//, ''), window.location.href).href;
+
+    const normalized = clean.replace(/\\/g, '/').replace(/^\/+/, '');
+    if (!normalized || normalized.includes('..')) {
+        return '';
+    }
+
+    return new URL(normalized, `${window.location.origin}/`).href;
 }
 
 function normalizeIncludeKey(path) {
@@ -28,11 +42,11 @@ async function fetchIncludeHtml(path) {
     const tried = new Set();
 
     for (const url of candidates) {
-        if (!url || tried.has(url)) continue;
+        if (!url || tried.has(url) || !isSameOriginUrl(url)) continue;
         tried.add(url);
 
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, { credentials: 'same-origin', redirect: 'error' });
             if (!response.ok) continue;
             const html = await response.text();
             if (html && !html.includes('Cannot GET')) {

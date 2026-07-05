@@ -31,15 +31,12 @@
 
     <div data-include="components/footer.html"></div>
 
-    <script>
-        // This script fetches your header, menu, and footer
-        document.querySelectorAll('[data-include]').forEach(el => {
-            fetch(el.getAttribute('data-include'))
-                .then(res => res.text())
-                .then(data => { el.outerHTML = data; });
+    <script type="module">
+        import { loadPageComponents } from './js/load-components.js';
+
+        loadPageComponents().then(() => {
+            if (window.lucide) window.lucide.createIcons();
         });
-        // Initializes Icons
-        lucide.createIcons();
     </script>
 </body>
 </html>

@@ -1,13 +1,8 @@
 import { getCoverImage, getProductImages } from './product-images.js';
 
-export function escapeHtml(value = '') {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
+import { escapeHtml } from './security-utils.js';
+
+export { escapeHtml };
 
 export function formatPrice(price) {
     const amount = Number(price);

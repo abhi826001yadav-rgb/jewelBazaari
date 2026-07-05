@@ -53,12 +53,36 @@ service cloud.firestore {
     }
 
     match /vendors/{vendorId} {
-      allow read: if true;
+      allow read: if isAdmin()
+        || (request.auth != null && resource.data.uid == request.auth.uid);
       allow create: if request.auth != null
         && request.resource.data.uid == request.auth.uid
-        && request.resource.data.status == 'pending';
-      allow update: if isAdmin();
+        && request.resource.data.status == 'pending'
+        && !request.resource.data.keys().hasAny(['vendorPasswordHash']);
+      allow update: if isAdmin()
+        && !request.resource.data.keys().hasAny(['vendorPasswordHash']);
       allow delete: if false;
+    }
+
+    match /vendorIds/{vendorId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && !exists(/databases/$(database)/documents/vendorIds/$(vendorId));
+      allow update, delete: if false;
+    }
+
+    match /vendorCredentials/{vendorId} {
+      allow read: if request.auth != null
+        && exists(/databases/$(database)/documents/vendors/$(vendorId))
+        && get(/databases/$(database)/documents/vendors/$(vendorId)).data.uid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'vendorPasswordHash'])
+        && request.resource.data.vendorPasswordHash is string
+        && request.resource.data.vendorPasswordHash.size() == 64
+        && !exists(/databases/$(database)/documents/vendorCredentials/$(vendorId));
+      allow update, delete: if false;
     }
 
     match /products/{productId} {

@@ -33,8 +33,8 @@ export function validateDirectImageUrl(url, { required = false, label = 'Image U
         return { ok: false, error: `${label} must be a valid link.` };
     }
 
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
-        return { ok: false, error: `${label} must start with https://` };
+    if (parsed.protocol !== 'https:') {
+        return { ok: false, error: `${label} must use https://` };
     }
 
     const host = parsed.hostname.toLowerCase();

@@ -335,6 +335,7 @@
             logoutVendor,
             getCurrentApprovedVendor
         } from './js/vendor-service.js';
+        import { escapeHtml, bindImageFallback } from './js/security-utils.js';
 
         const authSection = document.getElementById('auth-section');
         const dashboardSection = document.getElementById('dashboard-section');
@@ -470,17 +471,18 @@
                 const card = document.createElement('article');
                 card.className = 'product-card';
                 card.innerHTML = `
-                    <img src="${product.imageUrl || ''}" alt="${product.name || 'Product'}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22400%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%239ca3af%22 text-anchor=%22middle%22 dy=%22.3em%22%3ENo image%3C/text%3E%3C/svg%3E'">
+                    <img src="${escapeHtml(product.imageUrl || '')}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy">
                     <div class="p-4">
-                        <h4 class="font-semibold text-[#4A0E17] truncate">${product.name || 'Unnamed'}</h4>
-                        <p class="text-sm text-gray-500 capitalize mt-1">${product.category || '—'} · ${formatPrice(product.price)}</p>
-                        <p class="text-xs text-gray-400 mt-1 truncate">${product.id}</p>
+                        <h4 class="font-semibold text-[#4A0E17] truncate">${escapeHtml(product.name || 'Unnamed')}</h4>
+                        <p class="text-sm text-gray-500 capitalize mt-1">${escapeHtml(product.category || '—')} · ${formatPrice(product.price)}</p>
+                        <p class="text-xs text-gray-400 mt-1 truncate">${escapeHtml(product.id)}</p>
                         <div class="flex gap-2 mt-4">
-                            <button type="button" class="action-btn edit-btn" data-edit="${product.id}">Edit</button>
-                            <button type="button" class="action-btn delete-btn" data-delete="${product.id}">Delete</button>
+                            <button type="button" class="action-btn edit-btn" data-edit="${escapeHtml(product.id)}">Edit</button>
+                            <button type="button" class="action-btn delete-btn" data-delete="${escapeHtml(product.id)}">Delete</button>
                         </div>
                     </div>
                 `;
+                bindImageFallback(card.querySelector('img'));
                 listingsGrid.appendChild(card);
             });
 

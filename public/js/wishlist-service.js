@@ -1,9 +1,13 @@
+import { sanitizeStoredList, sanitizeWishlistItem } from './security-utils.js';
+
 const WISHLIST_STORAGE_KEY = 'jewelbazaari_wishlist';
 
 function readWishlist() {
     try {
         const raw = localStorage.getItem(WISHLIST_STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return sanitizeStoredList(parsed, sanitizeWishlistItem);
     } catch (error) {
         console.error('Failed to read wishlist:', error);
         return [];

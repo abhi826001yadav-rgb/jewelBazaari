@@ -16,10 +16,13 @@ import {
     orderBy,
     serverTimestamp,
     setDoc,
-    updateDoc
+    updateDoc,
+    writeBatch
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const VENDORS_COLLECTION = 'vendors';
+const VENDOR_IDS_COLLECTION = 'vendorIds';
+const VENDOR_CREDENTIALS_COLLECTION = 'vendorCredentials';
 const VENDOR_SESSION_KEY = 'jb_vendor_session';
 
 export const VENDOR_STATUS = {
@@ -60,10 +63,27 @@ function validateVendorPassword(password) {
 }
 
 function mapVendorDoc(docSnap) {
+    const { vendorPasswordHash, ...data } = docSnap.data();
     return {
         id: docSnap.id,
-        ...docSnap.data()
+        ...data
     };
+}
+
+async function getVendorPasswordHash(vendor) {
+    const vendorId = normalizeVendorId(vendor.vendorId || vendor.id);
+    if (!vendorId) {
+        return null;
+    }
+
+    const credentialsRef = doc(db, VENDOR_CREDENTIALS_COLLECTION, vendorId);
+    const credentialsSnap = await getDoc(credentialsRef);
+    if (credentialsSnap.exists()) {
+        return credentialsSnap.data().vendorPasswordHash || null;
+    }
+
+    const legacySnap = await getDoc(doc(db, VENDORS_COLLECTION, vendorId));
+    return legacySnap.exists() ? legacySnap.data().vendorPasswordHash || null : null;
 }
 
 async function hashVendorPassword(vendorId, password) {
@@ -76,12 +96,13 @@ async function hashVendorPassword(vendorId, password) {
 }
 
 async function verifyVendorPassword(vendor, password) {
-    if (!vendor.vendorPasswordHash) {
+    const storedHash = await getVendorPasswordHash(vendor);
+    if (!storedHash) {
         return false;
     }
 
     const expected = await hashVendorPassword(vendor.vendorId || vendor.id, password);
-    return expected === vendor.vendorPasswordHash;
+    return expected === storedHash;
 }
 
 async function signInVendorWithGoogle() {
@@ -125,8 +146,8 @@ export function clearVendorSession() {
 
 export async function isVendorIdAvailable(vendorId) {
     const normalizedId = normalizeVendorId(validateVendorId(vendorId));
-    const vendorRef = doc(db, VENDORS_COLLECTION, normalizedId);
-    const snapshot = await getDoc(vendorRef);
+    const vendorIdRef = doc(db, VENDOR_IDS_COLLECTION, normalizedId);
+    const snapshot = await getDoc(vendorIdRef);
     return !snapshot.exists();
 }
 
@@ -271,19 +292,33 @@ export async function completeVendorProfile({ shopName, vendorId, vendorPassword
     }
 
     const vendorPasswordHash = await hashVendorPassword(cleanVendorId, cleanVendorPassword);
+    const vendorIdRef = doc(db, VENDOR_IDS_COLLECTION, normalizedVendorId);
+    const credentialsRef = doc(db, VENDOR_CREDENTIALS_COLLECTION, normalizedVendorId);
+    const batch = writeBatch(db);
 
-    await setDoc(vendorRef, {
+    batch.set(vendorRef, {
         vendorId: cleanVendorId,
         shopName: cleanShopName,
         email: normalizeEmail(user.email),
         uid: user.uid,
-        vendorPasswordHash,
         status: VENDOR_STATUS.PENDING,
         emailVerified: true,
         authProvider: 'google',
         profileCompleted: true,
         createdAt: serverTimestamp()
     });
+
+    batch.set(vendorIdRef, {
+        vendorId: cleanVendorId,
+        uid: user.uid
+    });
+
+    batch.set(credentialsRef, {
+        uid: user.uid,
+        vendorPasswordHash
+    });
+
+    await batch.commit();
 
     await signOut(auth);
 

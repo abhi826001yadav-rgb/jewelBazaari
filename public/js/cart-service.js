@@ -1,9 +1,13 @@
+import { sanitizeCartItem, sanitizeStoredList } from './security-utils.js';
+
 const CART_STORAGE_KEY = 'jewelbazaari_cart';
 
 function readCart() {
     try {
         const raw = localStorage.getItem(CART_STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return sanitizeStoredList(parsed, sanitizeCartItem);
     } catch (error) {
         console.error('Failed to read cart:', error);
         return [];
