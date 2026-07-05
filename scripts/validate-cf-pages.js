@@ -94,24 +94,28 @@ for (const privatePage of ['/admin.html', '/vendor-upload.html', '/registered-ve
   }
 }
 
-const publicSlugs = [
-  'gold',
-  'diamond',
-  'gemstones',
-  'earrings',
-  'rings',
-  'wedding',
-  'combos',
-  'more',
-  'query'
+const htmlCspRule = headerRules.find((rule) => rule.pattern === '/*.html');
+const indexCspRule = headerRules.find((rule) => rule.pattern === '/index.html');
+
+for (const [label, rule] of [['/*.html', htmlCspRule], ['/index.html', indexCspRule]]) {
+  const csp = rule?.headers['Content-Security-Policy'] || '';
+  if (!csp.includes('connect-src')) {
+    fail(`${label} must include Content-Security-Policy connect-src (Cloudflare uses best-match rule only)`);
+  }
+  if (!csp.includes('firebasestorage')) {
+    fail(`${label} CSP must allow Firebase storage hosts`);
+  }
+}
+
+const loopRiskySlugs = [
+  'gold', 'diamond', 'gemstones', 'earrings', 'rings',
+  'wedding', 'combos', 'more', 'query', 'all-jewellery'
 ];
 
-for (const slug of publicSlugs) {
-  const rule = redirects.find((entry) => entry.from === `/${slug}`);
-  if (!rule) {
-    fail(`Missing clean URL redirect for /${slug}`);
-  } else if (rule.to !== `/${slug}.html`) {
-    fail(`Redirect /${slug} should target /${slug}.html`);
+for (const slug of loopRiskySlugs) {
+  const loopRule = redirects.find((entry) => entry.from === `/${slug}`);
+  if (loopRule) {
+    fail(`Redirect loop risk: remove /${slug} -> .html rule (conflicts with Cloudflare .html handling)`);
   }
 }
 

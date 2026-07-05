@@ -1,10 +1,11 @@
 # jewelBazaari — Cloudflare Pages redirects
 # Format: <source> <destination> [status]
-# HTTPS and www canonicalization are handled in Cloudflare zone settings.
+# NOTE: Do NOT add /page -> /page.html rules — they loop with .html URL stripping on Cloudflare.
 
 # Home aliases
 /home              /index.html    301
 /index             /index.html    301
+/home/             /index.html    301
 
 # Order tracking
 /track-order       /track-order.html    301
@@ -13,37 +14,14 @@
 # Contact aliases
 /contact           /query.html    301
 /contact-us        /query.html    301
-
-# Collection alias
-/jewellery         /all-jewellery.html    301
-/all-jewellery     /all-jewellery.html    301
-
-# Clean URLs (extensionless) — public catalogue pages
-/gold              /gold.html    301
-/diamond           /diamond.html    301
-/gemstones         /gemstones.html    301
-/earrings          /earrings.html    301
-/rings             /rings.html    301
-/wedding           /wedding.html    301
-/combos            /combos.html    301
-/more              /more.html    301
-/query             /query.html    301
-
-# Trailing-slash normalization (clean URLs)
-/gold/             /gold.html    301
-/diamond/          /diamond.html    301
-/gemstones/        /gemstones.html    301
-/earrings/         /earrings.html    301
-/rings/            /rings.html    301
-/wedding/          /wedding.html    301
-/combos/           /combos.html    301
-/more/             /more.html    301
-/query/            /query.html    301
-/all-jewellery/    /all-jewellery.html    301
-/home/             /index.html    301
 /contact/          /query.html    301
+/contact-us/       /query.html    301
 
-# Trailing-slash normalization (.html paths)
+# Collection alias (one-way; does not conflict with .html paths)
+/jewellery         /all-jewellery.html    301
+/jewellery/        /all-jewellery.html    301
+
+# Trailing-slash normalization (.html paths only)
 /index.html/       /index.html    301
 /gold.html/        /gold.html    301
 /diamond.html/     /diamond.html    301
@@ -56,5 +34,5 @@
 /more.html/        /more.html    301
 /query.html/       /query.html    301
 
-# Legacy / removed paths (URL-encoded space in filename)
+# Legacy / removed paths
 /diamond%20copy.html    /diamond.html    301
