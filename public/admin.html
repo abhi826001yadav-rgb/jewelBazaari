@@ -677,6 +677,7 @@
         } from './js/customer-query-service.js';
         import { auth } from './js/firebase-config.js';
         import { isAdminEmail } from './js/admin-config.js';
+        import { getAuthErrorMessage } from './js/auth-error-messages.js';
         import {
             GoogleAuthProvider,
             signInWithPopup,
@@ -778,11 +779,7 @@
 
                 unlockAdmin();
             } catch (error) {
-                if (error?.code === 'auth/popup-closed-by-user') {
-                    showLoginError('Sign-in cancelled. Please try again.');
-                } else {
-                    showLoginError(error?.message || 'Could not sign in. Please try again.');
-                }
+                showLoginError(getAuthErrorMessage(error));
             } finally {
                 loginBtn.disabled = false;
             }
