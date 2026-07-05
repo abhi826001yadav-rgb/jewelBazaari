@@ -26,6 +26,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/mobile-responsive.css">
+    <link rel="stylesheet" href="css/accessibility.css">
     <script>
         tailwind.config = {
             theme: {
@@ -368,15 +369,25 @@
         function clearErrors() {
             Object.keys(fields).forEach((key) => {
                 fields[key].classList.remove('error');
+                fields[key].removeAttribute('aria-invalid');
+                fields[key].removeAttribute('aria-describedby');
                 const errEl = document.getElementById(`${key}-error`);
-                if (errEl) errEl.textContent = '';
+                if (errEl) {
+                    errEl.textContent = '';
+                    errEl.removeAttribute('role');
+                }
             });
         }
 
         function setFieldError(field, message) {
             fields[field].classList.add('error');
+            fields[field].setAttribute('aria-invalid', 'true');
+            fields[field].setAttribute('aria-describedby', `${field}-error`);
             const errEl = document.getElementById(`${field}-error`);
-            if (errEl) errEl.textContent = message;
+            if (errEl) {
+                errEl.textContent = message;
+                errEl.setAttribute('role', 'alert');
+            }
         }
 
         function validateForm() {
@@ -462,5 +473,6 @@
             }
         });
     </script>
+    <script type="module" src="js/accessibility.js"></script>
 </body>
 </html>

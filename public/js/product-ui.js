@@ -2,6 +2,7 @@ import { getCoverImage, getProductImages } from './product-images.js';
 
 import { escapeHtml } from './security-utils.js';
 import { initLucideIcons, initLinkPrefetch, scheduleIdleTask } from './performance-boot.js';
+import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
 
 export { escapeHtml };
 
@@ -21,23 +22,25 @@ export function formatLabel(value) {
 let galleryInitialized = false;
 let galleryImages = [];
 let galleryIndex = 0;
+let galleryTrigger = null;
 
 function ensureProductGalleryModal() {
     if (document.getElementById('product-gallery-modal')) return;
 
     document.body.insertAdjacentHTML('beforeend', `
-        <div id="product-gallery-modal" class="hidden fixed inset-0 bg-black/70 z-[250] flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl">
+        <div id="product-gallery-overlay" class="hidden fixed inset-0 bg-black/70 z-[250]" aria-hidden="true"></div>
+        <div id="product-gallery-modal" class="hidden fixed inset-0 z-[251] flex items-center justify-center p-4 pointer-events-none" aria-labelledby="product-gallery-title">
+            <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl pointer-events-auto">
                 <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <h3 id="product-gallery-title" class="font-semibold text-[#4A0E17] text-sm sm:text-base line-clamp-1"></h3>
-                    <button type="button" id="product-gallery-close" class="text-2xl leading-none text-gray-500 hover:text-[#4A0E17]">&times;</button>
+                    <button type="button" id="product-gallery-close" class="text-2xl leading-none text-gray-500 hover:text-[#4A0E17]" aria-label="Close image gallery">&times;</button>
                 </div>
                 <div class="relative bg-[#FAF7F2]">
                     <img id="product-gallery-main" src="" alt="" class="w-full aspect-square object-cover">
-                    <button type="button" id="product-gallery-prev" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-gray-200 text-[#4A0E17] hover:bg-white">&#8249;</button>
-                    <button type="button" id="product-gallery-next" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-gray-200 text-[#4A0E17] hover:bg-white">&#8250;</button>
+                    <button type="button" id="product-gallery-prev" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-gray-200 text-[#4A0E17] hover:bg-white" aria-label="Previous image">&#8249;</button>
+                    <button type="button" id="product-gallery-next" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-gray-200 text-[#4A0E17] hover:bg-white" aria-label="Next image">&#8250;</button>
                 </div>
-                <div id="product-gallery-thumbs" class="hidden flex gap-2 p-4 justify-center bg-white border-t border-gray-100"></div>
+                <div id="product-gallery-thumbs" class="hidden flex gap-2 p-4 justify-center bg-white border-t border-gray-100" role="tablist" aria-label="Product image thumbnails"></div>
             </div>
         </div>
     `);
@@ -52,6 +55,8 @@ function renderGalleryView() {
     if (!mainImage || !galleryImages.length) return;
 
     mainImage.src = galleryImages[galleryIndex];
+    const title = document.getElementById('product-gallery-title')?.textContent || 'Product';
+    mainImage.alt = `${title} — image ${galleryIndex + 1} of ${galleryImages.length}`;
     const hasMultiple = galleryImages.length > 1;
 
     if (prevBtn) prevBtn.classList.toggle('hidden', !hasMultiple);
@@ -67,31 +72,45 @@ function renderGalleryView() {
 
     thumbsEl.classList.remove('hidden');
     thumbsEl.innerHTML = galleryImages.map((url, index) => `
-        <button type="button" data-gallery-thumb="${index}"
+        <button type="button" data-gallery-thumb="${index}" role="tab"
+            aria-selected="${index === galleryIndex ? 'true' : 'false'}"
+            aria-label="View image ${index + 1}"
             class="w-16 h-16 rounded-lg overflow-hidden border-2 ${index === galleryIndex ? 'border-[#9B7E4B]' : 'border-gray-200'}">
-            <img src="${escapeHtml(url)}" alt="Thumbnail ${index + 1}" class="w-full h-full object-cover">
+            <img src="${escapeHtml(url)}" alt="" class="w-full h-full object-cover" aria-hidden="true">
         </button>
     `).join('');
 }
 
-export function openProductGallery(product) {
+export function openProductGallery(product, trigger = document.activeElement) {
     galleryImages = getProductImages(product);
     if (!galleryImages.length) return;
 
     ensureProductGalleryModal();
     galleryIndex = 0;
+    galleryTrigger = trigger;
 
     const titleEl = document.getElementById('product-gallery-title');
     if (titleEl) titleEl.textContent = product.name || 'Product Images';
 
     renderGalleryView();
-    document.getElementById('product-gallery-modal')?.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    const panel = document.getElementById('product-gallery-modal');
+    const overlay = document.getElementById('product-gallery-overlay');
+    openAccessibleDialog({
+        panel,
+        overlay,
+        trigger,
+        labelledBy: 'product-gallery-title',
+        initialFocus: document.getElementById('product-gallery-close')
+    });
+    announce(`Image gallery opened for ${product.name || 'product'}.`);
 }
 
 export function closeProductGallery() {
-    document.getElementById('product-gallery-modal')?.classList.add('hidden');
-    document.body.style.overflow = '';
+    closeAccessibleDialog({
+        panel: document.getElementById('product-gallery-modal'),
+        overlay: document.getElementById('product-gallery-overlay')
+    });
+    galleryTrigger = null;
 }
 
 export function initProductGalleryUI() {
@@ -110,14 +129,14 @@ export function initProductGalleryUI() {
                 openProductGallery({
                     name: trigger.getAttribute('data-product-name') || 'Product',
                     images
-                });
+                }, trigger);
             } catch (error) {
                 console.error('Failed to open product gallery:', error);
             }
             return;
         }
 
-        if (event.target.id === 'product-gallery-close' || event.target.id === 'product-gallery-modal') {
+        if (event.target.id === 'product-gallery-close' || event.target.id === 'product-gallery-overlay') {
             closeProductGallery();
             return;
         }
@@ -156,6 +175,7 @@ export async function loadPageLayout() {
 
     await loadPageComponents('#announcement-placeholder, #header-placeholder, #category-placeholder');
 
+    window.dispatchEvent(new CustomEvent('jewelbazaari:components-loaded'));
     initLucideIcons();
 
     const { initCategoryNav } = await import('./category-nav.js');
@@ -179,7 +199,10 @@ export async function renderProducts(products, gridId = 'products-grid', countId
     grid.innerHTML = '';
 
     if (countEl) {
-        countEl.textContent = `${products.length} product${products.length === 1 ? '' : 's'}`;
+        const countText = `${products.length} product${products.length === 1 ? '' : 's'}`;
+        countEl.textContent = countText;
+        countEl.setAttribute('aria-live', 'polite');
+        countEl.setAttribute('aria-atomic', 'true');
     }
 
     if (!products.length) {

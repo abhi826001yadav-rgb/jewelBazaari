@@ -336,6 +336,7 @@
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="css/mobile-responsive.css">
+    <link rel="stylesheet" href="css/accessibility.css">
     <link rel="prefetch" href="gold.html" as="document">
     <link rel="prefetch" href="all-jewellery.html" as="document">
 </head>
@@ -350,6 +351,8 @@
         
         <div data-include="components/category-bar.html"></div>
     </header>
+
+    <main id="main-content">
 
     <section class="w-full">
         <div class="swiper mySwiper">
@@ -578,6 +581,8 @@
         </div>
     </section>
 
+    </main>
+
     <div data-include="components/footer.html"></div>
 
     <script type="module">
@@ -591,6 +596,7 @@
         import { initShadowCarousel, destroyShadowCarousel } from './js/home-featured-carousel.js';
         import { initLucideIcons, initLinkPrefetch, scheduleStorefrontUiInit } from './js/performance-boot.js';
         import { initPageSchemas } from './js/seo-schema.js';
+        import './js/accessibility.js';
 
         initPageSchemas({ pageKey: 'index.html' });
 
@@ -639,6 +645,8 @@
         bootSwipers();
 
         await loadPageComponents();
+        window.dispatchEvent(new CustomEvent('jewelbazaari:components-loaded'));
+        window.jbA11y?.ensureSkipLink();
         initCategoryNav();
         initLinkPrefetch();
         initLucideIcons();
@@ -795,23 +803,24 @@
         window.addEventListener('jewelbazaari:add-to-cart-count-updated', loadTrendingProducts);
     </script>
 <!-- ========== LIVE GOLD PRICE MODAL + DYNAMIC JS ========== -->
-<div id="gold-price-modal" onclick="if (event.target.id === 'gold-price-modal') closeGoldPriceModal()" 
-     class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+<div id="gold-price-modal"
+     class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
+     role="dialog" aria-modal="true" aria-labelledby="gold-price-modal-title">
 
-    <div onclick="event.stopImmediatePropagation()" class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+    <div id="gold-price-dialog-panel" class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
         
         <!-- Header -->
         <div class="bg-[#4A0E17] px-6 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-[#9B7E4B] rounded-2xl flex items-center justify-center">
+                <div class="w-9 h-9 bg-[#9B7E4B] rounded-2xl flex items-center justify-center" aria-hidden="true">
                     <i data-lucide="trending-up" class="w-5 h-5 text-[#4A0E17]"></i>
                 </div>
                 <div>
-                    <h3 class="font-serif text-2xl text-white tracking-tight">Live Gold Price</h3>
+                    <h3 id="gold-price-modal-title" class="font-serif text-2xl text-white tracking-tight">Live Gold Price</h3>
                     <p class="text-[#C5A880] text-xs tracking-wider">TODAY'S RATE • VERIFIED</p>
                 </div>
             </div>
-            <button onclick="closeGoldPriceModal()" class="text-white/70 hover:text-white text-2xl leading-none">×</button>
+            <button type="button" id="gold-price-modal-close" class="text-white/70 hover:text-white text-2xl leading-none" aria-label="Close live gold price">×</button>
         </div>
 
         <div class="p-6">
@@ -819,14 +828,14 @@
             <div class="mb-5">
                 <div class="flex justify-between mb-2">
                     <span class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Showing price for</span>
-                    <button onclick="detectCurrentLocation()" class="flex items-center gap-1 text-xs font-semibold text-[#9B7E4B]">
-                        <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <button type="button" id="gold-price-detect-btn" class="flex items-center gap-1 text-xs font-semibold text-[#9B7E4B]" aria-label="Detect my location">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5" aria-hidden="true"></i>
                         <span>Detect My Location</span>
                     </button>
                 </div>
                 
                 <div class="flex items-center gap-3 bg-[#FAF7F2] border border-[#9B7E4B]/30 rounded-2xl px-4 py-3">
-                    <i data-lucide="map-pin" class="w-5 h-5 text-[#9B7E4B]"></i>
+                    <i data-lucide="map-pin" class="w-5 h-5 text-[#9B7E4B]" aria-hidden="true"></i>
                     <div>
                         <div id="location-city" class="font-semibold text-[#2A2A2A]">Surat, Gujarat</div>
                         <div id="location-pin" class="text-xs text-gray-500">PIN: 395001 • Your current location</div>
@@ -836,8 +845,8 @@
 
             <!-- City Dropdown -->
             <div class="mb-4">
-                <label class="text-xs uppercase tracking-widest text-gray-500 font-semibold block mb-1.5">Or choose another city</label>
-                <select id="city-select" onchange="updateGoldPriceForCity()" class="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm">
+                <label for="city-select" class="text-xs uppercase tracking-widest text-gray-500 font-semibold block mb-1.5">Or choose another city</label>
+                <select id="city-select" class="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm">
                     <option value="Surat">Surat, Gujarat</option>
                     <option value="Delhi">Delhi</option>
                     <option value="Mumbai">Mumbai</option>
@@ -856,10 +865,10 @@
 
             <!-- PIN Code -->
             <div class="mb-6">
-                <label class="text-xs uppercase tracking-widest text-gray-500 font-semibold block mb-1.5">Or enter PIN code</label>
+                <label for="pincode-input" class="text-xs uppercase tracking-widest text-gray-500 font-semibold block mb-1.5">Or enter PIN code</label>
                 <div class="flex gap-2">
-                    <input type="text" id="pincode-input" placeholder="e.g. 395007 or 110001" class="flex-1 border border-gray-200 rounded-2xl px-4 py-3 text-sm">
-                    <button onclick="lookupByPincode()" class="px-6 bg-[#4A0E17] text-white text-sm font-semibold rounded-2xl">Check</button>
+                    <input type="text" id="pincode-input" inputmode="numeric" autocomplete="postal-code" placeholder="e.g. 395007 or 110001" class="flex-1 border border-gray-200 rounded-2xl px-4 py-3 text-sm">
+                    <button type="button" id="gold-price-check-pin" class="px-6 bg-[#4A0E17] text-white text-sm font-semibold rounded-2xl" aria-label="Check gold price for PIN code">Check</button>
                 </div>
             </div>
 
@@ -937,14 +946,26 @@
         return Math.round(price24k * 0.916);
     }
 
-    async function openGoldPriceModal() {
+    let goldModalTrigger = null;
+
+    async function openGoldPriceModal(trigger) {
         const modal = document.getElementById('gold-price-modal');
-        if (!modal) {
-            alert("Modal not found! Make sure you pasted the Modal HTML.");
-            return;
-        }
+        if (!modal) return;
+
+        goldModalTrigger = trigger || document.activeElement;
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+
+        window.jbA11y?.openAccessibleDialog({
+            panel: modal,
+            overlay: null,
+            trigger: goldModalTrigger,
+            labelledBy: 'gold-price-modal-title',
+            initialFocus: document.getElementById('gold-price-modal-close'),
+            onClose: () => {
+                modal.classList.remove('flex');
+            }
+        });
 
         document.getElementById('price-24k').innerText = "Loading...";
         document.getElementById('price-22k').innerText = "Loading...";
@@ -957,6 +978,7 @@
 
         document.getElementById('city-select').value = 'Surat';
         updateCityDisplay('Surat', price22k, price24k);
+        window.jbA11y?.announce('Live gold price dialog opened.');
     }
 
     function updateCityDisplay(city, base22k, base24k) {
@@ -985,8 +1007,11 @@
 
     function closeGoldPriceModal() {
         const modal = document.getElementById('gold-price-modal');
+        if (!modal) return;
+        window.jbA11y?.closeAccessibleDialog({ panel: modal, overlay: null });
         modal.classList.remove('flex');
         modal.classList.add('hidden');
+        goldModalTrigger = null;
     }
 
     function lookupByPincode() {
@@ -1015,6 +1040,15 @@
             updateGoldPriceForCity();
         }, 600);
     }
+
+    document.getElementById('gold-price-modal-close')?.addEventListener('click', closeGoldPriceModal);
+    document.getElementById('gold-price-modal')?.addEventListener('click', (event) => {
+        if (event.target.id === 'gold-price-modal') closeGoldPriceModal();
+    });
+    document.getElementById('gold-price-dialog-panel')?.addEventListener('click', (event) => event.stopPropagation());
+    document.getElementById('gold-price-detect-btn')?.addEventListener('click', detectCurrentLocation);
+    document.getElementById('gold-price-check-pin')?.addEventListener('click', lookupByPincode);
+    document.getElementById('city-select')?.addEventListener('change', updateGoldPriceForCity);
 </script>
     
 </body>

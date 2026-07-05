@@ -22,6 +22,7 @@
     <link rel="preload" href="css/mobile-responsive.css" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css">
+    <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body {
             margin: 0;
@@ -444,9 +445,9 @@
                 </button>
             </div>
 
-            <div class="admin-tabs">
-                <button type="button" id="tab-products" class="admin-tab-btn is-active">Jewellery Records</button>
-                <button type="button" id="tab-vendors" class="admin-tab-btn inline-flex items-center gap-1.5">
+            <div class="admin-tabs" role="tablist" aria-label="Admin dashboard sections">
+                <button type="button" id="tab-products" class="admin-tab-btn is-active" role="tab" aria-selected="true" aria-controls="products-view">Jewellery Records</button>
+                <button type="button" id="tab-vendors" class="admin-tab-btn inline-flex items-center gap-1.5" role="tab" aria-selected="false" aria-controls="vendors-view">
                     <svg class="admin-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -454,7 +455,7 @@
                     Vendors
                     <span id="pending-vendor-count" class="ml-0.5"></span>
                 </button>
-                <button type="button" id="tab-queries" class="admin-tab-btn inline-flex items-center gap-1.5">
+                <button type="button" id="tab-queries" class="admin-tab-btn inline-flex items-center gap-1.5" role="tab" aria-selected="false" aria-controls="queries-view">
                     <svg class="admin-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
@@ -463,11 +464,12 @@
                 </button>
             </div>
 
-            <div id="products-view" class="admin-view is-active">
+            <div id="products-view" class="admin-view is-active" role="tabpanel" aria-labelledby="tab-products">
             <div id="search-wrap" class="admin-search-wrap hidden">
+                <label for="admin-search" class="sr-only">Search jewellery records</label>
                 <input
                     type="search"
-                    id="admin-search"
+                    id="admin-search" aria-label="Search jewellery records"
                     class="admin-search-input"
                     placeholder="Search by Name, ID, Vendor Name etc"
                     autocomplete="off"
@@ -495,7 +497,7 @@
             </div>
             </div>
 
-            <div id="vendors-view" class="admin-view">
+            <div id="vendors-view" class="admin-view" role="tabpanel" aria-labelledby="tab-vendors" hidden>
                 <p class="text-sm text-gray-500 mb-4">Approve new vendors, reject applications, or discontinue approved vendors at any time.</p>
                 <div id="vendors-loading" class="text-center py-16 text-gray-500">Loading vendors...</div>
                 <div id="vendors-error" class="hidden text-center py-16 text-red-600"></div>
@@ -517,7 +519,7 @@
                 </div>
             </div>
 
-            <div id="queries-view" class="admin-view">
+            <div id="queries-view" class="admin-view" role="tabpanel" aria-labelledby="tab-queries" hidden>
                 <p class="text-sm text-gray-500 mb-4">View, edit, or delete customer contact form submissions.</p>
                 <div id="queries-loading" class="text-center py-16 text-gray-500">Loading customer queries...</div>
                 <div id="queries-error" class="hidden text-center py-16 text-red-600"></div>
@@ -805,9 +807,15 @@
             tabProducts.classList.toggle('is-active', tab === 'products');
             tabVendors.classList.toggle('is-active', tab === 'vendors');
             tabQueries.classList.toggle('is-active', tab === 'queries');
+            tabProducts.setAttribute('aria-selected', tab === 'products' ? 'true' : 'false');
+            tabVendors.setAttribute('aria-selected', tab === 'vendors' ? 'true' : 'false');
+            tabQueries.setAttribute('aria-selected', tab === 'queries' ? 'true' : 'false');
             productsView.classList.toggle('is-active', tab === 'products');
             vendorsView.classList.toggle('is-active', tab === 'vendors');
             queriesView.classList.toggle('is-active', tab === 'queries');
+            productsView.hidden = tab !== 'products';
+            vendorsView.hidden = tab !== 'vendors';
+            queriesView.hidden = tab !== 'queries';
         }
 
         function formatQueryDate(query) {
@@ -1368,5 +1376,6 @@
             }
         });
     </script>
+    <script type="module" src="js/accessibility.js"></script>
 </body>
 </html>

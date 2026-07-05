@@ -6,6 +6,7 @@ import {
     removeFromWishlist
 } from './wishlist-service.js';
 import { addToCart } from './cart-service.js';
+import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
 
 const WISHLIST_PINK = '#E75480';
 
@@ -60,11 +61,11 @@ function ensureWishlistDrawer() {
     if (document.getElementById('wishlist-drawer')) return;
 
     document.body.insertAdjacentHTML('beforeend', `
-        <div id="wishlist-drawer-overlay" class="hidden fixed inset-0 bg-black/50 z-[200]"></div>
-        <aside id="wishlist-drawer" class="hidden fixed top-0 right-0 h-full w-full max-w-md bg-[#FAF7F2] shadow-2xl z-[202] flex flex-col border-l border-[#9B7E4B]/30">
+        <div id="wishlist-drawer-overlay" class="hidden fixed inset-0 bg-black/50 z-[200]" aria-hidden="true"></div>
+        <aside id="wishlist-drawer" class="hidden fixed top-0 right-0 h-full w-full max-w-md bg-[#FAF7F2] shadow-2xl z-[202] flex flex-col border-l border-[#9B7E4B]/30" aria-labelledby="wishlist-drawer-title">
             <div class="bg-[#4A0E17] text-white px-5 py-4 flex items-center justify-between">
-                <h2 class="text-lg font-semibold">Your Wishlist</h2>
-                <button type="button" id="wishlist-drawer-close" class="text-2xl leading-none text-white/80 hover:text-white">&times;</button>
+                <h2 id="wishlist-drawer-title" class="text-lg font-semibold">Your Wishlist</h2>
+                <button type="button" id="wishlist-drawer-close" class="text-2xl leading-none text-white/80 hover:text-white" aria-label="Close wishlist">&times;</button>
             </div>
             <div id="wishlist-drawer-items" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
         </aside>
@@ -72,7 +73,12 @@ function ensureWishlistDrawer() {
 }
 
 export function updateWishlistBadge() {
-    const hasItems = getWishlistCount() > 0;
+    const count = getWishlistCount();
+    const hasItems = count > 0;
+
+    document.querySelectorAll('#wishlist-icon-btn, [data-wishlist-icon]').forEach((button) => {
+        button.setAttribute('aria-label', hasItems ? `Wishlist, ${count} item${count === 1 ? '' : 's'}` : 'Wishlist');
+    });
 
     document.querySelectorAll('[data-wishlist-header-heart]').forEach((heart) => {
         if (hasItems) {
@@ -144,18 +150,29 @@ function renderWishlistDrawer() {
     `).join('');
 }
 
-export function openWishlistDrawer() {
+let wishlistDrawerTrigger = null;
+
+export function openWishlistDrawer(trigger = document.activeElement) {
     ensureWishlistDrawer();
     renderWishlistDrawer();
-    document.getElementById('wishlist-drawer-overlay')?.classList.remove('hidden');
-    document.getElementById('wishlist-drawer')?.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    wishlistDrawerTrigger = trigger;
+    openAccessibleDialog({
+        panel: document.getElementById('wishlist-drawer'),
+        overlay: document.getElementById('wishlist-drawer-overlay'),
+        trigger,
+        labelledBy: 'wishlist-drawer-title',
+        initialFocus: document.getElementById('wishlist-drawer-close')
+    });
+    const count = getWishlistCount();
+    announce(`Wishlist opened. ${count} item${count === 1 ? '' : 's'}.`);
 }
 
 export function closeWishlistDrawer() {
-    document.getElementById('wishlist-drawer-overlay')?.classList.add('hidden');
-    document.getElementById('wishlist-drawer')?.classList.add('hidden');
-    document.body.style.overflow = '';
+    closeAccessibleDialog({
+        panel: document.getElementById('wishlist-drawer'),
+        overlay: document.getElementById('wishlist-drawer-overlay')
+    });
+    wishlistDrawerTrigger = null;
 }
 
 function handleWishlistToggle(button) {
@@ -194,7 +211,7 @@ export function initWishlistUI() {
         const wishlistIcon = event.target.closest('#wishlist-icon-btn, [data-wishlist-icon]');
         if (wishlistIcon) {
             event.preventDefault();
-            openWishlistDrawer();
+            openWishlistDrawer(wishlistIcon);
             return;
         }
 

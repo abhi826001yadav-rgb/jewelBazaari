@@ -5,8 +5,11 @@
         </a>
 
         <div class="flex-1 flex justify-center px-3 md:px-5 hidden md:flex min-w-0">
-            <input type="text" placeholder="Search diamond jewellery..."
-                class="w-full max-w-[22rem] border border-gray-300 rounded-full px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
+            <label for="header-search-input" class="sr-only">Search jewellery</label>
+            <input type="search" id="header-search-input" name="q" placeholder="Search diamond jewellery..."
+                aria-label="Search jewellery"
+                autocomplete="off"
+                class="jb-header-search w-full max-w-[22rem] border border-gray-300 rounded-full px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
         </div>
 
         <div class="jb-header-nav flex items-center text-gray-700">

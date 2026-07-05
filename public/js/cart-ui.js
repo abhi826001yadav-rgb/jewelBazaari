@@ -7,6 +7,7 @@ import {
     getTotalItems,
     getTotalAmount
 } from './cart-service.js';
+import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
 
 function formatPrice(amount) {
     return `₹${Number(amount || 0).toLocaleString('en-IN')}`;
@@ -25,14 +26,15 @@ function ensureCartDrawer() {
     if (document.getElementById('cart-drawer')) return;
 
     document.body.insertAdjacentHTML('beforeend', `
-        <div id="cart-drawer-overlay" class="hidden fixed inset-0 bg-black/50 z-[200]"></div>
-        <aside id="cart-drawer" class="hidden fixed top-0 right-0 h-full w-full max-w-md bg-[#FAF7F2] shadow-2xl z-[201] flex flex-col border-l border-[#9B7E4B]/30">
+        <div id="cart-drawer-overlay" class="hidden fixed inset-0 bg-black/50 z-[200]" aria-hidden="true"></div>
+        <aside id="cart-drawer" class="hidden fixed top-0 right-0 h-full w-full max-w-md bg-[#FAF7F2] shadow-2xl z-[201] flex flex-col border-l border-[#9B7E4B]/30" aria-labelledby="cart-drawer-title">
             <div class="bg-[#4A0E17] text-white px-5 py-4 flex items-center justify-between">
-                <a href="index.html" aria-label="Home" class="flex items-center gap-2 text-white/90 hover:text-[#9B7E4B] transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                <a href="index.html" aria-label="Back to homepage" class="flex items-center gap-2 text-white/90 hover:text-[#9B7E4B] transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
                     <span class="text-sm font-medium"> Back to homepage </span>
                 </a>
-                <button type="button" id="cart-drawer-close" class="text-2xl leading-none text-white/80 hover:text-white">&times;</button>
+                <h2 id="cart-drawer-title" class="sr-only">Shopping cart</h2>
+                <button type="button" id="cart-drawer-close" class="text-2xl leading-none text-white/80 hover:text-white" aria-label="Close cart">&times;</button>
             </div>
             <div id="cart-drawer-items" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
             <div class="border-t border-gray-200 p-4 bg-white">
@@ -57,6 +59,10 @@ export function updateCartBadge() {
     document.querySelectorAll('[data-cart-count]').forEach((badge) => {
         badge.textContent = String(count);
         badge.classList.toggle('hidden', count === 0);
+        badge.setAttribute('aria-hidden', count === 0 ? 'true' : 'false');
+    });
+    document.querySelectorAll('#cart-icon-btn, [data-cart-icon]').forEach((button) => {
+        button.setAttribute('aria-label', count > 0 ? `Cart, ${count} item${count === 1 ? '' : 's'}` : 'Cart');
     });
 }
 
@@ -78,10 +84,10 @@ function renderCartDrawer() {
                     <h3 class="font-medium text-sm text-[#2A2A2A] line-clamp-2">${escapeHtml(item.name)}</h3>
                     <p class="text-sm font-bold text-[#4A0E17] mt-1">${formatPrice(item.price)}</p>
                     <div class="flex items-center gap-2 mt-2">
-                        <button type="button" data-cart-decrease="${escapeHtml(item.id)}" class="w-7 h-7 rounded-full border border-gray-300 text-sm leading-none">-</button>
-                        <span class="text-sm font-medium w-6 text-center">${item.quantity}</span>
-                        <button type="button" data-cart-increase="${escapeHtml(item.id)}" class="w-7 h-7 rounded-full border border-gray-300 text-sm leading-none">+</button>
-                        <button type="button" data-cart-remove="${escapeHtml(item.id)}" class="ml-auto text-xs text-red-600 hover:underline">Remove</button>
+                        <button type="button" data-cart-decrease="${escapeHtml(item.id)}" class="w-7 h-7 rounded-full border border-gray-300 text-sm leading-none" aria-label="Decrease quantity of ${escapeHtml(item.name)}">-</button>
+                        <span class="text-sm font-medium w-6 text-center" aria-label="Quantity">${item.quantity}</span>
+                        <button type="button" data-cart-increase="${escapeHtml(item.id)}" class="w-7 h-7 rounded-full border border-gray-300 text-sm leading-none" aria-label="Increase quantity of ${escapeHtml(item.name)}">+</button>
+                        <button type="button" data-cart-remove="${escapeHtml(item.id)}" class="ml-auto text-xs text-red-600 hover:underline" aria-label="Remove ${escapeHtml(item.name)} from cart">Remove</button>
                     </div>
                 </div>
             </div>
@@ -92,18 +98,31 @@ function renderCartDrawer() {
     if (totalAmountEl) totalAmountEl.textContent = formatPrice(getTotalAmount());
 }
 
-export function openCartDrawer() {
+let cartDrawerTrigger = null;
+
+export function openCartDrawer(trigger = document.activeElement) {
     ensureCartDrawer();
     renderCartDrawer();
-    document.getElementById('cart-drawer-overlay')?.classList.remove('hidden');
-    document.getElementById('cart-drawer')?.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    cartDrawerTrigger = trigger;
+    const panel = document.getElementById('cart-drawer');
+    const overlay = document.getElementById('cart-drawer-overlay');
+    openAccessibleDialog({
+        panel,
+        overlay,
+        trigger,
+        labelledBy: 'cart-drawer-title',
+        initialFocus: document.getElementById('cart-drawer-close')
+    });
+    announce(`Cart opened. ${getTotalItems()} item${getTotalItems() === 1 ? '' : 's'}.`);
 }
 
 export function closeCartDrawer() {
-    document.getElementById('cart-drawer-overlay')?.classList.add('hidden');
-    document.getElementById('cart-drawer')?.classList.add('hidden');
-    document.body.style.overflow = '';
+    closeAccessibleDialog({
+        panel: document.getElementById('cart-drawer'),
+        overlay: document.getElementById('cart-drawer-overlay'),
+        trigger: cartDrawerTrigger
+    });
+    cartDrawerTrigger = null;
 }
 
 function rememberButtonDefault(button) {
@@ -151,10 +170,14 @@ function showCartSuccessNotification() {
         toast = document.createElement('div');
         toast.id = 'cart-success-toast';
         toast.className = 'fixed top-5 left-1/2 -translate-x-1/2 z-[300] bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none';
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
+        toast.setAttribute('aria-atomic', 'true');
         document.body.appendChild(toast);
     }
 
     toast.textContent = '✅ Added to Cart Successfully';
+    announce('Added to cart successfully');
     toast.classList.remove('opacity-0');
     toast.classList.add('opacity-100');
     clearTimeout(toast._hideTimer);
@@ -208,7 +231,7 @@ export function initCartUI() {
         const cartIcon = event.target.closest('#cart-icon-btn, [data-cart-icon]');
         if (cartIcon) {
             event.preventDefault();
-            openCartDrawer();
+            openCartDrawer(cartIcon);
             return;
         }
 

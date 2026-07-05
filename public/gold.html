@@ -25,6 +25,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css">
+    <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html { overflow-x: clip; }
         body { background-color: #FAF7F2; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
@@ -57,7 +58,9 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <div class="mb-6">
-            <input type="text" id="search-input" placeholder="Search gold jewellery..."
+            <label for="search-input" class="sr-only">Search gold jewellery</label>
+
+            <input type="search" id="search-input" aria-label="Search gold jewellery" placeholder="Search gold jewellery..."
                 class="w-full md:w-80 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#9B7E4B]">
         </div>
 
@@ -76,5 +79,6 @@
 
         initCategoryPageDeferred(() => getProductsByMetal('gold'), { pageKey: 'gold.html' });
     </script>
+    <script type="module" src="js/accessibility.js"></script>
 </body>
 </html>

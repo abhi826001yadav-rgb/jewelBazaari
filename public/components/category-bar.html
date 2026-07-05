@@ -34,7 +34,7 @@
             <span class="jb-mobile-menu-title">Collections</span>
             <button type="button" id="jb-mobile-menu-close" class="jb-mobile-menu-close" aria-label="Close menu">&times;</button>
         </div>
-        <nav class="jb-mobile-menu-links">
+        <nav class="jb-mobile-menu-links" aria-label="Mobile collections menu">
             <div class="jb-mobile-menu-group">
                 <div class="jb-mobile-menu-row">
                     <button type="button" class="jb-mobile-menu-link jb-mobile-menu-trigger" aria-expanded="false">All Jewellery</button>
@@ -181,7 +181,7 @@
     </aside>
 
     <div class="jb-category-scroll max-w-7xl mx-auto hidden md:block">
-    <nav class="jb-category-nav max-w-7xl mx-auto px-3 sm:px-4 flex flex-nowrap justify-start md:justify-center h-14 items-center text-[12px] font-bold tracking-wider text-gray-600 uppercase">
+    <nav class="jb-category-nav max-w-7xl mx-auto px-3 sm:px-4 flex flex-nowrap justify-start md:justify-center h-14 items-center text-[12px] font-bold tracking-wider text-gray-600 uppercase" aria-label="Jewellery categories">
         
         <!-- ALL JEWELLERY -->
         <div class="relative group h-14 flex items-center">
@@ -402,7 +402,7 @@
                     
                     <!-- Live Gold Price -->
                     <li class="p-0 m-0">
-                        <a href="#" onclick="openGoldPriceModal(); return false;" class="jb-nav-dropdown-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                        <a href="#" data-gold-price-trigger class="jb-nav-dropdown-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg" aria-label="View live gold price">
                             <span class="text-lg w-6 text-center shrink-0">📍</span>
                             <span class="font-medium">Live Gold Price</span>
                         </a>
