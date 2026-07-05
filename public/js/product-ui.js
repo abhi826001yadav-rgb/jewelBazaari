@@ -3,16 +3,9 @@ import { getCoverImage, getProductImages } from './product-images.js';
 import { escapeHtml } from './security-utils.js';
 import { initLucideIcons, initLinkPrefetch, scheduleIdleTask } from './performance-boot.js';
 import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
+import { formatProductPrice } from './format-utils.js';
 
-export { escapeHtml };
-
-export function formatPrice(price) {
-    const amount = Number(price);
-    if (!amount) {
-        return 'Price on request';
-    }
-    return `₹${amount.toLocaleString('en-IN')}`;
-}
+export { formatProductPrice as formatPrice };
 
 export function formatLabel(value) {
     if (!value) return '';
@@ -246,7 +239,7 @@ export async function renderProducts(products, gridId = 'products-grid', countId
                 ${product.description ? `<p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(product.description)}</p>` : ''}
                 ${tags ? `<p class="text-xs text-[#9B7E4B] mt-2 capitalize">${escapeHtml(tags)}</p>` : ''}
                 <div class="flex items-center justify-between mt-3 gap-2">
-                    <span class="text-xl font-bold text-[#4A0E17]">${formatPrice(product.price)}</span>
+                    <span class="text-xl font-bold text-[#4A0E17]">${formatProductPrice(product.price)}</span>
                     <button type="button" data-add-cart="${escapeHtml(product.id)}" data-add-name="${escapeHtml(product.name)}" data-add-price="${escapeHtml(product.price || 0)}" data-add-image="${escapeHtml(imageSrc)}"
                         class="px-4 py-1.5 text-xs font-medium bg-[#4A0E17] text-white rounded-full hover:bg-[#3A0A12] shrink-0">
                         Add to Cart

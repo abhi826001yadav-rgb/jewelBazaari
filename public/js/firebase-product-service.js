@@ -72,13 +72,6 @@ function getAddToCartCount(product) {
     return 0;
 }
 
-function logTrendingSortDebug(products, label) {
-    console.log(`[Trending] ${label}:`);
-    products.forEach((product) => {
-        console.log(`${product.name || 'Unnamed'} | ${getAddToCartCount(product)}`);
-    });
-}
-
 function sortByAddToCartCount(products) {
     return [...products].sort((a, b) => {
         const countA = getAddToCartCount(a);
@@ -397,12 +390,7 @@ export async function getTrendingProducts(limit = 10) {
     const snapshot = await getDocs(collection(db, PRODUCTS_COLLECTION));
     const products = snapshot.docs.map(mapDoc);
 
-    logTrendingSortDebug(products, 'Before sorting');
-
     const sorted = sortByAddToCartCount(products);
-
-    logTrendingSortDebug(sorted, 'After sorting');
-
     return sorted.slice(0, limit);
 }
 

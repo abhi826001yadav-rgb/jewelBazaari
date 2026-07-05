@@ -69,31 +69,3 @@ export function initLinkPrefetch() {
     });
 }
 
-export function buildResponsiveImageMarkup({
-    src,
-    webpSrc = '',
-    alt = '',
-    className = '',
-    width = '',
-    height = '',
-    loading = 'lazy',
-    fetchPriority = '',
-    sizes = ''
-}) {
-    const attrs = [
-        `alt="${alt.replace(/"/g, '&quot;')}"`,
-        className ? `class="${className}"` : '',
-        width ? `width="${width}"` : '',
-        height ? `height="${height}"` : '',
-        `loading="${loading}"`,
-        'decoding="async"',
-        fetchPriority ? `fetchpriority="${fetchPriority}"` : '',
-        sizes ? `sizes="${sizes}"` : ''
-    ].filter(Boolean).join(' ');
-
-    if (webpSrc) {
-        return `<picture><source srcset="${webpSrc}" type="image/webp"><img src="${src}" ${attrs}></picture>`;
-    }
-
-    return `<img src="${src}" ${attrs}>`;
-}

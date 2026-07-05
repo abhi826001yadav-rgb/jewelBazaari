@@ -7,23 +7,10 @@ import {
 } from './wishlist-service.js';
 import { addToCart } from './cart-service.js';
 import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
+import { escapeHtml } from './security-utils.js';
+import { formatProductPrice } from './format-utils.js';
 
 const WISHLIST_PINK = '#E75480';
-
-function escapeHtml(value = '') {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function formatPrice(amount) {
-    const value = Number(amount || 0);
-    if (!value) return 'Price on request';
-    return `₹${value.toLocaleString('en-IN')}`;
-}
 
 function heartSvg(filled = false) {
     if (filled) {
@@ -129,7 +116,7 @@ function renderWishlistDrawer() {
                 <div class="flex-1 min-w-0">
                     <h3 class="font-medium text-sm text-[#2A2A2A] line-clamp-2">${escapeHtml(item.name)}</h3>
                     <p class="text-[10px] uppercase text-[#9B7E4B] font-semibold tracking-wider mt-1">${escapeHtml(item.vendor || 'Verified Vendor')}</p>
-                    <p class="text-sm font-bold text-[#4A0E17] mt-1">${formatPrice(item.price)}</p>
+                    <p class="text-sm font-bold text-[#4A0E17] mt-1">${formatProductPrice(item.price)}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">

@@ -696,6 +696,7 @@
         import { auth } from './js/firebase-config.js';
         import { isAdminEmail } from './js/admin-config.js';
         import { getAuthErrorMessage } from './js/auth-error-messages.js';
+        import { escapeHtml } from './js/security-utils.js';
         import {
             GoogleAuthProvider,
             signInWithPopup,
@@ -1061,14 +1062,6 @@
             }
         }
 
-        function escapeHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
-
         function renderRow(product, index) {
             const images = getProductImages(product);
             const cover = images[0] || '';
@@ -1376,6 +1369,5 @@
             }
         });
     </script>
-    <script type="module" src="js/accessibility.js"></script>
 </body>
 </html>

@@ -354,6 +354,7 @@
             getCurrentApprovedVendor
         } from './js/vendor-service.js';
         import { escapeHtml, bindImageFallback } from './js/security-utils.js';
+        import { formatCartPrice } from './js/format-utils.js';
 
         const authSection = document.getElementById('auth-section');
         const dashboardSection = document.getElementById('dashboard-section');
@@ -384,11 +385,6 @@
             element.textContent = '';
             element.classList.add('hidden');
             element.classList.remove('status-success', 'status-error', 'status-info');
-        }
-
-        function formatPrice(value) {
-            const amount = Number(value) || 0;
-            return `₹${amount.toLocaleString('en-IN')}`;
         }
 
         function productBelongsToVendor(product) {
@@ -492,7 +488,7 @@
                     <img src="${escapeHtml(product.imageUrl || '')}" alt="${escapeHtml(product.name || 'Product')}" loading="lazy">
                     <div class="p-4">
                         <h4 class="font-semibold text-[#4A0E17] truncate">${escapeHtml(product.name || 'Unnamed')}</h4>
-                        <p class="text-sm text-gray-500 capitalize mt-1">${escapeHtml(product.category || '—')} · ${formatPrice(product.price)}</p>
+                        <p class="text-sm text-gray-500 capitalize mt-1">${escapeHtml(product.category || '—')} · ${formatCartPrice(product.price)}</p>
                         <p class="text-xs text-gray-400 mt-1 truncate">${escapeHtml(product.id)}</p>
                         <div class="flex gap-2 mt-4">
                             <button type="button" class="action-btn edit-btn" data-edit="${escapeHtml(product.id)}">Edit</button>
@@ -686,6 +682,5 @@
         document.getElementById('announcement-placeholder').setAttribute('data-include', 'components/announcement.html');
         loadPageComponents('#announcement-placeholder');
     </script>
-    <script type="module" src="js/accessibility.js"></script>
 </body>
 </html>

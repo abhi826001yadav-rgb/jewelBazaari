@@ -28,28 +28,9 @@
     <link rel="modulepreload" href="js/load-components.js">
     <link rel="modulepreload" href="js/home-featured-carousel.js">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tailwind-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        luxuryMaroon: '#4A0E17',
-                        luxuryGold: '#9B7E4B',
-                        luxuryGoldLight: '#C5A880',
-                        luxuryBg: '#FAF7F2',
-                        luxuryDark: '#2A2A2A'
-                    },
-                    fontFamily: {
-                        serif: ['Playfair Display', 'serif'],
-                        sans: ['Montserrat', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         /* Hero banner swiper only */
         .mySwiper {
@@ -597,6 +578,9 @@
         import { initLucideIcons, initLinkPrefetch, scheduleStorefrontUiInit } from './js/performance-boot.js';
         import { initPageSchemas } from './js/seo-schema.js';
         import './js/accessibility.js';
+        import { escapeHtml } from './js/security-utils.js';
+        import { formatProductPrice } from './js/format-utils.js';
+        import { initGoldPriceModal } from './js/gold-price-modal.js';
 
         initPageSchemas({ pageKey: 'index.html' });
 
@@ -654,21 +638,7 @@
         window.jewelBazaariCart = { updateCartBadge };
         scheduleStorefrontUiInit();
         initProductGalleryUI();
-
-        function escapeHtml(value = '') {
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function formatTrendingPrice(price) {
-            const amount = Number(price);
-            if (!amount) return 'Price on request';
-            return `₹${amount.toLocaleString('en-IN')}`;
-        }
+        initGoldPriceModal();
 
         function buildTrendingCard(product, slot, index) {
             const images = getProductImages(product);
@@ -696,7 +666,7 @@
                         <h3 class="font-luxury font-semibold text-base text-luxuryDark mb-2 line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h3>
                         <div class="flex items-center justify-between mt-2 border-t border-gray-200/60 pt-3">
                             <div>
-                                <span class="text-sm font-bold text-luxuryMaroon">${formatTrendingPrice(product.price)}</span>
+                                <span class="text-sm font-bold text-luxuryMaroon">${formatProductPrice(product.price)}</span>
                             </div>
                             <button type="button" data-add-cart="${escapeHtml(product.id)}" data-add-name="${escapeHtml(product.name || 'Product')}" data-add-price="${escapeHtml(product.price || 0)}" data-add-image="${escapeHtml(imageSrc)}" class="text-xs uppercase font-semibold tracking-wider text-luxuryGold hover:text-luxuryMaroon transition">Add to Cart</button>
                         </div>
@@ -728,7 +698,7 @@
                             <h3 class="font-luxury font-semibold text-base text-luxuryDark mt-1 mb-2 line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h3>
                         </div>
                         <div class="flex justify-between items-center pt-2 border-t border-gray-50">
-                            <span class="text-sm font-bold text-luxuryMaroon">${formatTrendingPrice(product.price)}</span>
+                            <span class="text-sm font-bold text-luxuryMaroon">${formatProductPrice(product.price)}</span>
                             <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 uppercase tracking-wide">New In</span>
                         </div>
                     </div>
@@ -905,151 +875,6 @@
     </div>
 </div>
 
-<!-- Dynamic Gold Price JavaScript -->
-<script>
-    let currentGoldPrice = null;
 
-    async function fetchLiveGoldPrice() {
-        try {
-            const response = await fetch('https://api.gold-api.com/price/XAU-INR', {
-                method: 'GET',
-                credentials: 'omit',
-                redirect: 'error',
-                referrerPolicy: 'no-referrer'
-            });
-
-            if (!response.ok) {
-                throw new Error(`Gold API responded with ${response.status}`);
-            }
-
-            const contentType = response.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-                throw new Error('Gold API returned a non-JSON response');
-            }
-
-            const data = await response.json();
-            const price = Number(data?.price);
-
-            if (!Number.isFinite(price) || price <= 0) {
-                throw new Error('Gold API returned an invalid price');
-            }
-
-            currentGoldPrice = Math.round(price * 10);
-            return currentGoldPrice;
-        } catch (error) {
-            currentGoldPrice = 78200;
-            return currentGoldPrice;
-        }
-    }
-
-    function calculate22KPrice(price24k) {
-        return Math.round(price24k * 0.916);
-    }
-
-    let goldModalTrigger = null;
-
-    async function openGoldPriceModal(trigger) {
-        const modal = document.getElementById('gold-price-modal');
-        if (!modal) return;
-
-        goldModalTrigger = trigger || document.activeElement;
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-
-        window.jbA11y?.openAccessibleDialog({
-            panel: modal,
-            overlay: null,
-            trigger: goldModalTrigger,
-            labelledBy: 'gold-price-modal-title',
-            initialFocus: document.getElementById('gold-price-modal-close'),
-            onClose: () => {
-                modal.classList.remove('flex');
-            }
-        });
-
-        document.getElementById('price-24k').innerText = "Loading...";
-        document.getElementById('price-22k').innerText = "Loading...";
-
-        const price24k = await fetchLiveGoldPrice();
-        const price22k = calculate22KPrice(price24k);
-
-        document.getElementById('price-24k').innerText = '₹' + price24k.toLocaleString('en-IN');
-        document.getElementById('price-22k').innerText = '₹' + price22k.toLocaleString('en-IN');
-
-        document.getElementById('city-select').value = 'Surat';
-        updateCityDisplay('Surat', price22k, price24k);
-        window.jbA11y?.announce('Live gold price dialog opened.');
-    }
-
-    function updateCityDisplay(city, base22k, base24k) {
-        const cityPremium = {
-            "Surat": 0, "Delhi": 150, "Mumbai": 200, "Ahmedabad": -50,
-            "Chennai": 300, "Bangalore": 250, "Hyderabad": 100, "Jaipur": -150,
-            "Lucknow": -100, "Patna": -200, "Ranchi": -180,
-            "Colombo": -1200, "Dubai": -800
-        };
-
-        const premium = cityPremium[city] || 0;
-        const final22k = base22k + premium;
-        const final24k = base24k + premium;
-
-        document.getElementById('price-22k').innerText = '₹' + final22k.toLocaleString('en-IN');
-        document.getElementById('price-24k').innerText = '₹' + final24k.toLocaleString('en-IN');
-        document.getElementById('location-city').innerText = city;
-    }
-
-    function updateGoldPriceForCity() {
-        const city = document.getElementById('city-select').value;
-        const price24k = parseInt(document.getElementById('price-24k').innerText.replace(/[₹,]/g, '')) || 78200;
-        const price22k = parseInt(document.getElementById('price-22k').innerText.replace(/[₹,]/g, '')) || 71700;
-        updateCityDisplay(city, price22k, price24k);
-    }
-
-    function closeGoldPriceModal() {
-        const modal = document.getElementById('gold-price-modal');
-        if (!modal) return;
-        window.jbA11y?.closeAccessibleDialog({ panel: modal, overlay: null });
-        modal.classList.remove('flex');
-        modal.classList.add('hidden');
-        goldModalTrigger = null;
-    }
-
-    function lookupByPincode() {
-        const pin = document.getElementById('pincode-input').value.trim();
-        if (!pin) return alert("Please enter a PIN code");
-
-        const pinMap = {
-            "395": "Surat", "110": "Delhi", "400": "Mumbai", "380": "Ahmedabad",
-            "600": "Chennai", "560": "Bangalore", "500": "Hyderabad", "302": "Jaipur",
-            "226": "Lucknow", "800": "Patna", "834": "Ranchi"
-        };
-
-        let city = "Surat";
-        for (let prefix in pinMap) {
-            if (pin.startsWith(prefix)) { city = pinMap[prefix]; break; }
-        }
-        document.getElementById('city-select').value = city;
-        updateGoldPriceForCity();
-        document.getElementById('pincode-input').value = '';
-    }
-
-    function detectCurrentLocation() {
-        document.getElementById('location-city').innerText = "Detecting...";
-        setTimeout(() => {
-            document.getElementById('location-city').innerText = "Surat, Gujarat";
-            updateGoldPriceForCity();
-        }, 600);
-    }
-
-    document.getElementById('gold-price-modal-close')?.addEventListener('click', closeGoldPriceModal);
-    document.getElementById('gold-price-modal')?.addEventListener('click', (event) => {
-        if (event.target.id === 'gold-price-modal') closeGoldPriceModal();
-    });
-    document.getElementById('gold-price-dialog-panel')?.addEventListener('click', (event) => event.stopPropagation());
-    document.getElementById('gold-price-detect-btn')?.addEventListener('click', detectCurrentLocation);
-    document.getElementById('gold-price-check-pin')?.addEventListener('click', lookupByPincode);
-    document.getElementById('city-select')?.addEventListener('change', updateGoldPriceForCity);
-</script>
-    
 </body>
 </html>

@@ -23,20 +23,10 @@
     <link rel="modulepreload" href="js/category-page-init.js">
     <link rel="preload" href="css/mobile-responsive.css" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css">
     <link rel="stylesheet" href="css/accessibility.css">
-    <style>
-        html { overflow-x: clip; }
-        body { background-color: #FAF7F2; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
-        .luxury-card { transition: all 0.3s ease; }
-        .luxury-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-        .section-title { font-family: 'Playfair Display', Georgia, serif; }
-        #announcement-placeholder, #header-placeholder, #category-placeholder { position: relative; z-index: 40; }
-        main { position: relative; z-index: 1; }
-    </style>
 </head>
-<body>
+<body class="jb-category-page">
 
     <div id="announcement-placeholder"></div>
     <div id="header-placeholder"></div>
@@ -75,6 +65,5 @@
 
         initCategoryPageDeferred(() => getProductsByCategory('earrings'), { pageKey: 'earrings.html' });
     </script>
-    <script type="module" src="js/accessibility.js"></script>
 </body>
 </html>

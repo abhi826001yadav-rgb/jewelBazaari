@@ -3,7 +3,6 @@ const path = require('path');
 
 const publicDir = path.join(__dirname, '..', 'public');
 const cssLine = '    <link rel="stylesheet" href="css/accessibility.css">';
-const moduleLine = '    <script type="module" src="js/accessibility.js"></script>';
 
 const searchLabelMap = {
     'all-jewellery.html': 'Search jewellery',
@@ -27,11 +26,6 @@ for (const file of fs.readdirSync(publicDir).filter((name) => name.endsWith('.ht
             );
             changed = true;
         }
-    }
-
-    if (!html.includes('js/accessibility.js') && !html.includes("import './js/accessibility.js'") && !html.includes('import "./js/accessibility.js"')) {
-        html = html.replace('</body>', `${moduleLine}\n</body>`);
-        changed = true;
     }
 
     const labelText = searchLabelMap[file];
