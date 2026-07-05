@@ -95,7 +95,7 @@ body.jb-category-page main {
 
 .jb-category-hero-title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(1.75rem, 4.5vw + 0.75rem, 2.75rem);
+    font-size: 2.25rem;
     font-weight: 700;
     line-height: 1.2;
 }
@@ -111,6 +111,12 @@ body.jb-category-page main {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9375rem;
     font-weight: 300;
+}
+
+@media (min-width: 640px) {
+    .jb-category-hero-title {
+        font-size: 2.75rem;
+    }
 }
 
 .jb-nav-dropdown--compact {
@@ -179,17 +185,6 @@ input,
 select,
 textarea {
     touch-action: manipulation;
-}
-
-.mySwiper {
-    width: 100%;
-    height: clamp(220px, 42vw, 500px);
-}
-
-.mySwiper .swiper-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
 .jb-featured-carousel-wrap,
@@ -634,8 +629,8 @@ button.jb-mobile-menu-link {
         padding-right: 0.75rem;
     }
 
-    .swiper:not(.jb-why-swiper) {
-        height: clamp(220px, 42vw, 280px) !important;
+    .swiper {
+        height: 280px !important;
     }
 
     main.max-w-7xl,
@@ -751,8 +746,8 @@ button.jb-mobile-menu-link {
         letter-spacing: 0.05em;
     }
 
-    .swiper:not(.jb-why-swiper) {
-        height: clamp(200px, 38vw, 240px) !important;
+    .swiper {
+        height: 220px !important;
     }
 
     .jb-header-nav {
@@ -762,8 +757,7 @@ button.jb-mobile-menu-link {
     .jb-header-nav-item {
         font-size: 0.75rem;
         padding: 0;
-        min-height: 44px;
-        min-width: 44px;
+        min-height: 40px;
     }
 
     .jb-logo img {
@@ -889,107 +883,49 @@ button.jb-mobile-menu-link {
     }
 }
 
-/* Touch targets — minimum 44×44px on interactive controls */
-.wishlist-heart-btn,
-[data-wishlist-toggle] {
-    min-width: 44px;
-    min-height: 44px;
-}
-
+/* Touch targets — expanded hit area without changing visual size */
 [data-cart-decrease],
 [data-cart-increase],
-[data-cart-remove] {
-    min-height: 44px;
-}
-
-[data-cart-decrease],
-[data-cart-increase] {
-    min-width: 44px;
-}
-
 [data-gallery-thumb],
 #product-gallery-prev,
 #product-gallery-next,
 #product-gallery-close,
 #cart-drawer-close,
 #wishlist-drawer-close,
-#gold-price-modal-close {
-    min-width: 44px;
-    min-height: 44px;
+#gold-price-modal-close,
+.jb-header-nav-item {
+    position: relative;
 }
 
-.jb-mobile-submenu-link {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+.wishlist-heart-btn::after,
+[data-wishlist-toggle]::after,
+[data-cart-decrease]::after,
+[data-cart-increase]::after,
+[data-gallery-thumb]::after,
+#product-gallery-prev::after,
+#product-gallery-next::after,
+#product-gallery-close::after,
+#cart-drawer-close::after,
+#wishlist-drawer-close::after,
+#gold-price-modal-close::after,
+.jb-header-nav-item::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
 }
 
-.jb-mobile-nav-bar {
-    min-height: 48px;
-}
-
-footer ul a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    padding-top: 0.125rem;
-    padding-bottom: 0.125rem;
-}
-
-/* Prevent iOS input zoom; comfortable tap targets on forms */
 @media (max-width: 767px) {
-    input,
-    select,
-    textarea,
-    .form-input,
-    .admin-search-input,
-    #search-input,
-    .home-search-input,
-    .jb-header-search {
-        font-size: 16px;
-        min-height: 44px;
-    }
-
-    .submit-btn,
-    .quick-btn,
-    #submit-btn,
-    button[data-add-cart],
-    [data-wishlist-add-cart] {
-        min-height: 44px;
-    }
-
-    .jb-shadow-card--left {
-        transform: translateX(-18%) scale(0.82);
-    }
-
-    .jb-shadow-card--right {
-        transform: translateX(18%) scale(0.82);
-    }
-
     .jb-shadow-card {
         will-change: auto;
-    }
-
-    .admin-tab-btn {
-        min-height: 44px;
-    }
-
-    .admin-tabs {
-        flex-wrap: wrap;
-        gap: 0.5rem;
     }
 
     .admin-table-wrap {
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-x: contain;
-    }
-
-    #cart-drawer,
-    #wishlist-drawer {
-        width: 100%;
-        max-width: 100%;
     }
 }
 
@@ -1016,13 +952,6 @@ footer ul a {
     .jb-why-header + .jb-why-carousel-wrap {
         content-visibility: auto;
         contain-intrinsic-size: auto 480px;
-    }
-
-    .luxury-card:hover,
-    body.jb-category-page .luxury-card:hover,
-    .info-card:hover {
-        transform: none;
-        box-shadow: inherit;
     }
 }
 
