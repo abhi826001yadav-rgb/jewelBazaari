@@ -4,12 +4,24 @@
             <img src="images/logo.png" alt="jewelBazaari logo" width="176" height="80" class="h-20 w-auto max-w-full object-contain">
         </a>
 
-        <div class="flex-1 flex justify-center px-3 md:px-5 hidden md:flex min-w-0">
-            <label for="header-search-input" class="sr-only">Search jewellery</label>
-            <input type="search" id="header-search-input" name="q" placeholder="Search diamond jewellery..."
-                aria-label="Search jewellery"
-                autocomplete="off"
-                class="jb-header-search w-full max-w-[22rem] border border-gray-300 rounded-full px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
+        <div class="jb-header-search-wrap flex-1 flex justify-center px-3 md:px-5 hidden md:flex min-w-0">
+            <form class="jb-header-search-form home-search-bar relative flex items-center w-full max-w-[22rem]" role="search" action="all-jewellery.html" method="get" autocomplete="off">
+                <button type="submit" class="jb-header-search-submit home-search-submit" aria-label="Search">
+                    <svg class="home-search-icon w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                </button>
+                <label for="header-search-input" class="sr-only">Search jewellery</label>
+                <input type="search" id="header-search-input" name="q" placeholder="Search gold jewellery..."
+                    aria-label="Search jewellery"
+                    autocomplete="off"
+                    enterkeyhint="search"
+                    inputmode="search"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    class="jb-header-search home-search-input w-full border border-gray-300 rounded-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400">
+            </form>
         </div>
 
         <div class="jb-header-nav flex items-center text-gray-700">

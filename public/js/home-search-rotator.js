@@ -1,7 +1,6 @@
 const HOME_SEARCH_PLACEHOLDERS = [
     { text: 'Search your jewellery here', emoji: '💍' },
-    { text: '22KT gold jewellery', emoji: '✨' },
-    { text: 'Diamond jewellery', emoji: '💎' }
+    { text: '22KT gold jewellery', emoji: '✨' }
 ];
 
 const ROTATE_MS = 3000;

@@ -5,17 +5,23 @@
         </a>
 
         <div class="jb-header-search-wrap">
-            <div class="home-search-bar jb-search-bar w-full max-w-[30.8rem] border border-gray-300 rounded-full px-4 sm:px-5 py-2 relative flex items-center justify-center">
-                <svg class="home-search-icon w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.3-4.3"></path>
-                </svg>
+            <form class="home-search-bar jb-search-bar w-full max-w-[30.8rem] border border-gray-300 rounded-full px-4 sm:px-5 py-2 relative flex items-center justify-center" role="search" action="all-jewellery.html" method="get" autocomplete="off">
+                <button type="submit" class="home-search-submit" aria-label="Search">
+                    <svg class="home-search-icon w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                </button>
                 <label for="header-search-input" class="sr-only">Search your jewellery</label>
                 <input type="search" id="header-search-input" name="q" placeholder="💍 Search your jewellery here"
                     aria-label="Search your jewellery here"
                     autocomplete="off"
+                    enterkeyhint="search"
+                    inputmode="search"
+                    autocapitalize="off"
+                    spellcheck="false"
                     class="home-search-input border-0 bg-transparent outline-none text-sm py-0 w-full text-center">
-            </div>
+            </form>
         </div>
 
         <div class="jb-header-nav flex items-center text-gray-700">

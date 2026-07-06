@@ -27,6 +27,7 @@ export function initLucideIcons(root = document) {
 }
 
 export function scheduleStorefrontUiInit() {
+    import('./header-search.js');
     import('./accessibility.js').then(() => {
         window.jbA11y?.ensureSkipLink?.();
     });

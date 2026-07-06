@@ -1,6 +1,10 @@
 /* jewelBazaari mobile responsiveness — desktop layout unchanged above 768px */
 
-/* Homepage header search */
+/* Header search */
+.jb-header-search-wrap {
+    position: relative;
+}
+
 .home-search-bar {
     position: relative;
 }
@@ -10,21 +14,85 @@
     box-shadow: 0 0 0 2px #9ca3af;
 }
 
-.home-search-icon {
+.home-search-submit,
+.jb-header-search-submit {
     position: absolute;
-    left: 1rem;
+    left: 0.35rem;
     top: 50%;
     transform: translateY(-50%);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
     color: #9ca3af;
-    pointer-events: none;
-    z-index: 1;
 }
 
-.home-search-input {
+.home-search-submit:hover,
+.jb-header-search-submit:hover {
+    color: #4A0E17;
+}
+
+.home-search-icon {
+    color: currentColor;
+    pointer-events: none;
+}
+
+.home-search-input,
+.jb-header-search.home-search-input {
     text-align: center;
     width: 100%;
-    padding-left: 2.25rem;
-    padding-right: 2.25rem;
+    padding-left: 2.75rem;
+    padding-right: 1rem;
+}
+
+.jb-header-search-form .jb-header-search {
+    padding-left: 2.75rem;
+    padding-right: 1rem;
+}
+
+.jb-search-suggestions {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    z-index: 70;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+}
+
+.jb-search-suggestion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+}
+
+.jb-search-suggestion:hover,
+.jb-search-suggestion.is-active {
+    background: #FAF7F2;
+    color: #4A0E17;
+}
+
+.jb-search-suggestion-emoji {
+    width: 1.25rem;
+    text-align: center;
+    flex-shrink: 0;
 }
 
 .home-search-input::placeholder {
