@@ -2,7 +2,6 @@ import { escapeHtml } from './security-utils.js';
 
 const SEARCH_DESTINATIONS = [
     { label: 'Gold', url: 'gold.html', emoji: '✨', keywords: ['gold', 'go', 'gol', '22kt', '22k', '22 karat', '22kt gold'] },
-    { label: 'Diamond', url: 'diamond.html', emoji: '💎', keywords: ['diamond', 'diam', 'dia', 'dim'] },
     { label: 'Gemstones', url: 'gemstones.html', emoji: '💎', keywords: ['gemstone', 'gemstones', 'gem', 'ruby', 'emerald', 'sapphire'] },
     { label: 'Earrings', url: 'earrings.html', emoji: '👂', keywords: ['earring', 'earrings', 'jhumka', 'stud'] },
     { label: 'Rings', url: 'rings.html', emoji: '💍', keywords: ['ring', 'rings', 'engagement'] },
