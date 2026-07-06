@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const componentsDir = path.join(__dirname, '..', 'public', 'components');
-const outFile = path.join(__dirname, '..', 'public', 'js', 'layout-components.js');
+const outFile = path.join(__dirname, '..', 'public', 'js', 'layout-components.v2.js');
 
 const files = fs.readdirSync(componentsDir).filter((name) => name.endsWith('.html'));
 

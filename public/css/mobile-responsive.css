@@ -210,20 +210,26 @@ textarea {
     font-weight: 400;
 }
 
-.jb-announcement-sep {
-    display: inline;
-    font-weight: 300;
+@media (min-width: 769px) {
+    .jb-announcement {
+        display: block;
+    }
+
+    .jb-announcement-by::before {
+        content: ' | ';
+        font-weight: 300;
+    }
 }
 
 @media (max-width: 768px) {
     .jb-announcement {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto auto;
         align-items: center;
-        justify-content: center;
-        gap: 0.1rem;
+        justify-items: center;
+        row-gap: 0.1rem;
         padding: 0.35rem 0.5rem;
-        line-height: 1.15;
+        line-height: 1.1;
         overflow-x: clip;
     }
 
@@ -231,24 +237,27 @@ textarea {
     .jb-announcement-by {
         display: block;
         text-align: center;
-        width: 100%;
+        width: max-content;
         max-width: 100%;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+        letter-spacing: 0;
     }
 
     .jb-announcement-main {
-        font-size: clamp(7px, 2.65vw, 11px);
-        letter-spacing: 0.01em;
+        font-size: clamp(6px, 2.35vw, 10px);
     }
 
     .jb-announcement-by {
-        font-size: clamp(7px, 2.45vw, 10px);
-        letter-spacing: 0.01em;
+        font-size: clamp(6px, 2.2vw, 9px);
     }
+}
 
-    .jb-announcement-sep {
-        display: none;
-    }
+/* Homepage header — admin belongs in More menu only */
+.jb-header-layout .jb-header-nav a[href="admin.html"],
+.jb-header-layout .jb-header-nav a[aria-label="Admin"] {
+    display: none !important;
 }
 
 /* Mobile hamburger + left drawer menu */

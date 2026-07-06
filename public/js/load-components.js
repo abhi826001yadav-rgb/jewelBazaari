@@ -1,4 +1,4 @@
-import { getEmbeddedComponent } from './layout-components.js';
+import { getEmbeddedComponent } from './layout-components.v2.js';
 
 function isSameOriginUrl(url) {
     try {
@@ -60,6 +60,15 @@ async function fetchIncludeHtml(path) {
     throw new Error(`Failed to load include: ${normalizeIncludeKey(path)}`);
 }
 
+function sanitizeHomepageHeader() {
+    const nav = document.querySelector('.jb-header-layout .jb-header-nav');
+    if (!nav) return;
+
+    nav.querySelectorAll('a[href="admin.html"], a[aria-label="Admin"], a[aria-label="Home"]').forEach((link) => {
+        link.remove();
+    });
+}
+
 export async function loadPageComponents(selector = '[data-include]') {
     const elements = [...document.querySelectorAll(selector)];
 
@@ -74,4 +83,6 @@ export async function loadPageComponents(selector = '[data-include]') {
             console.error('Component load failed:', includePath, error);
         }
     }));
+
+    sanitizeHomepageHeader();
 }

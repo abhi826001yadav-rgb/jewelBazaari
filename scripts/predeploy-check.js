@@ -111,12 +111,12 @@ for (const page of indexablePages) {
 
 // --- Components bundle sync ---
 const componentsDir = path.join(publicDir, 'components');
-const bundlePath = path.join(publicDir, 'js/layout-components.js');
+const bundlePath = path.join(publicDir, 'js/layout-components.v2.js');
 if (fs.existsSync(bundlePath)) {
   const bundle = fs.readFileSync(bundlePath, 'utf8');
   for (const comp of fs.readdirSync(componentsDir).filter((f) => f.endsWith('.html'))) {
     const key = `components/${comp}`;
-    if (!bundle.includes(key)) warn(`Component not in layout-components.js bundle: ${key}`);
+    if (!bundle.includes(key)) warn(`Component not in layout-components.v2.js bundle: ${key}`);
   }
 }
 
