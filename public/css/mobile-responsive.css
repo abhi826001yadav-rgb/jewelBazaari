@@ -1,28 +1,37 @@
 /* jewelBazaari mobile responsiveness — desktop layout unchanged above 768px */
 
 /* Homepage header search */
+.home-search-bar {
+    position: relative;
+}
+
 .home-search-bar:focus-within {
     outline: none;
     box-shadow: 0 0 0 2px #9ca3af;
 }
 
+.home-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+    z-index: 1;
+}
+
 .home-search-input {
-    text-align: left;
+    text-align: center;
+    width: 100%;
+    padding-left: 2.25rem;
+    padding-right: 2.25rem;
 }
 
 .home-search-input::placeholder {
-    text-align: left;
+    text-align: center;
     color: inherit;
     letter-spacing: normal;
     word-spacing: normal;
-}
-
-.home-search-icon {
-    color: #9ca3af;
-}
-
-.heart-icon {
-    color: #E75480;
 }
 
 /* Category listing pages */
@@ -210,7 +219,7 @@ textarea {
     font-weight: 400;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
     .jb-announcement {
         display: block;
     }
@@ -221,16 +230,21 @@ textarea {
     }
 }
 
-@media (max-width: 768px) {
+/* Two-line announcement on homepage + all navigation pages (mobile/tablet) */
+@media (max-width: 1024px) {
     .jb-announcement {
         display: grid;
         grid-template-rows: auto auto;
         align-items: center;
         justify-items: center;
-        row-gap: 0.1rem;
-        padding: 0.35rem 0.5rem;
+        row-gap: 2em;
+        padding: 0.5rem 0.5rem;
         line-height: 1.1;
         overflow-x: clip;
+    }
+
+    .jb-announcement-by::before {
+        content: none;
     }
 
     .jb-announcement-main,
@@ -569,11 +583,6 @@ button.jb-mobile-menu-link {
         width: 100% !important;
     }
 
-    .home-search-bar .flex.items-center {
-        width: 100%;
-        min-width: 0;
-    }
-
     .jb-header-standard {
         gap: 0.5rem;
     }
@@ -892,12 +901,12 @@ button.jb-mobile-menu-link {
     }
 
     .home-search-input {
-        width: 12.75rem !important;
-        max-width: calc(100% - 2.5rem) !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .home-search-input:focus {
-        width: 16rem !important;
+        width: 100% !important;
     }
 
     .jb-logo img {
