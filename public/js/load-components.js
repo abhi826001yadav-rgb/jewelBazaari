@@ -1,4 +1,4 @@
-import { getEmbeddedComponent } from './layout-components.v2.js';
+import { getEmbeddedComponent } from './layout-components.v3.js';
 
 function isSameOriginUrl(url) {
     try {
@@ -60,6 +60,10 @@ async function fetchIncludeHtml(path) {
     throw new Error(`Failed to load include: ${normalizeIncludeKey(path)}`);
 }
 
+function sanitizeSearchBar() {
+    document.querySelectorAll('.home-search-bar .heart-icon').forEach((el) => el.remove());
+}
+
 function sanitizeHomepageHeader() {
     const nav = document.querySelector('.jb-header-layout .jb-header-nav');
     if (!nav) return;
@@ -95,4 +99,5 @@ export async function loadPageComponents(selector = '[data-include]') {
 
     sanitizeHomepageHeader();
     sanitizeAdminLinks();
+    sanitizeSearchBar();
 }

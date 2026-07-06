@@ -34,6 +34,10 @@
     word-spacing: normal;
 }
 
+.home-search-bar .heart-icon {
+    display: none !important;
+}
+
 /* Category listing pages */
 body.jb-category-page {
     background-color: #FAF7F2;
@@ -237,9 +241,10 @@ textarea {
         grid-template-rows: auto auto;
         align-items: center;
         justify-items: center;
-        row-gap: 2em;
-        padding: 0.5rem 0.5rem;
-        line-height: 1.1;
+        row-gap: 0;
+        gap: 0;
+        padding: 0.35rem 0.5rem;
+        line-height: 1;
         overflow-x: clip;
     }
 
