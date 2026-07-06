@@ -197,16 +197,22 @@ textarea {
     background-color: #4A0E17;
     color: #fff;
     font-size: 0.75rem;
+    font-weight: 400;
     text-align: center;
     padding: 0.5rem 1rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    line-height: 1.4;
-    word-wrap: break-word;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    line-height: 1.35;
+}
+
+.jb-announcement-main,
+.jb-announcement-by {
+    font-weight: 400;
 }
 
 .jb-announcement-sep {
     display: inline;
+    font-weight: 300;
 }
 
 @media (max-width: 767px) {
@@ -215,7 +221,9 @@ textarea {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.2rem;
+        gap: 0.15rem;
+        padding: 0.4rem 0.5rem;
+        line-height: 1.2;
     }
 
     .jb-announcement-main,
@@ -223,6 +231,15 @@ textarea {
         display: block;
         text-align: center;
         width: 100%;
+        white-space: nowrap;
+    }
+
+    .jb-announcement-main {
+        font-size: clamp(8px, 2.5vw, 11px);
+    }
+
+    .jb-announcement-by {
+        font-size: clamp(8px, 2.35vw, 10px);
     }
 
     .jb-announcement-sep {
@@ -231,6 +248,31 @@ textarea {
 }
 
 /* Mobile hamburger + left drawer menu */
+.jb-mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.jb-mobile-nav-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #4b5563;
+}
+
+.jb-mobile-nav-toggle .jb-hamburger {
+    pointer-events: none;
+}
+
 .jb-hamburger {
     display: flex;
     flex-direction: column;
@@ -242,7 +284,6 @@ textarea {
     padding: 10px;
     border: none;
     background: transparent;
-    cursor: pointer;
     flex-shrink: 0;
 }
 
@@ -623,10 +664,8 @@ button.jb-mobile-menu-link {
 
 @media (max-width: 768px) {
     .jb-announcement {
-        font-size: 10px;
-        letter-spacing: 0.08em;
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
     }
 
     .swiper {
@@ -742,8 +781,8 @@ button.jb-mobile-menu-link {
 
 @media (max-width: 480px) {
     .jb-announcement {
-        font-size: 9px;
-        letter-spacing: 0.05em;
+        padding-left: 0.35rem;
+        padding-right: 0.35rem;
     }
 
     .swiper {

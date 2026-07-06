@@ -34,6 +34,10 @@ function isMobileNav() {
     return window.matchMedia('(max-width: 767px)').matches;
 }
 
+function getMobileMenuHamburger() {
+    return document.querySelector('#jb-mobile-menu-toggle .jb-hamburger');
+}
+
 function ensureMoreBackdrop() {
     if (document.getElementById('jb-more-backdrop')) return;
 
@@ -150,7 +154,7 @@ function closeMobileMenu() {
     collapseMobileSubmenus();
     menu?.classList.remove('jb-mobile-menu-open');
     backdrop?.classList.add('hidden');
-    toggle?.classList.remove('jb-hamburger-open');
+    getMobileMenuHamburger()?.classList.remove('jb-hamburger-open');
     toggle?.setAttribute('aria-expanded', 'false');
     menu?.setAttribute('aria-hidden', 'true');
     backdrop?.setAttribute('aria-hidden', 'true');
@@ -166,7 +170,7 @@ function openMobileMenu() {
 
     menu?.classList.add('jb-mobile-menu-open');
     backdrop?.classList.remove('hidden');
-    toggle?.classList.add('jb-hamburger-open');
+    getMobileMenuHamburger()?.classList.add('jb-hamburger-open');
     toggle?.setAttribute('aria-expanded', 'true');
     menu?.setAttribute('aria-hidden', 'false');
     backdrop?.setAttribute('aria-hidden', 'false');

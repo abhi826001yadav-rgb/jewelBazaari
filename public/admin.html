@@ -684,6 +684,7 @@
         import {
             getAllVendorRequests,
             approveVendor,
+            syncAllVendorEmailIndexes,
             rejectVendor,
             discontinueVendor,
             VENDOR_STATUS
@@ -1043,6 +1044,9 @@
                 vendorsTableContainer.classList.add('hidden');
 
                 const vendors = await getAllVendorRequests();
+                await syncAllVendorEmailIndexes(vendors).catch((error) => {
+                    console.warn('Vendor email index sync skipped:', error);
+                });
                 vendorsCache = vendors;
                 updatePendingVendorCount();
                 vendorsLoading.classList.add('hidden');

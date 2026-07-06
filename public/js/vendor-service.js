@@ -2,7 +2,11 @@ import { auth, db } from './firebase-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import {
     GoogleAuthProvider,
+    EmailAuthProvider,
     signInWithPopup,
+    signInWithEmailAndPassword,
+    linkWithCredential,
+    fetchSignInMethodsForEmail,
     signOut,
     onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -22,6 +26,7 @@ import {
 
 const VENDORS_COLLECTION = 'vendors';
 const VENDOR_IDS_COLLECTION = 'vendorIds';
+const VENDOR_EMAILS_COLLECTION = 'vendorEmails';
 const VENDOR_CREDENTIALS_COLLECTION = 'vendorCredentials';
 const VENDOR_SESSION_KEY = 'jb_vendor_session';
 
@@ -37,7 +42,18 @@ function normalizeVendorId(vendorId) {
 }
 
 function normalizeEmail(email) {
-    return String(email || '').trim().toLowerCase();
+    return String(email || '').trim().toLowerCase().replace(/\s+/g, '');
+}
+
+function validateRegisteredEmail(email) {
+    const clean = normalizeEmail(email);
+    if (!clean) {
+        throw new Error('Registered email is required.');
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) {
+        throw new Error('Please enter a valid registered email address.');
+    }
+    return clean;
 }
 
 function validateVendorId(vendorId) {
@@ -105,13 +121,75 @@ async function verifyVendorPassword(vendor, password) {
     return expected === storedHash;
 }
 
-async function signInVendorWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
+async function getVendorByRegisteredEmail(email) {
+    const cleanEmail = validateRegisteredEmail(email);
+    const emailIndexRef = doc(db, VENDOR_EMAILS_COLLECTION, cleanEmail);
+    const emailIndexSnap = await getDoc(emailIndexRef);
+
+    if (emailIndexSnap.exists()) {
+        const vendorId = emailIndexSnap.data().vendorId;
+        const vendor = await getVendorByVendorId(vendorId);
+        if (vendor) {
+            return vendor;
+        }
+    }
 
     try {
-        return await signInWithPopup(auth, provider);
+        const snapshot = await getDocs(
+            query(
+                collection(db, VENDORS_COLLECTION),
+                where('email', '==', cleanEmail)
+            )
+        );
+
+        if (!snapshot.empty) {
+            return mapVendorDoc(snapshot.docs[0]);
+        }
     } catch (error) {
+        if (error?.code !== 'permission-denied') {
+            throw error;
+        }
+    }
+
+    return null;
+}
+
+export async function syncVendorEmailIndex(vendor) {
+    if (!vendor?.email) {
+        return;
+    }
+
+    const normalizedEmail = normalizeEmail(vendor.email);
+    const vendorDocId = normalizeVendorId(vendor.vendorId || vendor.id);
+    if (!vendorDocId) {
+        return;
+    }
+
+    await setDoc(doc(db, VENDOR_EMAILS_COLLECTION, normalizedEmail), {
+        vendorId: vendor.vendorId || vendor.id,
+        uid: vendor.uid,
+        email: normalizedEmail,
+        shopName: vendor.shopName || '',
+        status: vendor.status || VENDOR_STATUS.PENDING
+    }, { merge: true });
+}
+
+export async function syncAllVendorEmailIndexes(vendors = []) {
+    await Promise.all(vendors.map((vendor) => syncVendorEmailIndex(vendor)));
+}
+
+async function linkVendorEmailPassword(user, email, password) {
+    const credential = EmailAuthProvider.credential(normalizeEmail(email), password);
+
+    try {
+        await linkWithCredential(user, credential);
+    } catch (error) {
+        if (error?.code === 'auth/provider-already-linked') {
+            return;
+        }
+        if (error?.code === 'auth/email-already-in-use') {
+            throw new Error('This email already has a login method. Contact jewelBazaari support.');
+        }
         throw new Error(getAuthErrorMessage(error));
     }
 }
@@ -200,7 +278,7 @@ export async function signInWithGoogle() {
     const existingByEmail = await getVendorProfileByEmail(email);
     if (existingByEmail?.profileCompleted && existingByEmail.uid !== user.uid) {
         await signOut(auth).catch(() => {});
-        throw new Error('This Google email already has a vendor application. Login with your vendor password after approval.');
+        throw new Error('This Google email already has a vendor application. Login with your registered email and vendor password after approval.');
     }
 
     return {
@@ -293,6 +371,7 @@ export async function completeVendorProfile({ shopName, vendorId, vendorPassword
 
     const vendorPasswordHash = await hashVendorPassword(cleanVendorId, cleanVendorPassword);
     const vendorIdRef = doc(db, VENDOR_IDS_COLLECTION, normalizedVendorId);
+    const vendorEmailRef = doc(db, VENDOR_EMAILS_COLLECTION, normalizeEmail(user.email));
     const credentialsRef = doc(db, VENDOR_CREDENTIALS_COLLECTION, normalizedVendorId);
     const batch = writeBatch(db);
 
@@ -310,7 +389,18 @@ export async function completeVendorProfile({ shopName, vendorId, vendorPassword
 
     batch.set(vendorIdRef, {
         vendorId: cleanVendorId,
-        uid: user.uid
+        uid: user.uid,
+        email: normalizeEmail(user.email),
+        shopName: cleanShopName,
+        status: VENDOR_STATUS.PENDING
+    });
+
+    batch.set(vendorEmailRef, {
+        vendorId: cleanVendorId,
+        uid: user.uid,
+        email: normalizeEmail(user.email),
+        shopName: cleanShopName,
+        status: VENDOR_STATUS.PENDING
     });
 
     batch.set(credentialsRef, {
@@ -319,7 +409,7 @@ export async function completeVendorProfile({ shopName, vendorId, vendorPassword
     });
 
     await batch.commit();
-
+    await linkVendorEmailPassword(user, user.email, cleanVendorPassword);
     await signOut(auth);
 
     return {
@@ -330,51 +420,72 @@ export async function completeVendorProfile({ shopName, vendorId, vendorPassword
     };
 }
 
-export async function loginVendor({ password }) {
-    const cleanPassword = validateVendorPassword(password);
-
-    const userCredential = await signInVendorWithGoogle();
-    const vendor = await getVendorProfileByUid(userCredential.user.uid);
-
-    if (!vendor) {
-        await signOut(auth).catch(() => {});
-        throw new Error('No vendor account found for this Google account. Register first or use the Google account from registration.');
-    }
-
+function assertVendorCanLogin(vendor) {
     if (!vendor.profileCompleted) {
-        await signOut(auth).catch(() => {});
         throw new Error('Vendor registration is incomplete. Finish vendor registration first.');
     }
 
-    const passwordValid = await verifyVendorPassword(vendor, cleanPassword);
-    if (!passwordValid) {
-        await signOut(auth).catch(() => {});
-        throw new Error('Invalid vendor password.');
-    }
-
-    if (!vendor.emailVerified) {
-        await signOut(auth).catch(() => {});
-        const verificationError = new Error('Please verify your email before logging in.');
-        verificationError.code = 'auth/email-not-verified';
-        verificationError.email = vendor.email;
-        throw verificationError;
-    }
-
     if (vendor.status === VENDOR_STATUS.REJECTED) {
-        await signOut(auth).catch(() => {});
         throw new Error('Your vendor application was not approved. Contact jewelBazaari support for help.');
     }
 
     if (vendor.status === VENDOR_STATUS.DISCONTINUED) {
-        await signOut(auth).catch(() => {});
         throw new Error('Your vendor account has been discontinued by admin. Contact jewelBazaari support for help.');
     }
 
     if (vendor.status === VENDOR_STATUS.PENDING) {
-        await signOut(auth).catch(() => {});
         const pendingError = new Error('Your application is under admin review. You can upload jewellery after approval.');
         pendingError.code = 'vendor/pending-approval';
         throw pendingError;
+    }
+}
+
+export async function loginVendor({ email, password }) {
+    const cleanEmail = validateRegisteredEmail(email);
+    const cleanPassword = validateVendorPassword(password);
+
+    const vendor = await getVendorByRegisteredEmail(cleanEmail);
+    if (!vendor) {
+        throw new Error('No vendor account found for this email. Use the exact email from your approved vendor registration.');
+    }
+
+    if (normalizeEmail(vendor.email) !== cleanEmail) {
+        throw new Error('Registered email does not match this vendor account.');
+    }
+
+    assertVendorCanLogin(vendor);
+
+    const passwordValid = await verifyVendorPassword(vendor, cleanPassword);
+    if (!passwordValid) {
+        throw new Error('Invalid registered email or vendor password.');
+    }
+
+    const authEmail = normalizeEmail(vendor.email);
+    let userCredential;
+    try {
+        userCredential = await signInWithEmailAndPassword(auth, authEmail, cleanPassword);
+    } catch (error) {
+        if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-login-credentials'].includes(error?.code)) {
+            try {
+                const methods = await fetchSignInMethodsForEmail(auth, authEmail);
+                if (methods.includes('google.com') && !methods.includes('password')) {
+                    throw new Error('Your vendor password is correct, but password login still needs activation. Contact jewelBazaari support with your registered email.');
+                }
+            } catch (lookupError) {
+                if (lookupError.message?.includes('password login still needs activation')) {
+                    throw lookupError;
+                }
+            }
+
+            throw new Error('Invalid registered email or vendor password.');
+        }
+
+        throw new Error(getAuthErrorMessage(error));
+    }
+
+    if (userCredential.user.uid !== vendor.uid) {
+        await signOut(auth).catch(() => {});
+        throw new Error('Vendor credentials do not match this account. Contact jewelBazaari support.');
     }
 
     const sessionVendor = {
@@ -434,9 +545,25 @@ export async function approveVendor(vendorDocId) {
         throw new Error('Vendor request not found.');
     }
 
+    const vendor = mapVendorDoc(vendorSnap);
+
     await updateDoc(vendorRef, {
         status: VENDOR_STATUS.APPROVED,
         approvedAt: serverTimestamp()
+    });
+
+    const vendorIdRef = doc(db, VENDOR_IDS_COLLECTION, vendorDocId);
+    await setDoc(vendorIdRef, {
+        vendorId: vendor.vendorId || vendorDocId,
+        uid: vendor.uid,
+        email: normalizeEmail(vendor.email),
+        shopName: vendor.shopName || '',
+        status: VENDOR_STATUS.APPROVED
+    }, { merge: true });
+
+    await syncVendorEmailIndex({
+        ...vendor,
+        status: VENDOR_STATUS.APPROVED
     });
 
     return mapVendorDoc(await getDoc(vendorRef));

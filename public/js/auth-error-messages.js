@@ -12,7 +12,7 @@ export function getAuthErrorMessage(error) {
         'auth/too-many-requests': 'Too many attempts. Please try again later.',
         'auth/unauthorized-domain': `This site (${host}) is not authorized for Google sign-in. In Firebase Console → Authentication → Settings → Authorized domains, click Add domain and enter: ${host}. Also add jewelbazaari.com if you use a custom domain.`,
         'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'Google sign-in is blocked. On your Browser API key → API restrictions → add Identity Toolkit API and Token Service API → Save. Wait 5 minutes, then hard refresh.',
-        'auth/operation-not-allowed': 'Google sign-in is disabled. In Firebase Console → Authentication → Sign-in method, enable Google.',
+        'auth/operation-not-allowed': 'Email/password sign-in is disabled. In Firebase Console → Authentication → Sign-in method, enable Email/Password.',
         'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again.',
         'auth/popup-blocked': 'Pop-up blocked. Allow pop-ups for this site and try again.',
         'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
