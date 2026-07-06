@@ -196,7 +196,7 @@ textarea {
 .jb-announcement {
     background-color: #4A0E17;
     color: #fff;
-    font-size: 0.75rem;
+    font-size: 1.125rem;
     font-weight: 400;
     text-align: center;
     padding: 0.5rem 1rem;
@@ -246,17 +246,20 @@ textarea {
     }
 
     .jb-announcement-main {
-        font-size: clamp(6px, 2.35vw, 10px);
+        font-size: clamp(9px, 3.525vw, 15px);
     }
 
     .jb-announcement-by {
-        font-size: clamp(6px, 2.2vw, 9px);
+        font-size: clamp(9px, 3.3vw, 13.5px);
     }
 }
 
-/* Homepage header — admin belongs in More menu only */
-.jb-header-layout .jb-header-nav a[href="admin.html"],
-.jb-header-layout .jb-header-nav a[aria-label="Admin"] {
+/* Admin only inside More menu — hide stray/cached copies elsewhere */
+.jb-header-nav a[href="admin.html"],
+.jb-header-nav a[aria-label="Admin"],
+.jb-mobile-submenu:not(.jb-more-submenu) a[href="admin.html"],
+.jb-nav-dropdown:not(.jb-more-dropdown) a[href="admin.html"],
+a[href="admin.html"]:not(.jb-more-admin-link) {
     display: none !important;
 }
 

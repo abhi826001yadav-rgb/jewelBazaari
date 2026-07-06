@@ -155,7 +155,7 @@ export function initProductGalleryUI() {
 }
 
 export async function loadPageLayout() {
-    const { loadPageComponents } = await import('./load-components.js?v=20260706b');
+    const { loadPageComponents } = await import('./load-components.js?v=20260706c');
     const { scheduleStorefrontUiInit } = await import('./performance-boot.js');
     const announcementEl = document.getElementById('announcement-placeholder');
     const headerEl = document.getElementById('header-placeholder');

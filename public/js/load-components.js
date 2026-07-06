@@ -69,6 +69,15 @@ function sanitizeHomepageHeader() {
     });
 }
 
+function sanitizeAdminLinks() {
+    document.querySelectorAll('a[href="admin.html"]').forEach((link) => {
+        const inMore = link.closest('.jb-more-submenu, .jb-more-dropdown');
+        if (!inMore) {
+            link.remove();
+        }
+    });
+}
+
 export async function loadPageComponents(selector = '[data-include]') {
     const elements = [...document.querySelectorAll(selector)];
 
@@ -85,4 +94,5 @@ export async function loadPageComponents(selector = '[data-include]') {
     }));
 
     sanitizeHomepageHeader();
+    sanitizeAdminLinks();
 }
