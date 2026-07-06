@@ -27,7 +27,10 @@ export function initLucideIcons(root = document) {
 }
 
 export function scheduleStorefrontUiInit() {
-    import('./header-search.js');
+    import('./build-version.js').then(({ BUILD_VERSION }) => {
+        import(`./header-search.js?v=${BUILD_VERSION}`);
+        import(`./home-search-rotator.js?v=${BUILD_VERSION}`).then(({ initHomeSearchRotator }) => initHomeSearchRotator());
+    });
     import('./accessibility.js').then(() => {
         window.jbA11y?.ensureSkipLink?.();
     });

@@ -277,15 +277,18 @@ textarea {
 
 /* Two-line announcement — identical on homepage and every navigation page */
 .jb-announcement,
-.jb-announcement--two-line {
+.jb-announcement--two-line,
+#announcement-placeholder .jb-announcement,
+.jb-site-banner .jb-announcement {
     background-color: #4A0E17;
     color: #fff;
     display: grid !important;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     align-items: center;
     justify-items: center;
-    row-gap: 0;
-    gap: 0;
+    row-gap: 0 !important;
+    gap: 0 !important;
     font-weight: 400;
     text-align: center;
     padding: 0.35rem 0.5rem;
@@ -293,19 +296,25 @@ textarea {
     text-transform: none;
     line-height: 1;
     overflow-x: clip;
+    width: 100%;
+}
+
+.jb-announcement-sep {
+    display: none !important;
 }
 
 .jb-announcement-main,
 .jb-announcement-by {
-    display: block;
+    display: block !important;
     font-weight: 400;
     text-align: center;
     width: max-content;
     max-width: 100%;
-    white-space: nowrap;
+    white-space: nowrap !important;
     overflow: hidden;
     text-overflow: clip;
     letter-spacing: 0;
+    grid-column: 1;
 }
 
 .jb-announcement-by::before {

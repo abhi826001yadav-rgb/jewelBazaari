@@ -1,4 +1,5 @@
-import { getEmbeddedComponent } from './layout-components.v6.js';
+import { getEmbeddedComponent } from './layout-components.v7.js';
+import { BUILD_VERSION } from './build-version.js';
 
 function isSameOriginUrl(url) {
     try {
@@ -82,6 +83,52 @@ function sanitizeAdminLinks() {
     });
 }
 
+function sanitizeAnnouncement() {
+    document.querySelectorAll('.jb-announcement').forEach((el) => {
+        el.classList.add('jb-announcement--two-line');
+        el.querySelectorAll('.jb-announcement-sep').forEach((sep) => sep.remove());
+
+        el.style.display = 'grid';
+        el.style.gridTemplateRows = 'auto auto';
+        el.style.justifyItems = 'center';
+        el.style.alignItems = 'center';
+        el.style.textAlign = 'center';
+        el.style.gap = '0';
+        el.style.rowGap = '0';
+
+        const main = el.querySelector('.jb-announcement-main');
+        const by = el.querySelector('.jb-announcement-by');
+
+        if (main) {
+            main.style.display = 'block';
+            main.style.whiteSpace = 'nowrap';
+            if (/across India/i.test(main.textContent)) {
+                main.textContent = 'Affordable jewellery from verified sellers in India';
+            }
+        }
+
+        if (by) {
+            by.style.display = 'block';
+            by.style.whiteSpace = 'nowrap';
+        }
+    });
+}
+
+function sanitizeSearchPlaceholders() {
+    document.querySelectorAll('#header-search-input, .home-search-input').forEach((input) => {
+        const placeholder = input.getAttribute('placeholder') || '';
+        const ariaLabel = input.getAttribute('aria-label') || '';
+
+        if (/diamond/i.test(placeholder)) {
+            input.setAttribute('placeholder', '💍 Search your jewellery here');
+        }
+
+        if (/diamond/i.test(ariaLabel)) {
+            input.setAttribute('aria-label', 'Search your jewellery here');
+        }
+    });
+}
+
 export async function loadPageComponents(selector = '[data-include]') {
     const elements = [...document.querySelectorAll(selector)];
 
@@ -100,4 +147,8 @@ export async function loadPageComponents(selector = '[data-include]') {
     sanitizeHomepageHeader();
     sanitizeAdminLinks();
     sanitizeSearchBar();
+    sanitizeAnnouncement();
+    sanitizeSearchPlaceholders();
 }
+
+export { BUILD_VERSION };

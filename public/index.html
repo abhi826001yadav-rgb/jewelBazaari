@@ -24,8 +24,8 @@
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://www.gstatic.com">
     <link rel="preload" href="images/photo1.webp" as="image" type="image/webp" fetchpriority="high">
-    <link rel="preload" href="css/mobile-responsive.css?v=20260706h" as="style">
-    <link rel="modulepreload" href="js/load-components.js?v=20260706h">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260706i" as="style">
+    <link rel="modulepreload" href="js/load-components.js?v=20260706i">
     <link rel="modulepreload" href="js/home-featured-carousel.js">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/tailwind-config.js"></script>
@@ -316,7 +316,7 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260706h">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260706i">
     <link rel="stylesheet" href="css/accessibility.css">
 
 </head>
@@ -341,12 +341,6 @@
                     <picture>
                         <source srcset="images/photo1.webp" type="image/webp">
                         <img src="images/photo1.jpg" alt="Premium gold and diamond jewellery collection at jewelBazaari" width="1920" height="500" fetchpriority="high" loading="eager" decoding="async">
-                    </picture>
-                </div>
-                <div class="swiper-slide">
-                    <picture>
-                        <source srcset="images/photo2.webp" type="image/webp">
-                        <img src="images/photo2.jpg" alt="Handcrafted bridal jewellery showcase" width="1920" height="500" loading="lazy" decoding="async">
                     </picture>
                 </div>
                 <div class="swiper-slide">
@@ -566,22 +560,22 @@
     <div data-include="components/footer.html"></div>
 
     <script type="module">
-        import { loadPageComponents } from './js/load-components.js?v=20260706h';
+        import { loadPageComponents } from './js/load-components.js?v=20260706i';
         import { updateCartBadge, syncCartButtonStates } from './js/cart-ui.js';
         import { updateWishlistBadge, syncWishlistHeartStates, buildWishlistHeartButton } from './js/wishlist-ui.js';
         import { initCategoryNav } from './js/category-nav.js';
         import { getTrendingProducts, getNewArrivals } from './js/firebase-product-service.js';
         import { getCoverImage, getProductImages } from './js/product-images.js';
-        import { initProductGalleryUI } from './js/product-ui.js';
+        import { initProductGalleryUI } from './js/product-ui.js?v=20260706i';
         import { initShadowCarousel, destroyShadowCarousel } from './js/home-featured-carousel.js';
-        import { initLucideIcons, initLinkPrefetch, scheduleStorefrontUiInit } from './js/performance-boot.js';
+        import { initLucideIcons, initLinkPrefetch, scheduleStorefrontUiInit } from './js/performance-boot.js?v=20260706i';
         import { initPageSchemas } from './js/seo-schema.js';
         import { escapeHtml, sanitizeImageUrl } from './js/security-utils.js';
         import { formatProductPrice } from './js/format-utils.js';
         import { initGoldPriceModal } from './js/gold-price-modal.js';
         import { getSwiperAutoplayOptions } from './js/mobile-perf.js';
-        import { initHomeSearchRotator } from './js/home-search-rotator.js';
-        import './js/header-search.js';
+        import { initHomeSearchRotator } from './js/home-search-rotator.js?v=20260706i';
+        import './js/header-search.js?v=20260706i';
 
         initPageSchemas({ pageKey: 'index.html' });
 

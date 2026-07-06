@@ -1,7 +1,7 @@
 const HOME_SEARCH_PLACEHOLDERS = [
     { text: 'Search your jewellery here', emoji: '💍' },
     { text: '22KT gold jewellery', emoji: '✨' }
-];
+].filter((item) => !/diamond/i.test(item.text));
 
 const ROTATE_MS = 3000;
 
@@ -21,6 +21,8 @@ export function initHomeSearchRotator() {
     function applyPlaceholder(nextIndex) {
         const item = HOME_SEARCH_PLACEHOLDERS[nextIndex];
         if (!item || document.activeElement === input || input.value.trim()) return;
+
+        if (/diamond/i.test(item.text)) return;
 
         const placeholder = formatPlaceholder(item);
         input.setAttribute('placeholder', placeholder);
