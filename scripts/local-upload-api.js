@@ -90,27 +90,7 @@ function getBearerToken(req) {
     return match ? match[1].trim() : '';
 }
 
-async function verifyFirebaseToken(idToken, apiKey) {
-    if (!idToken || !apiKey) {
-        return null;
-    }
-
-    const response = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken })
-        }
-    );
-
-    if (!response.ok) {
-        return null;
-    }
-
-    const data = await response.json();
-    return data.users?.[0] || null;
-}
+const { verifyFirebaseAuthToken } = require('./firebase-token-verify');
 
 function sha1Hex(value) {
     return crypto.createHash('sha1').update(value).digest('hex');
@@ -230,8 +210,11 @@ function createLocalUploadHandler(rootDir) {
         }
 
         const idToken = getBearerToken(req);
-        const firebaseUser = await verifyFirebaseToken(idToken, env.FIREBASE_API_KEY);
-        if (!firebaseUser) {
+        const firebaseUser = await verifyFirebaseAuthToken(idToken, {
+            projectId: env.FIREBASE_PROJECT_ID || 'jewelbazaari',
+            apiKey: env.FIREBASE_API_KEY
+        });
+        if (!firebaseUser?.uid) {
             sendJson(res, 401, { error: 'Unauthorized. Please log in again as an approved vendor.' });
             return true;
         }

@@ -63,7 +63,7 @@ async function uploadThroughApi(file, vendorId) {
     }
 
     const compressed = await compressJewelleryImage(file);
-    const token = await user.getIdToken();
+    const token = await user.getIdToken(true);
     const formData = new FormData();
     formData.append('image', compressed, compressed.name);
     formData.append('vendorId', vendorId);
