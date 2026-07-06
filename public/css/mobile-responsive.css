@@ -124,7 +124,8 @@ body.jb-category-page .luxury-card:hover {
 
 #announcement-placeholder,
 #header-placeholder,
-#category-placeholder {
+#category-placeholder,
+.jb-site-banner {
     position: relative;
     z-index: 40;
 }
@@ -274,70 +275,63 @@ textarea {
     max-width: 100%;
 }
 
-.jb-announcement {
+/* Two-line announcement — identical on homepage and every navigation page */
+.jb-announcement,
+.jb-announcement--two-line {
     background-color: #4A0E17;
     color: #fff;
-    font-size: 1.125rem;
+    display: grid !important;
+    grid-template-rows: auto auto;
+    align-items: center;
+    justify-items: center;
+    row-gap: 0;
+    gap: 0;
     font-weight: 400;
     text-align: center;
-    padding: 0.5rem 1rem;
-    letter-spacing: 0.02em;
+    padding: 0.35rem 0.5rem;
+    letter-spacing: 0;
     text-transform: none;
-    line-height: 1.35;
+    line-height: 1;
+    overflow-x: clip;
 }
 
 .jb-announcement-main,
 .jb-announcement-by {
+    display: block;
     font-weight: 400;
+    text-align: center;
+    width: max-content;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    letter-spacing: 0;
+}
+
+.jb-announcement-by::before {
+    content: none !important;
+}
+
+.jb-announcement-main {
+    font-size: clamp(9px, 3.525vw, 15px);
+}
+
+.jb-announcement-by {
+    font-size: clamp(9px, 3.3vw, 13.5px);
 }
 
 @media (min-width: 1025px) {
-    .jb-announcement {
-        display: block;
-    }
-
-    .jb-announcement-by::before {
-        content: ' | ';
-        font-weight: 300;
-    }
-}
-
-/* Two-line announcement on homepage + all navigation pages (mobile/tablet) */
-@media (max-width: 1024px) {
-    .jb-announcement {
-        display: grid;
-        grid-template-rows: auto auto;
-        align-items: center;
-        justify-items: center;
-        row-gap: 0;
-        gap: 0;
-        padding: 0.35rem 0.5rem;
-        line-height: 1;
-        overflow-x: clip;
-    }
-
-    .jb-announcement-by::before {
-        content: none;
-    }
-
-    .jb-announcement-main,
-    .jb-announcement-by {
-        display: block;
-        text-align: center;
-        width: max-content;
-        max-width: 100%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: clip;
-        letter-spacing: 0;
-    }
-
     .jb-announcement-main {
-        font-size: clamp(9px, 3.525vw, 15px);
+        font-size: 0.9375rem;
     }
 
     .jb-announcement-by {
-        font-size: clamp(9px, 3.3vw, 13.5px);
+        font-size: 0.8125rem;
+    }
+
+    .jb-announcement,
+    .jb-announcement--two-line {
+        padding: 0.4rem 1rem;
     }
 }
 
@@ -778,6 +772,7 @@ button.jb-mobile-menu-link {
     }
 
     header.sticky,
+    .jb-site-banner,
     #announcement-placeholder,
     #header-placeholder,
     #category-placeholder {

@@ -154,8 +154,36 @@ export function initProductGalleryUI() {
     });
 }
 
+function findCategoryBarRoot() {
+    return document.querySelector('.jb-mobile-nav-bar')?.closest('.relative.z-50')
+        || document.querySelector('.jb-category-scroll')?.closest('.relative.z-50')
+        || document.querySelector('[aria-label="Jewellery categories"]')?.closest('.bg-white');
+}
+
+export function ensureSiteBanner() {
+    const announcement = document.querySelector('.jb-announcement');
+    const header = document.querySelector('header');
+    const categoryBar = findCategoryBarRoot();
+
+    if (!announcement || !header || announcement.closest('.jb-site-banner')) {
+        return;
+    }
+
+    const banner = document.createElement('div');
+    banner.className = 'sticky top-0 z-50 bg-white jb-site-banner';
+    banner.setAttribute('role', 'banner');
+
+    const parent = announcement.parentNode;
+    if (!parent) return;
+
+    parent.insertBefore(banner, announcement);
+    banner.appendChild(announcement);
+    if (header.parentNode === parent) banner.appendChild(header);
+    if (categoryBar?.parentNode === parent) banner.appendChild(categoryBar);
+}
+
 export async function loadPageLayout() {
-    const { loadPageComponents } = await import('./load-components.js?v=20260706g');
+    const { loadPageComponents } = await import('./load-components.js?v=20260706h');
     const { scheduleStorefrontUiInit } = await import('./performance-boot.js');
     const announcementEl = document.getElementById('announcement-placeholder');
     const headerEl = document.getElementById('header-placeholder');
@@ -172,6 +200,7 @@ export async function loadPageLayout() {
     const selectors = ['#announcement-placeholder', '#header-placeholder', '#category-placeholder'];
     if (footerEl) selectors.push('#footer-placeholder');
     await loadPageComponents(selectors.join(', '));
+    ensureSiteBanner();
 
     window.dispatchEvent(new CustomEvent('jewelbazaari:components-loaded'));
     initLucideIcons();

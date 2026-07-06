@@ -1,4 +1,4 @@
-import { getEmbeddedComponent } from './layout-components.v5.js';
+import { getEmbeddedComponent } from './layout-components.v6.js';
 
 function isSameOriginUrl(url) {
     try {
