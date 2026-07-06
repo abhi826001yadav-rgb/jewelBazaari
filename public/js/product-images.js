@@ -6,11 +6,13 @@ export function getProductImages(product) {
     const imageUrls = [
         product.imageUrl,
         product.imageUrl2,
-        product.imageUrl3
+        product.imageUrl3,
+        product.imageUrl4,
+        product.imageUrl5
     ]
         .map((url) => String(url || '').trim())
         .filter(Boolean)
-        .slice(0, 3);
+        .slice(0, 5);
 
     if (imageUrls.length) {
         return imageUrls;
@@ -20,7 +22,7 @@ export function getProductImages(product) {
         return product.images
             .map((url) => String(url || '').trim())
             .filter(Boolean)
-            .slice(0, 3);
+            .slice(0, 5);
     }
 
     return [];

@@ -580,6 +580,7 @@
         import { formatProductPrice } from './js/format-utils.js';
         import { initGoldPriceModal } from './js/gold-price-modal.js';
         import { getSwiperAutoplayOptions } from './js/mobile-perf.js';
+        import { initHomeSearchRotator } from './js/home-search-rotator.js';
 
         initPageSchemas({ pageKey: 'index.html' });
 
@@ -628,6 +629,7 @@
 
         await loadPageComponents();
         window.dispatchEvent(new CustomEvent('jewelbazaari:components-loaded'));
+        initHomeSearchRotator();
         window.jbA11y?.ensureSkipLink();
         initCategoryNav();
         initLinkPrefetch();

@@ -59,6 +59,72 @@
             transform: translateY(-2px);
         }
         .upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .jb-image-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+        .jb-image-upload-card {
+            position: relative;
+            border: 2px solid #E5E7EB;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #fff;
+        }
+        .jb-image-upload-card img {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+            display: block;
+        }
+        .jb-image-upload-meta {
+            padding: 0.5rem 0.65rem;
+            font-size: 0.7rem;
+            color: #4A0E17;
+            line-height: 1.3;
+        }
+        .jb-image-remove-btn {
+            position: absolute;
+            top: 0.45rem;
+            right: 0.45rem;
+            width: 1.75rem;
+            height: 1.75rem;
+            border: none;
+            border-radius: 9999px;
+            background: rgba(74, 14, 23, 0.88);
+            color: #fff;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .jb-image-picker-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 3rem;
+            border: 2px dashed #9B7E4B;
+            border-radius: 1rem;
+            background: #fff;
+            color: #4A0E17;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .jb-image-picker-btn:hover { background: #FFF8EE; }
+        .progress-track {
+            width: 100%;
+            height: 0.5rem;
+            background: #E5E7EB;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #9B7E4B, #4A0E17);
+            transition: width 0.2s ease;
+        }
         .status-message { font-size: 0.875rem; line-height: 1.4; }
         .status-success { color: #166534; }
         .status-error { color: #B91C1C; }
@@ -301,20 +367,18 @@
                             <textarea id="p-description" rows="3" placeholder="Description" class="w-full p-4 border-2 border-gray-300 rounded-2xl resize-none"></textarea>
                         </div>
                         <div>
-                            <label for="p-image-url-1" class="block text-sm font-medium text-gray-700 mb-1">Image URL 1 *</label>
-                            <input type="url" id="p-image-url-1" required placeholder="Direct link of first image" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                        </div>
-                        <div>
-                            <label for="p-image-url-2" class="block text-sm font-medium text-gray-700 mb-1">Image URL 2 (Optional)</label>
-                            <input type="url" id="p-image-url-2" placeholder="Direct link of second image" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                        </div>
-                        <div>
-                            <label for="p-image-url-3" class="block text-sm font-medium text-gray-700 mb-1">Image URL 3 (Optional)</label>
-                            <input type="url" id="p-image-url-3" placeholder="Direct link of third image" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                        </div>
-                        <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17]">
-                            <p class="font-semibold mb-1">Image hosting tip</p>
-                            <p>Upload photos to <a href="https://postimages.org" target="_blank" rel="noopener noreferrer" class="text-[#9B7E4B] underline">postimages.org</a> and paste the Direct Link here (max 3 images).</p>
+                            <label for="p-images" class="block text-sm font-medium text-gray-700 mb-1">Jewellery Photos *</label>
+                            <input type="file" id="p-images" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple class="sr-only">
+                            <button type="button" id="p-images-trigger" class="jb-image-picker-btn">📷 Choose up to 5 photos</button>
+                            <div id="image-preview-grid" class="jb-image-upload-grid mt-3 hidden" aria-live="polite"></div>
+                            <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17] mt-3">
+                                <p class="font-semibold mb-1">Photo rules</p>
+                                <p>Upload up to <strong>5 photos</strong> per jewellery item. Images are saved in Cloudinary.</p>
+                                <p class="mt-2">Photos are auto-cropped to <strong>4:5</strong>, resized to <strong>1200 × 1500 px</strong>, and compressed to <strong>1 MB or less</strong>.</p>
+                            </div>
+                            <div class="progress-track mt-3 hidden" id="image-upload-progress-track" aria-hidden="true">
+                                <div class="progress-fill" id="image-upload-progress-fill"></div>
+                            </div>
                         </div>
                         <input type="number" id="p-price" required min="1" placeholder="Price (₹) *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
                         <p id="upload-status" class="status-message hidden" role="status" aria-live="polite"></p>
@@ -358,6 +422,9 @@
         } from './js/vendor-service.js';
         import { escapeHtml, bindImageFallback, sanitizeImageUrl } from './js/security-utils.js';
         import { formatCartPrice } from './js/format-utils.js';
+        import { getProductImages } from './js/product-images.js';
+        import { uploadVendorImages, mapUrlsToProductFields, IMAGE_UPLOAD_LIMITS } from './js/cloudinary-image-upload.js';
+        import { formatImageSize } from './js/image-compress.js';
 
         const authSection = document.getElementById('auth-section');
         const dashboardSection = document.getElementById('dashboard-section');
@@ -373,10 +440,17 @@
         const listingsEmpty = document.getElementById('listings-empty');
         const listingsLoading = document.getElementById('listings-loading');
         const listingsStatus = document.getElementById('listings-status');
+        const imageInput = document.getElementById('p-images');
+        const imageTrigger = document.getElementById('p-images-trigger');
+        const imagePreviewGrid = document.getElementById('image-preview-grid');
+        const imageUploadProgressTrack = document.getElementById('image-upload-progress-track');
+        const imageUploadProgressFill = document.getElementById('image-upload-progress-fill');
 
         let currentVendor = null;
         let editingProductId = null;
         let vendorProducts = [];
+        let selectedImageFiles = [];
+        let existingImageUrls = [];
 
         function setStatus(element, message, type = 'info') {
             element.textContent = message;
@@ -439,6 +513,9 @@
         function resetProductForm() {
             productForm.reset();
             editingProductId = null;
+            selectedImageFiles = [];
+            existingImageUrls = [];
+            renderImagePreviews();
             editBanner.classList.remove('is-visible');
             submitBtn.textContent = '✨ Upload Product';
             clearStatus(uploadStatus);
@@ -450,13 +527,86 @@
             document.getElementById('p-stone').value = product.stoneType || '';
             document.getElementById('p-name').value = product.name || '';
             document.getElementById('p-description').value = product.description || '';
-            document.getElementById('p-image-url-1').value = product.imageUrl || '';
-            document.getElementById('p-image-url-2').value = product.imageUrl2 || '';
-            document.getElementById('p-image-url-3').value = product.imageUrl3 || '';
             document.getElementById('p-price').value = product.price || '';
+            selectedImageFiles = [];
+            existingImageUrls = getProductImages(product);
+            renderImagePreviews();
         }
 
-        function collectProductPayload() {
+        function totalSelectedImages() {
+            return existingImageUrls.length + selectedImageFiles.length;
+        }
+
+        function renderImagePreviews() {
+            imagePreviewGrid.innerHTML = '';
+            const total = totalSelectedImages();
+
+            if (!total) {
+                imagePreviewGrid.classList.add('hidden');
+                imageTrigger.textContent = '📷 Choose up to 5 photos';
+                return;
+            }
+
+            imagePreviewGrid.classList.remove('hidden');
+            imageTrigger.textContent = total >= IMAGE_UPLOAD_LIMITS.maxImages
+                ? 'Maximum 5 photos selected'
+                : `📷 Add more photos (${total}/5)`;
+
+            existingImageUrls.forEach((url, index) => {
+                const card = document.createElement('div');
+                card.className = 'jb-image-upload-card';
+
+                const image = document.createElement('img');
+                image.src = sanitizeImageUrl(url, '');
+                image.alt = `Saved jewellery photo ${index + 1}`;
+
+                const meta = document.createElement('div');
+                meta.className = 'jb-image-upload-meta';
+                meta.textContent = `Saved photo ${index + 1}`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'jb-image-remove-btn';
+                removeBtn.setAttribute('aria-label', `Remove saved photo ${index + 1}`);
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => {
+                    existingImageUrls = existingImageUrls.filter((_, itemIndex) => itemIndex !== index);
+                    renderImagePreviews();
+                });
+
+                card.append(image, meta, removeBtn);
+                bindImageFallback(image);
+                imagePreviewGrid.appendChild(card);
+            });
+
+            selectedImageFiles.forEach((file, index) => {
+                const card = document.createElement('div');
+                card.className = 'jb-image-upload-card';
+
+                const image = document.createElement('img');
+                image.src = URL.createObjectURL(file);
+                image.alt = `New jewellery photo ${index + 1}`;
+
+                const meta = document.createElement('div');
+                meta.className = 'jb-image-upload-meta';
+                meta.textContent = `${file.name} • ${formatImageSize(file.size)}`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'jb-image-remove-btn';
+                removeBtn.setAttribute('aria-label', `Remove new photo ${index + 1}`);
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => {
+                    selectedImageFiles = selectedImageFiles.filter((_, itemIndex) => itemIndex !== index);
+                    renderImagePreviews();
+                });
+
+                card.append(image, meta, removeBtn);
+                imagePreviewGrid.appendChild(card);
+            });
+        }
+
+        function collectProductPayload(imageFields = {}) {
             const metalValue = document.getElementById('p-metal').value;
             const stoneValue = document.getElementById('p-stone').value;
             return {
@@ -468,11 +618,56 @@
                 stoneType: stoneValue,
                 vendor: currentVendor?.shopName || '',
                 vendorId: currentVendor?.vendorId || '',
-                imageUrl: document.getElementById('p-image-url-1').value.trim(),
-                imageUrl2: document.getElementById('p-image-url-2').value.trim(),
-                imageUrl3: document.getElementById('p-image-url-3').value.trim()
+                ...imageFields
             };
         }
+
+        async function resolveProductImageFields() {
+            if (!totalSelectedImages()) {
+                throw new Error('Please choose at least one jewellery photo.');
+            }
+
+            let uploadedUrls = [];
+            if (selectedImageFiles.length) {
+                uploadedUrls = await uploadVendorImages(selectedImageFiles, currentVendor?.vendorId, {
+                    onProgress: ({ completed, total }) => {
+                        const percent = Math.round((completed / total) * 100);
+                        imageUploadProgressFill.style.width = `${percent}%`;
+                        submitBtn.textContent = `Uploading photos (${completed}/${total})...`;
+                    }
+                });
+            }
+
+            const allUrls = [...existingImageUrls, ...uploadedUrls].slice(0, IMAGE_UPLOAD_LIMITS.maxImages);
+            return mapUrlsToProductFields(allUrls);
+        }
+
+        imageTrigger.addEventListener('click', () => {
+            if (totalSelectedImages() >= IMAGE_UPLOAD_LIMITS.maxImages) {
+                setStatus(uploadStatus, 'You can upload a maximum of 5 photos per jewellery item.', 'error');
+                return;
+            }
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', () => {
+            clearStatus(uploadStatus);
+            const incoming = Array.from(imageInput.files || []);
+            imageInput.value = '';
+
+            if (!incoming.length) {
+                return;
+            }
+
+            const remainingSlots = IMAGE_UPLOAD_LIMITS.maxImages - totalSelectedImages();
+            const accepted = incoming.slice(0, remainingSlots);
+            if (accepted.length < incoming.length) {
+                setStatus(uploadStatus, 'Only some photos were added because the maximum is 5 per product.', 'info');
+            }
+
+            selectedImageFiles = [...selectedImageFiles, ...accepted];
+            renderImagePreviews();
+        });
 
         function renderListings() {
             listingsGrid.innerHTML = '';
@@ -627,17 +822,16 @@
             event.preventDefault();
             clearStatus(uploadStatus);
 
-            const product = collectProductPayload();
-
-            if (!product.imageUrl) {
-                setStatus(uploadStatus, 'Image URL 1 is required.', 'error');
+            if (!totalSelectedImages()) {
+                setStatus(uploadStatus, 'Please choose at least one jewellery photo.', 'error');
+                imageTrigger.focus();
                 return;
             }
-            if (!product.category) {
+            if (!document.getElementById('p-category').value) {
                 setStatus(uploadStatus, 'Please select a jewellery category.', 'error');
                 return;
             }
-            if (!product.metalType) {
+            if (!document.getElementById('p-metal').value) {
                 setStatus(uploadStatus, 'Please select a metal type.', 'error');
                 return;
             }
@@ -652,9 +846,20 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = isEditing ? 'Saving changes...' : 'Uploading...';
+            submitBtn.textContent = selectedImageFiles.length
+                ? 'Uploading photos...'
+                : (isEditing ? 'Saving changes...' : 'Uploading...');
+            imageUploadProgressTrack.classList.toggle('hidden', !selectedImageFiles.length);
+            imageUploadProgressFill.style.width = '0%';
 
             try {
+                setStatus(uploadStatus, selectedImageFiles.length
+                    ? 'Compressing and uploading photos to Cloudinary...'
+                    : 'Saving product...', 'info');
+
+                const imageFields = await resolveProductImageFields();
+                const product = collectProductPayload(imageFields);
+
                 if (isEditing) {
                     const existing = vendorProducts.find((item) => item.id === editingProductId);
                     if (!existing || !productBelongsToVendor(existing)) {
@@ -668,7 +873,7 @@
                 } else {
                     const saved = await addProduct(product);
                     setStatus(uploadStatus, `"${saved.name}" is now live across all matching sections.`, 'success');
-                    productForm.reset();
+                    resetProductForm();
                     await loadVendorListings();
                 }
             } catch (error) {
@@ -677,6 +882,8 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = editingProductId ? '💾 Save Changes' : '✨ Upload Product';
+                imageUploadProgressTrack.classList.add('hidden');
+                imageUploadProgressFill.style.width = '0%';
             }
         });
 

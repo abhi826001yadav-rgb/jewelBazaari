@@ -146,11 +146,15 @@ function normalizeProductData(product) {
     const {
         imageUrl,
         imageUrl2,
-        imageUrl3
+        imageUrl3,
+        imageUrl4,
+        imageUrl5
     } = validateProductImageUrls({
         imageUrl: product.imageUrl,
         imageUrl2: product.imageUrl2,
-        imageUrl3: product.imageUrl3
+        imageUrl3: product.imageUrl3,
+        imageUrl4: product.imageUrl4,
+        imageUrl5: product.imageUrl5
     });
 
     const normalized = {
@@ -173,6 +177,14 @@ function normalizeProductData(product) {
 
     if (imageUrl3) {
         normalized.imageUrl3 = imageUrl3;
+    }
+
+    if (imageUrl4) {
+        normalized.imageUrl4 = imageUrl4;
+    }
+
+    if (imageUrl5) {
+        normalized.imageUrl5 = imageUrl5;
     }
 
     return normalized;
@@ -301,11 +313,15 @@ export async function updateProduct(productId, product) {
     const {
         imageUrl,
         imageUrl2,
-        imageUrl3
+        imageUrl3,
+        imageUrl4,
+        imageUrl5
     } = validateProductImageUrls({
         imageUrl: product.imageUrl,
         imageUrl2: product.imageUrl2,
-        imageUrl3: product.imageUrl3
+        imageUrl3: product.imageUrl3,
+        imageUrl4: product.imageUrl4,
+        imageUrl5: product.imageUrl5
     });
 
     const updateData = {
@@ -338,6 +354,12 @@ export async function updateProduct(productId, product) {
     }
     if (imageUrl3) {
         updateData.imageUrl3 = imageUrl3;
+    }
+    if (imageUrl4) {
+        updateData.imageUrl4 = imageUrl4;
+    }
+    if (imageUrl5) {
+        updateData.imageUrl5 = imageUrl5;
     }
 
     await updateDoc(doc(db, PRODUCTS_COLLECTION, id), updateData);

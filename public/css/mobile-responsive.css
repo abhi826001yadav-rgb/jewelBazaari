@@ -215,15 +215,16 @@ textarea {
     font-weight: 300;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .jb-announcement {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.15rem;
-        padding: 0.4rem 0.5rem;
-        line-height: 1.2;
+        gap: 0.1rem;
+        padding: 0.35rem 0.5rem;
+        line-height: 1.15;
+        overflow-x: clip;
     }
 
     .jb-announcement-main,
@@ -231,15 +232,18 @@ textarea {
         display: block;
         text-align: center;
         width: 100%;
+        max-width: 100%;
         white-space: nowrap;
     }
 
     .jb-announcement-main {
-        font-size: clamp(8px, 2.5vw, 11px);
+        font-size: clamp(7px, 2.65vw, 11px);
+        letter-spacing: 0.01em;
     }
 
     .jb-announcement-by {
-        font-size: clamp(8px, 2.35vw, 10px);
+        font-size: clamp(7px, 2.45vw, 10px);
+        letter-spacing: 0.01em;
     }
 
     .jb-announcement-sep {
