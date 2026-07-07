@@ -1,6 +1,7 @@
 import { auth, db } from './firebase-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js';
+import { isIOSDevice } from './ios-vendor-login-fix.js';
 import {
     signInWithGoogle as firebaseGoogleSignIn,
     resolveGoogleRedirectResult
@@ -454,10 +455,17 @@ function assertVendorCanLogin(vendor) {
     }
 }
 
-export async function loginVendor({ email, password }) {
+export async function loginVendor({ email, password, onStatus } = {}) {
+    const report = (message) => {
+        if (typeof onStatus === 'function') {
+            onStatus(message);
+        }
+    };
+
     const cleanEmail = validateRegisteredEmail(email);
     const cleanPassword = validateVendorPassword(password);
 
+    report('Looking up vendor account...');
     const vendor = await getVendorByRegisteredEmail(cleanEmail);
     if (!vendor) {
         throw new Error('No vendor account found for this email. Use the exact email from your approved vendor registration.');
@@ -469,6 +477,7 @@ export async function loginVendor({ email, password }) {
 
     assertVendorCanLogin(vendor);
 
+    report('Verifying vendor password...');
     const passwordValid = await verifyVendorPassword(vendor, cleanPassword);
     if (!passwordValid) {
         throw new Error('Invalid registered email or vendor password.');
@@ -477,17 +486,20 @@ export async function loginVendor({ email, password }) {
     const authEmail = normalizeEmail(vendor.email);
     let userCredential;
     try {
+        report('Signing in securely...');
         userCredential = await signInWithEmailAndPassword(auth, authEmail, cleanPassword);
     } catch (error) {
         if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-login-credentials'].includes(error?.code)) {
-            try {
-                const methods = await fetchSignInMethodsForEmail(auth, authEmail);
-                if (methods.includes('google.com') && !methods.includes('password')) {
-                    throw new Error('Your vendor password is correct, but password login still needs activation. Contact jewelBazaari support with your registered email.');
-                }
-            } catch (lookupError) {
-                if (lookupError.message?.includes('password login still needs activation')) {
-                    throw lookupError;
+            if (!isIOSDevice()) {
+                try {
+                    const methods = await fetchSignInMethodsForEmail(auth, authEmail);
+                    if (methods.includes('google.com') && !methods.includes('password')) {
+                        throw new Error('Your vendor password is correct, but password login still needs activation. Contact jewelBazaari support with your registered email.');
+                    }
+                } catch (lookupError) {
+                    if (lookupError.message?.includes('password login still needs activation')) {
+                        throw lookupError;
+                    }
                 }
             }
 

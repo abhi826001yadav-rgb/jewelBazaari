@@ -536,7 +536,7 @@
                         </div>
                         <div>
                             <label for="login-vendor-email" class="block text-sm font-medium text-gray-700 mb-1">Registered Email *</label>
-                            <input type="email" id="login-vendor-email" required placeholder="your.email@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="email">
+                            <input type="email" id="login-vendor-email" required placeholder="your.email@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-2xl" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email">
                         </div>
                         <div>
                             <label for="login-vendor-password" class="block text-sm font-medium text-gray-700 mb-1">Vendor Password *</label>
@@ -675,7 +675,14 @@
         import { auth } from './js/firebase-config.js';
         import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
         import { safeGetItem, safeSetItem } from './js/safe-storage.js';
-        import { installIOSVendorLoginFixes } from './js/ios-vendor-login-fix.js';
+        import {
+            installIOSVendorLoginFixes,
+            bindVendorLoginButton,
+            markVendorLoginReady,
+            showVendorBootError
+        } from './js/ios-vendor-login-fix.js';
+
+        window.__jbShowVendorBootError = showVendorBootError;
 
         const authSection = document.getElementById('auth-section');
         const uploadSection = document.getElementById('upload-section');
@@ -983,11 +990,18 @@
             const password = loginVendorPasswordInput.value;
             const loginBtn = document.getElementById('vendor-login-btn');
 
+            if (!email || !password) {
+                setPanelStatus(vendorLoginStatus, 'Enter your registered email and vendor password.', 'error');
+                return;
+            }
+
             try {
                 loginBtn.disabled = true;
-                setPanelStatus(vendorLoginStatus, 'Signing you in...', 'info');
-
-                const vendor = await loginVendor({ email, password });
+                const vendor = await loginVendor({
+                    email,
+                    password,
+                    onStatus: (message) => setPanelStatus(vendorLoginStatus, message, 'info')
+                });
                 safeSetItem(localStorage, 'jb_last_vendor_email', vendor.email || email);
                 showUploadPortal(vendor);
             } catch (error) {
@@ -1005,10 +1019,7 @@
             }
         }
 
-        vendorLoginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            await submitVendorLogin();
-        });
+        bindVendorLoginButton(submitVendorLogin);
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await logoutVendor();
@@ -1195,6 +1206,7 @@
                 showAuthPage('welcome');
             } finally {
                 finishAuthLoading();
+                markVendorLoginReady();
             }
         });
     </script>
@@ -1203,6 +1215,25 @@
 
         document.getElementById('announcement-placeholder').setAttribute('data-include', 'components/announcement.html');
         loadPageComponents('#announcement-placeholder');
+    </script>
+    <script>
+        window.addEventListener('error', function (event) {
+            if (typeof window.__jbShowVendorBootError === 'function') {
+                window.__jbShowVendorBootError(event.message || 'Unexpected page error.');
+            }
+        });
+        window.addEventListener('unhandledrejection', function (event) {
+            if (typeof window.__jbShowVendorBootError === 'function') {
+                const reason = event.reason;
+                const message = reason && reason.message ? reason.message : 'Unexpected login error.';
+                window.__jbShowVendorBootError(message);
+            }
+        });
+        setTimeout(function () {
+            if (!window.__jbVendorLoginReady && typeof window.__jbShowVendorBootError === 'function') {
+                window.__jbShowVendorBootError('Login did not load. Force-close Safari, reopen this page, and try again.');
+            }
+        }, 5000);
     </script>
 </body>
 </html>
