@@ -1,6 +1,6 @@
-import { auth } from './firebase-config.js?v=20260707g';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707g';
-import { isMobileAuthEnvironment } from './device-utils.js?v=20260707g';
+import { auth } from './firebase-config.js?v=20260707h';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707h';
+import { isMobileAuthEnvironment } from './device-utils.js?v=20260707h';
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -19,13 +19,45 @@ const POPUP_FALLBACK_CODES = new Set([
 
 const REDIRECT_BENIGN_CODES = new Set([
     'auth/redirect-cancelled-by-user',
-    'auth/cancelled-popup-request'
+    'auth/cancelled-popup-request',
+    'auth/argument-error'
 ]);
 
 export function createGoogleProvider(options = {}) {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: options.prompt || 'select_account' });
     return provider;
+}
+
+function hasPendingAuthRedirect() {
+    try {
+        const href = window.location.href;
+        if (/[?&#](apiKey|authUser|code|state)=/i.test(href)) {
+            return true;
+        }
+        if (href.includes('/__/auth/')) {
+            return true;
+        }
+
+        return Object.keys(sessionStorage).some((key) => (
+            key.startsWith('firebase:')
+            && /redirect/i.test(key)
+        ));
+    } catch {
+        return false;
+    }
+}
+
+function clearStaleRedirectState() {
+    try {
+        Object.keys(sessionStorage).forEach((key) => {
+            if (key.startsWith('firebase:') && /redirect/i.test(key)) {
+                sessionStorage.removeItem(key);
+            }
+        });
+    } catch {
+        // Ignore storage errors (private browsing, etc.).
+    }
 }
 
 async function ensureAuthPersistence() {
@@ -69,10 +101,16 @@ export async function signInWithGoogle(options = {}) {
 export async function resolveGoogleRedirectResult() {
     await auth.authStateReady();
 
+    if (!hasPendingAuthRedirect()) {
+        return null;
+    }
+
     try {
         return await getRedirectResult(auth);
     } catch (error) {
-        if (REDIRECT_BENIGN_CODES.has(error?.code)) {
+        const code = error?.code || '';
+        if (REDIRECT_BENIGN_CODES.has(code)) {
+            clearStaleRedirectState();
             return null;
         }
         throw new Error(getAuthErrorMessage(error));
