@@ -1,7 +1,7 @@
 import { auth, db } from './firebase-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js';
-import { isIOSDevice } from './ios-vendor-login-fix.js';
+import { isIOSDevice } from './device-utils.js';
 import {
     signInWithGoogle as firebaseGoogleSignIn,
     resolveGoogleRedirectResult

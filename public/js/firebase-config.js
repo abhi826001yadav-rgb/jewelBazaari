@@ -8,7 +8,7 @@ import {
     inMemoryPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { isIOSDevice } from "./ios-vendor-login-fix.js";
+import { isIOSDevice } from "./device-utils.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAgNhB28vIQRlMOrFGoV5E7FcNk3bqMjPU",
@@ -22,27 +22,19 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-function getAuthPersistence() {
+function createAuth() {
     if (isIOSDevice()) {
-        return [
-            browserLocalPersistence,
-            browserSessionPersistence,
-            inMemoryPersistence
-        ];
+        return getAuth(app);
     }
 
-    return [
-        indexedDBLocalPersistence,
-        browserLocalPersistence,
-        browserSessionPersistence,
-        inMemoryPersistence
-    ];
-}
-
-function createAuth() {
     try {
         return initializeAuth(app, {
-            persistence: getAuthPersistence()
+            persistence: [
+                indexedDBLocalPersistence,
+                browserLocalPersistence,
+                browserSessionPersistence,
+                inMemoryPersistence
+            ]
         });
     } catch (error) {
         if (error?.code === 'auth/already-initialized') {

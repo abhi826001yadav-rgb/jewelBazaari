@@ -19,9 +19,9 @@
     <meta name="twitter:description" content="jewelBazaari admin access.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260706i" as="style">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707a" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260706i">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707a">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body {
@@ -32,61 +32,13 @@
             background: #FAF7F2;
             font-family: 'Inter', system-ui, sans-serif;
         }
-        body.admin-locked {
-            overflow: hidden;
-        }
-        @media (max-width: 768px) {
-            body.admin-locked {
-                overflow: auto;
-                position: static;
-                width: auto;
-                min-height: 100dvh;
-            }
-            #password-section {
-                position: relative;
-                inset: auto;
-                min-height: 100dvh;
-                align-items: flex-start;
-                padding-top: max(1.5rem, env(safe-area-inset-top));
-                padding-bottom: max(2rem, env(safe-area-inset-bottom));
-                -webkit-overflow-scrolling: touch;
-            }
-            #password-section .bg-white.rounded-3xl {
-                margin-bottom: 1.5rem;
-            }
-        }
-        @supports (-webkit-touch-callout: none) {
-            body.admin-locked {
-                overflow: auto;
-                position: static;
-                width: auto;
-                min-height: -webkit-fill-available;
-            }
-            #password-section {
-                position: relative;
-                inset: auto;
-                min-height: -webkit-fill-available;
-                align-items: flex-start;
-                padding-top: max(1.5rem, env(safe-area-inset-top));
-                padding-bottom: max(3rem, env(safe-area-inset-bottom));
-                -webkit-overflow-scrolling: touch;
-            }
-        }
+
         .admin-title {
             font-family: 'Playfair Display', Georgia, serif;
             color: #4A0E17;
         }
         #password-section {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: linear-gradient(135deg, #1F1A17 0%, #2C211F 100%);
-        }
-        #password-section.is-hidden {
-            display: none;
         }
         #admin-section {
             display: none;
@@ -453,10 +405,15 @@
 </head>
 <body class="admin-locked">
 
+    <header class="jb-portal-header" id="jb-portal-header">
+        <a href="index.html" class="jb-portal-logo-link" aria-label="jewelBazaari Home">
+            <img src="images/logo.png" alt="jewelBazaari" width="160" height="72" class="jb-portal-logo" decoding="async">
+        </a>
+    </header>
+
     <div id="password-section" role="dialog" aria-label="Admin login">
         <div class="max-w-md w-full mx-4">
             <div class="bg-white rounded-3xl p-8 shadow-xl relative">
-                <a href="index.html" class="admin-home-btn" aria-label="Return to homepage">🏠 Home</a>
                 <div class="text-center mb-6">
                     <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                         <span class="text-3xl">🔐</span>
@@ -1462,6 +1419,9 @@
 
         installIOSAdminLoginFixes();
         bindTapButton(loginBtn, signInAsAdmin);
+        window.__jbAdminSignIn = signInAsAdmin;
+
+        let adminAuthReady = false;
 
         adminLogoutBtn.addEventListener('click', async () => {
             await signOut(auth);
@@ -1469,6 +1429,10 @@
         });
 
         onAuthStateChanged(auth, async (user) => {
+            if (!adminAuthReady) {
+                return;
+            }
+
             if (isAdminUser(user)) {
                 unlockAdmin();
                 return;
@@ -1485,6 +1449,7 @@
         });
 
         initAdminAuth().finally(() => {
+            adminAuthReady = true;
             markAdminLoginReady();
         });
     </script>

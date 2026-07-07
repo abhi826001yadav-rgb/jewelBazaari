@@ -1,26 +1,12 @@
 import { auth } from './firebase-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
+import { isMobileAuthEnvironment } from './device-utils.js';
 import {
     GoogleAuthProvider,
     signInWithPopup,
     signInWithRedirect,
     getRedirectResult
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-
-export function isMobileAuthEnvironment() {
-    const ua = navigator.userAgent || '';
-
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
-        return true;
-    }
-
-    // iPadOS reports as Mac with touch support.
-    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
-        return true;
-    }
-
-    return window.matchMedia('(max-width: 768px)').matches && navigator.maxTouchPoints > 0;
-}
 
 export function createGoogleProvider(options = {}) {
     const provider = new GoogleAuthProvider();

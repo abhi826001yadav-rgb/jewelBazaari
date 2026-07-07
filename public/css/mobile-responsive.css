@@ -1107,3 +1107,70 @@ button.jb-mobile-menu-link {
         --swiper-autoplay-delay: 0;
     }
 }
+
+/* Portal login pages — vendor, admin (scrollable on iPhone Safari) */
+.jb-portal-header {
+    position: sticky;
+    top: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    padding-top: max(0.65rem, env(safe-area-inset-top));
+    background: #fff;
+    border-bottom: 1px solid rgba(155, 126, 75, 0.28);
+    box-shadow: 0 4px 18px -10px rgba(74, 14, 23, 0.35);
+}
+
+.jb-portal-logo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+.jb-portal-logo {
+    display: block;
+    height: 3.25rem;
+    width: auto;
+    max-width: min(72vw, 11rem);
+    object-fit: contain;
+}
+
+body.vendor-locked,
+body.admin-locked {
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 100dvh;
+    -webkit-overflow-scrolling: touch;
+}
+
+#auth-section,
+#password-section {
+    position: static;
+    inset: auto;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: auto;
+    padding: 1rem 0.75rem max(2.5rem, calc(1.5rem + env(safe-area-inset-bottom)));
+    overflow: visible;
+    -webkit-overflow-scrolling: touch;
+}
+
+#auth-section.is-hidden,
+#password-section.is-hidden {
+    display: none !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+    body.vendor-locked,
+    body.admin-locked {
+        min-height: -webkit-fill-available;
+    }
+}

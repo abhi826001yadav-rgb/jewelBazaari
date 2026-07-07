@@ -19,9 +19,9 @@
     <meta name="twitter:description" content="Approved jewelBazaari vendor dashboard for managing jewellery listings.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260706i" as="style">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707a" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260706i">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707a">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body { margin: 0; min-height: 100vh; }
@@ -29,8 +29,6 @@
             background: linear-gradient(135deg, #1F1A17 0%, #2C211F 100%);
             font-family: 'Inter', system-ui, sans-serif;
         }
-        body.vendor-locked { overflow: hidden; }
-        body.vendor-locked #announcement-placeholder { display: none; }
         #vendor-login-btn {
             min-height: 44px;
             touch-action: manipulation;
@@ -40,73 +38,10 @@
         #vendor-login-form input {
             font-size: 16px;
         }
-        @media (max-width: 768px) {
-            body.vendor-locked {
-                overflow: auto;
-                position: static;
-                width: auto;
-                min-height: 100dvh;
-            }
-            #auth-section {
-                position: relative;
-                inset: auto;
-                min-height: 100dvh;
-                align-items: flex-start;
-                padding-top: max(1.5rem, env(safe-area-inset-top));
-                padding-bottom: max(2rem, env(safe-area-inset-bottom));
-                -webkit-overflow-scrolling: touch;
-            }
-            #auth-section .luxury-card {
-                margin-bottom: 1.5rem;
-            }
-        }
-        @supports (-webkit-touch-callout: none) {
-            body.vendor-locked {
-                overflow: auto;
-                position: static;
-                width: auto;
-                min-height: -webkit-fill-available;
-            }
-            #auth-section {
-                position: relative;
-                inset: auto;
-                min-height: -webkit-fill-available;
-                align-items: flex-start;
-                padding-top: max(1.5rem, env(safe-area-inset-top));
-                padding-bottom: max(3rem, env(safe-area-inset-bottom));
-                -webkit-overflow-scrolling: touch;
-            }
-        }
         .luxury-card {
             background: #FAF7F2;
             border: 2px solid #9B7E4B;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
-        }
-        .vendor-home-btn {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            z-index: 10;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.35rem;
-            min-height: 44px;
-            min-width: 44px;
-            padding: 0.5rem 0.875rem;
-            border-radius: 9999px;
-            border: 1px solid rgba(155, 126, 75, 0.45);
-            background: #fff;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #4A0E17;
-            text-decoration: none;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .vendor-home-btn:hover {
-            color: #9B7E4B;
-            background: #FAF7F2;
         }
         .vendor-home-link-btn {
             display: flex;
@@ -226,21 +161,7 @@
         .status-error { color: #B91C1C; }
         .status-info { color: #4A0E17; }
         #auth-section {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
             background: #2C1810;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 1.5rem 1rem;
-            overflow-y: auto;
-        }
-        #auth-section.is-hidden {
-            display: none !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
         }
         #dashboard-section { display: none; min-height: 100vh; padding: 2rem 1rem 3rem; }
         #dashboard-section.is-visible { display: block; }
@@ -342,13 +263,16 @@
 <body class="vendor-locked">
     <h1 class="sr-only">jewelBazaari Vendor Dashboard</h1>
 
-    <div id="announcement-placeholder"></div>
+    <header class="jb-portal-header" id="jb-portal-header">
+        <a href="index.html" class="jb-portal-logo-link" aria-label="jewelBazaari Home">
+            <img src="images/logo.png" alt="jewelBazaari" width="160" height="72" class="jb-portal-logo" decoding="async">
+        </a>
+    </header>
 
     <div id="auth-section" role="dialog" aria-label="Registered vendor login">
         <div class="max-w-md w-full mx-4">
             <div class="bg-white rounded-3xl p-8 shadow-xl relative luxury-card">
-                <a href="index.html" class="vendor-home-btn" aria-label="Return to homepage">🏠 Home</a>
-                <div class="text-center mb-6 pt-6">
+                <div class="text-center mb-6">
                     <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                         <span class="text-3xl">🔐</span>
                     </div>
@@ -899,6 +823,7 @@
         }
 
         bindVendorLoginButton(submitVendorLogin);
+        window.__jbVendorLoginSubmit = submitVendorLogin;
         markVendorLoginReady();
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -1026,11 +951,6 @@
                 console.error('Session restore failed:', error);
             }
         })();
-    </script>
-    <script type="module">
-        import { loadPageComponents } from './js/load-components.js?v=20260706i';
-        document.getElementById('announcement-placeholder').setAttribute('data-include', 'components/announcement.html');
-        loadPageComponents('#announcement-placeholder');
     </script>
     <script>
         window.addEventListener('error', function (event) {
