@@ -1,6 +1,6 @@
-import { auth } from './firebase-config.js?v=20260707h';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707h';
-import { isMobileAuthEnvironment } from './device-utils.js?v=20260707h';
+import { auth } from './firebase-config.js?v=20260707i';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707i';
+import { isMobileAuthEnvironment } from './device-utils.js?v=20260707i';
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -16,18 +16,6 @@ const POPUP_FALLBACK_CODES = new Set([
     'auth/popup-closed-by-user',
     'auth/cancelled-popup-request'
 ]);
-
-const REDIRECT_BENIGN_CODES = new Set([
-    'auth/redirect-cancelled-by-user',
-    'auth/cancelled-popup-request',
-    'auth/argument-error'
-]);
-
-export function createGoogleProvider(options = {}) {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: options.prompt || 'select_account' });
-    return provider;
-}
 
 function hasPendingAuthRedirect() {
     try {
@@ -78,7 +66,15 @@ async function ensureAuthPersistence() {
     }
 }
 
+export function createGoogleProvider(options = {}) {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: options.prompt || 'select_account' });
+    return provider;
+}
+
 export async function signInWithGoogle(options = {}) {
+    clearStaleRedirectState();
+
     const provider = createGoogleProvider(options);
     await ensureAuthPersistence();
 
@@ -108,12 +104,9 @@ export async function resolveGoogleRedirectResult() {
     try {
         return await getRedirectResult(auth);
     } catch (error) {
-        const code = error?.code || '';
-        if (REDIRECT_BENIGN_CODES.has(code)) {
-            clearStaleRedirectState();
-            return null;
-        }
-        throw new Error(getAuthErrorMessage(error));
+        clearStaleRedirectState();
+        console.warn('Google redirect result could not be restored:', error);
+        return null;
     }
 }
 

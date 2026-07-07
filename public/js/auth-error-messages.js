@@ -18,8 +18,7 @@ export function getAuthErrorMessage(error) {
         'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
         'auth/redirect-cancelled-by-user': 'Sign-in cancelled. Please try again.',
         'auth/redirect-operation-pending': 'Sign-in is already in progress. Please wait a moment and try again.',
-        'auth/internal-error': 'Google sign-in failed. Hard refresh (Ctrl+Shift+R), then confirm Firebase authorized domains include your Cloudflare URL, Google sign-in is enabled, and the Browser API key allows Identity Toolkit API.',
-        'auth/argument-error': 'Google sign-in session was stale. Hard refresh this page, then tap Sign in with Google again. If testing locally, use the same URL each time (localhost or jewelbazaari.com).'
+        'auth/internal-error': 'Google sign-in failed. Hard refresh (Ctrl+Shift+R), then confirm Firebase authorized domains include your Cloudflare URL, Google sign-in is enabled, and the Browser API key allows Identity Toolkit API.'
     };
 
     return messages[code] || error?.message || 'Something went wrong. Please try again.';

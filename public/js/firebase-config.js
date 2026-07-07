@@ -5,10 +5,11 @@ import {
     indexedDBLocalPersistence,
     browserLocalPersistence,
     browserSessionPersistence,
-    inMemoryPersistence
+    inMemoryPersistence,
+    browserPopupRedirectResolver
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { isIOSDevice } from "./device-utils.js?v=20260707h";
+import { isIOSDevice } from "./device-utils.js?v=20260707i";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAgNhB28vIQRlMOrFGoV5E7FcNk3bqMjPU",
@@ -44,7 +45,10 @@ function createAuth() {
         ];
 
     try {
-        return initializeAuth(app, { persistence });
+        return initializeAuth(app, {
+            persistence,
+            popupRedirectResolver: browserPopupRedirectResolver
+        });
     } catch (error) {
         if (error?.code === "auth/already-initialized") {
             return getAuth(app);
