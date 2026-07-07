@@ -4,19 +4,49 @@ export function isIOSDevice() {
         || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
-function scrollActiveFieldIntoView() {
+function scrollActiveFieldIntoView(sectionSelector, buttonId) {
     const active = document.activeElement;
-    if (!active || !active.closest('#auth-section')) {
+    const section = document.querySelector(sectionSelector);
+    if (!active || !section || !section.contains(active)) {
         return;
     }
 
     window.requestAnimationFrame(() => {
         active.scrollIntoView({ block: 'center', behavior: 'auto' });
-        const loginBtn = document.getElementById('vendor-login-btn');
-        if (loginBtn) {
-            loginBtn.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+        const button = buttonId ? document.getElementById(buttonId) : null;
+        if (button) {
+            button.scrollIntoView({ block: 'nearest', behavior: 'auto' });
         }
     });
+}
+
+export function bindTapButton(button, handler) {
+    const element = typeof button === 'string' ? document.getElementById(button) : button;
+    if (!element || typeof handler !== 'function') {
+        return;
+    }
+
+    let running = false;
+
+    const run = async (event) => {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        if (running) {
+            return;
+        }
+
+        running = true;
+        try {
+            await handler();
+        } finally {
+            running = false;
+        }
+    };
+
+    element.addEventListener('click', run);
+    element.addEventListener('touchend', run, { passive: false });
 }
 
 export function bindVendorLoginButton(submitFn) {
@@ -53,24 +83,29 @@ export function bindVendorLoginButton(submitFn) {
     button.addEventListener('touchend', run, { passive: false });
 }
 
-export function installIOSVendorLoginFixes() {
+export function installIOSLoginScreenFixes({
+    sectionSelector = '#auth-section',
+    lockedClass = 'vendor-locked',
+    primaryButtonId = 'vendor-login-btn'
+} = {}) {
     if (!isIOSDevice()) {
         return;
     }
 
     document.documentElement.classList.add('jb-ios-device');
 
-    const authSection = document.getElementById('auth-section');
-    if (!authSection) {
+    const section = document.querySelector(sectionSelector);
+    if (!section) {
         return;
     }
 
-    authSection.addEventListener('focusin', scrollActiveFieldIntoView);
+    const onFocus = () => scrollActiveFieldIntoView(sectionSelector, primaryButtonId);
+    section.addEventListener('focusin', onFocus);
 
     if (window.visualViewport) {
         const onViewportChange = () => {
-            if (document.body.classList.contains('vendor-locked')) {
-                scrollActiveFieldIntoView();
+            if (document.body.classList.contains(lockedClass)) {
+                onFocus();
             }
         };
 
@@ -79,8 +114,28 @@ export function installIOSVendorLoginFixes() {
     }
 }
 
+export function installIOSVendorLoginFixes() {
+    installIOSLoginScreenFixes({
+        sectionSelector: '#auth-section',
+        lockedClass: 'vendor-locked',
+        primaryButtonId: 'vendor-login-btn'
+    });
+}
+
+export function installIOSAdminLoginFixes() {
+    installIOSLoginScreenFixes({
+        sectionSelector: '#password-section',
+        lockedClass: 'admin-locked',
+        primaryButtonId: 'login-btn'
+    });
+}
+
 export function markVendorLoginReady() {
     window.__jbVendorLoginReady = true;
+}
+
+export function markAdminLoginReady() {
+    window.__jbAdminLoginReady = true;
 }
 
 export function showVendorBootError(message) {
@@ -92,4 +147,14 @@ export function showVendorBootError(message) {
     status.textContent = message;
     status.classList.remove('hidden', 'status-success', 'status-info');
     status.classList.add('status-error');
+}
+
+export function showAdminBootError(message) {
+    const status = document.getElementById('admin-login-error');
+    if (!status) {
+        return;
+    }
+
+    status.textContent = message;
+    status.classList.remove('hidden');
 }

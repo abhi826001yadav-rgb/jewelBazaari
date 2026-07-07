@@ -82,6 +82,55 @@
             border: 2px solid #9B7E4B;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
         }
+        .vendor-home-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            min-height: 44px;
+            min-width: 44px;
+            padding: 0.5rem 0.875rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(155, 126, 75, 0.45);
+            background: #fff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4A0E17;
+            text-decoration: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .vendor-home-btn:hover {
+            color: #9B7E4B;
+            background: #FAF7F2;
+        }
+        .vendor-home-link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 44px;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(155, 126, 75, 0.45);
+            background: #fff;
+            color: #4A0E17;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .vendor-home-link-btn:hover {
+            background: #FAF7F2;
+            color: #9B7E4B;
+        }
         h2 {
             font-family: 'Playfair Display', Georgia, serif;
             color: #4A0E17;
@@ -298,7 +347,7 @@
     <div id="auth-section" role="dialog" aria-label="Registered vendor login">
         <div class="max-w-md w-full mx-4">
             <div class="bg-white rounded-3xl p-8 shadow-xl relative luxury-card">
-                <a href="index.html" class="absolute top-4 left-4 text-sm text-[#4A0E17] hover:text-[#9B7E4B]">🏠 Home</a>
+                <a href="index.html" class="vendor-home-btn" aria-label="Return to homepage">🏠 Home</a>
                 <div class="text-center mb-6 pt-6">
                     <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                         <span class="text-3xl">🔐</span>
@@ -331,6 +380,7 @@
                     Not registered yet?
                     <a href="vendor-upload.html" class="text-[#9B7E4B] underline hover:text-[#4A0E17]">Become a Vendor</a>
                 </p>
+                <a href="index.html" class="vendor-home-link-btn" aria-label="Return to jewelBazaari homepage">🏠 Back to Home</a>
             </div>
         </div>
     </div>
