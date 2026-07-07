@@ -1,11 +1,11 @@
-import { loginVendor } from './vendor-service.js';
-import { safeGetItem, safeSetItem } from './safe-storage.js';
+import { loginVendor } from './vendor-service.js?v=20260707f';
+import { safeGetItem, safeSetItem } from './safe-storage.js?v=20260707f';
 import {
     installIOSVendorLoginFixes,
     bindVendorLoginButton,
     markVendorLoginReady,
     showVendorBootError
-} from './ios-vendor-login-fix.js';
+} from './ios-vendor-login-fix.js?v=20260707f';
 
 window.__jbShowVendorBootError = showVendorBootError;
 

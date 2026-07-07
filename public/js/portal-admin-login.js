@@ -1,13 +1,12 @@
-import { auth } from './firebase-config.js';
-import { isAdminEmail } from './admin-config.js';
-import { getAuthErrorMessage } from './auth-error-messages.js';
-import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js';
+import { auth } from './firebase-config.js?v=20260707f';
+import { isAdminEmail } from './admin-config.js?v=20260707f';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707f';
+import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260707f';
 import {
-    bindTapButton,
     installIOSAdminLoginFixes,
     markAdminLoginReady,
     showAdminBootError
-} from './ios-vendor-login-fix.js';
+} from './ios-vendor-login-fix.js?v=20260707f';
 import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 window.__jbShowAdminBootError = showAdminBootError;
@@ -132,9 +131,7 @@ window.__jbAdminUnlock = unlockAdmin;
 window.__jbAdminIsUser = isAdminUser;
 
 installIOSAdminLoginFixes();
-bindTapButton(loginBtn, signInAsAdmin);
 window.__jbAdminSignIn = signInAsAdmin;
+markAdminLoginReady();
 
-initAdminAuth().finally(() => {
-    markAdminLoginReady();
-});
+initAdminAuth();

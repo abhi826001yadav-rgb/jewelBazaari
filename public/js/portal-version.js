@@ -1,0 +1,1 @@
+export const PORTAL_VERSION = '20260707f';

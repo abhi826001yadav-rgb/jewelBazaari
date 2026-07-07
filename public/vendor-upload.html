@@ -19,10 +19,10 @@
     <meta name="twitter:description" content="Register as a jewelBazaari vendor to list certified jewellery.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260707b" as="style">
-    <script src="js/portal-tap-bridge.js" defer></script>
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707f" as="style">
+    <script src="js/portal-tap-bridge.js?v=20260707f" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707b">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707f">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body {
@@ -494,7 +494,7 @@
                         </div>
                         <p class="auth-note">Login only works after admin approves your vendor application.</p>
                         <p id="vendor-login-status" class="status-message hidden" role="status"></p>
-                        <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
+                        <button type="button" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
                             Login to Vendor Portal
                         </button>
                     </form>
@@ -621,17 +621,17 @@
             getCurrentApprovedVendor,
             getRegistrationProgress,
             watchVendorAuth
-        } from './js/vendor-service.js';
-        import { auth } from './js/firebase-config.js';
+        } from './js/vendor-service.js?v=20260707f';
+        import { auth } from './js/firebase-config.js?v=20260707f';
         import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-        import { safeGetItem, safeSetItem } from './js/safe-storage.js';
+        import { safeGetItem, safeSetItem } from './js/safe-storage.js?v=20260707f';
         import {
             installIOSVendorLoginFixes,
             bindTapButton,
             bindVendorLoginButton,
             markVendorLoginReady,
             showVendorBootError
-        } from './js/ios-vendor-login-fix.js';
+        } from './js/ios-vendor-login-fix.js?v=20260707f';
 
         window.__jbShowVendorBootError = showVendorBootError;
 
@@ -974,6 +974,7 @@
         bindTapButton('google-signin-btn', () => handleGoogleSignIn(true));
         window.__jbVendorLoginSubmit = submitVendorLogin;
         window.__jbGoogleSignIn = () => handleGoogleSignIn(true);
+        markVendorLoginReady();
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await logoutVendor();

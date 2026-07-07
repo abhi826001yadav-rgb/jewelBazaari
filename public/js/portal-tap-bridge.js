@@ -1,5 +1,5 @@
 (function () {
-    var PORTAL_VERSION = '20260707d';
+    var PORTAL_VERSION = '20260707f';
 
     function showTapMessage(message) {
         var vendorStatus = document.getElementById('vendor-login-status');
@@ -32,20 +32,28 @@
         }
 
         element.dataset.jbTapBound = '1';
+        var tapLock = false;
 
         function onActivate(event) {
-            if (window.__jbVendorLoginReady || window.__jbAdminLoginReady) {
-                return;
-            }
-
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
+
+            if (tapLock) {
+                return;
+            }
+
+            tapLock = true;
+            window.setTimeout(function () {
+                tapLock = false;
+            }, 700);
+
             invokeHandler(globalName);
         }
 
         element.addEventListener('pointerup', onActivate);
+        element.addEventListener('click', onActivate);
     }
 
     function bindAll() {

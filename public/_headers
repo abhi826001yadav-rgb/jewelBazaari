@@ -49,6 +49,21 @@
 /js/ios-vendor-login-fix.js
   Cache-Control: public, max-age=0, must-revalidate
 
+/js/portal-version.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/js/device-utils.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/js/admin-config.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/js/auth-error-messages.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/js/safe-storage.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 /images/*
   Cache-Control: public, max-age=31536000, immutable
   CDN-Cache-Control: max-age=31536000

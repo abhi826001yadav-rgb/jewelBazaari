@@ -1,4 +1,4 @@
-import { isIOSDevice } from './device-utils.js';
+import { isIOSDevice } from './device-utils.js?v=20260707f';
 
 export { isIOSDevice };
 
@@ -43,12 +43,22 @@ function bindActivate(element, handler) {
         }
     };
 
+    if (isIOSDevice()) {
+        // Login buttons use portal-tap-bridge on iOS; other buttons use pointerup here.
+        element.addEventListener('pointerup', run);
+        return;
+    }
+
     element.addEventListener('click', run);
-    element.addEventListener('touchend', run, { passive: false });
 }
+
+const PORTAL_BRIDGE_BUTTON_IDS = new Set(['vendor-login-btn', 'login-btn']);
 
 export function bindTapButton(button, handler) {
     const element = typeof button === 'string' ? document.getElementById(button) : button;
+    if (element?.id && PORTAL_BRIDGE_BUTTON_IDS.has(element.id)) {
+        return;
+    }
     bindActivate(element, handler);
 }
 
@@ -67,7 +77,6 @@ export function bindVendorLoginButton(submitFn) {
         });
     }
 
-    bindActivate(button, submitFn);
 }
 
 export function installIOSLoginScreenFixes({
