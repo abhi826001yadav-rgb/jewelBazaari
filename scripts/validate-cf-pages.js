@@ -105,6 +105,9 @@ for (const [label, rule] of [['/*.html', htmlCspRule], ['/index.html', indexCspR
   if (!csp.includes('firebasestorage')) {
     fail(`${label} CSP must allow Firebase storage hosts`);
   }
+  if (!csp.includes('api.cloudinary.com')) {
+    fail(`${label} CSP must allow Cloudinary uploads (api.cloudinary.com)`);
+  }
 }
 
 const loopRiskySlugs = [
