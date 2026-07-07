@@ -1,11 +1,11 @@
-import { auth, db } from './firebase-config.js?v=20260707f';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707f';
-import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js?v=20260707f';
-import { isIOSDevice } from './device-utils.js?v=20260707f';
+import { auth, db } from './firebase-config.js?v=20260707g';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707g';
+import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js?v=20260707g';
+import { isIOSDevice } from './device-utils.js?v=20260707g';
 import {
     signInWithGoogle as firebaseGoogleSignIn,
     resolveGoogleRedirectResult
-} from './google-auth.js?v=20260707f';
+} from './google-auth.js?v=20260707g';
 import {
     EmailAuthProvider,
     signInWithEmailAndPassword,

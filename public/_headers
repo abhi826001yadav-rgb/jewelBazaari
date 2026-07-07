@@ -64,6 +64,12 @@
 /js/safe-storage.js
   Cache-Control: public, max-age=0, must-revalidate
 
+/js/firebase-product-service.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/js/customer-query-service.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 /images/*
   Cache-Control: public, max-age=31536000, immutable
   CDN-Cache-Control: max-age=31536000

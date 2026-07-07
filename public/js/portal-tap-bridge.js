@@ -1,5 +1,5 @@
 (function () {
-    var PORTAL_VERSION = '20260707f';
+    var PORTAL_VERSION = '20260707g';
 
     function showTapMessage(message) {
         var vendorStatus = document.getElementById('vendor-login-status');
