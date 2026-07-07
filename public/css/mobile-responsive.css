@@ -1139,6 +1139,34 @@ button.jb-mobile-menu-link {
     object-fit: contain;
 }
 
+.jb-portal-home-btn,
+.vendor-home-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(155, 126, 75, 0.45);
+    background: #fff;
+    color: #4A0E17;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+
+.jb-portal-home-btn:hover,
+.vendor-home-link-btn:hover {
+    background: #FAF7F2;
+    color: #9B7E4B;
+}
+
 body.vendor-locked,
 body.admin-locked {
     overflow-x: hidden;

@@ -487,6 +487,7 @@ export async function loginVendor({ email, password, onStatus } = {}) {
     let userCredential;
     try {
         report('Signing in securely...');
+        await auth.authStateReady();
         userCredential = await signInWithEmailAndPassword(auth, authEmail, cleanPassword);
     } catch (error) {
         if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-login-credentials'].includes(error?.code)) {

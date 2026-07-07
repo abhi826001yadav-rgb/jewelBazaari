@@ -5,7 +5,10 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
     signInWithRedirect,
-    getRedirectResult
+    getRedirectResult,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 export function createGoogleProvider(options = {}) {
@@ -14,8 +17,27 @@ export function createGoogleProvider(options = {}) {
     return provider;
 }
 
+async function ensureAuthPersistence() {
+    await auth.authStateReady();
+
+    if (!isMobileAuthEnvironment()) {
+        return;
+    }
+
+    try {
+        await setPersistence(auth, browserLocalPersistence);
+    } catch (error) {
+        try {
+            await setPersistence(auth, browserSessionPersistence);
+        } catch {
+            // Firebase will fall back automatically.
+        }
+    }
+}
+
 export async function signInWithGoogle(options = {}) {
     const provider = createGoogleProvider(options);
+    await ensureAuthPersistence();
 
     if (isMobileAuthEnvironment()) {
         await signInWithRedirect(auth, provider);
@@ -26,9 +48,16 @@ export async function signInWithGoogle(options = {}) {
 }
 
 export async function resolveGoogleRedirectResult() {
+    await auth.authStateReady();
+
     try {
         return await getRedirectResult(auth);
     } catch (error) {
         throw new Error(getAuthErrorMessage(error));
     }
+}
+
+export async function getAuthenticatedUser() {
+    await auth.authStateReady();
+    return auth.currentUser;
 }

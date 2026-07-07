@@ -19,9 +19,10 @@
     <meta name="twitter:description" content="Approved jewelBazaari vendor dashboard for managing jewellery listings.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260707a" as="style">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707b" as="style">
+    <script src="js/portal-tap-bridge.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707a">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707b">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body { margin: 0; min-height: 100vh; }
@@ -304,7 +305,7 @@
                     Not registered yet?
                     <a href="vendor-upload.html" class="text-[#9B7E4B] underline hover:text-[#4A0E17]">Become a Vendor</a>
                 </p>
-                <a href="index.html" class="vendor-home-link-btn" aria-label="Return to jewelBazaari homepage">🏠 Back to Home</a>
+                <a href="index.html" class="jb-portal-home-btn" aria-label="Return to jewelBazaari homepage">🏠 Back to Home</a>
             </div>
         </div>
     </div>
@@ -451,12 +452,12 @@
             markVendorLoginReady,
             showVendorBootError
         } from './js/ios-vendor-login-fix.js';
-
-        window.__jbShowVendorBootError = showVendorBootError;
         import { formatCartPrice } from './js/format-utils.js';
         import { getProductImageAssets } from './js/product-images.js';
         import { IMAGE_UPLOAD_LIMITS } from './js/components/vendor-image-picker.js';
         import { formatImageSize } from './js/utils/image-compress.js';
+
+        window.__jbShowVendorBootError = showVendorBootError;
 
         const authSection = document.getElementById('auth-section');
         const dashboardSection = document.getElementById('dashboard-section');

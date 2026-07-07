@@ -19,9 +19,10 @@
     <meta name="twitter:description" content="jewelBazaari admin access.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260707a" as="style">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707b" as="style">
+    <script src="js/portal-tap-bridge.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707a">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707b">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body {
@@ -436,6 +437,7 @@
                         </svg>
                         Sign in with Google
                     </button>
+                    <a href="index.html" class="jb-portal-home-btn" aria-label="Return to jewelBazaari homepage">🏠 Back to Home</a>
                 </div>
             </div>
         </div>
@@ -712,7 +714,7 @@
         import { auth } from './js/firebase-config.js';
         import { isAdminEmail } from './js/admin-config.js';
         import { getAuthErrorMessage } from './js/auth-error-messages.js';
-        import { signInWithGoogle, resolveGoogleRedirectResult } from './js/google-auth.js';
+        import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './js/google-auth.js';
         import {
             bindTapButton,
             installIOSAdminLoginFixes,
@@ -720,12 +722,13 @@
             showAdminBootError
         } from './js/ios-vendor-login-fix.js';
         import { escapeHtml, sanitizeImageUrl } from './js/security-utils.js';
-
-        window.__jbShowAdminBootError = showAdminBootError;
         import {
             signOut,
             onAuthStateChanged
         } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+        window.__jbShowAdminBootError = showAdminBootError;
+
         const passwordSection = document.getElementById('password-section');
         const adminSection = document.getElementById('admin-section');
         const loginBtn = document.getElementById('login-btn');
@@ -849,19 +852,23 @@
             try {
                 showLoginError('Checking Google sign-in...');
                 const result = await resolveGoogleRedirectResult();
-                if (result?.user) {
+                const redirectUser = result?.user;
+                const currentUser = redirectUser || await getAuthenticatedUser();
+
+                if (currentUser) {
                     adminRedirectPending = false;
-                    showLoginError('');
-                    await handleSignedInUser(result.user);
-                    loginBtn.disabled = false;
-                    return;
+                    const signedIn = await handleSignedInUser(currentUser);
+                    if (signedIn) {
+                        return;
+                    }
                 }
 
                 showLoginError('');
             } catch (error) {
                 adminRedirectPending = false;
-                loginBtn.disabled = false;
                 showLoginError(error.message || getAuthErrorMessage(error));
+            } finally {
+                loginBtn.disabled = false;
             }
         }
 
