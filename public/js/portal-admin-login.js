@@ -1,13 +1,16 @@
-import { auth } from './firebase-config.js?v=20260707i';
-import { isAdminEmail } from './admin-config.js?v=20260707i';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707i';
-import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260707i';
+import { auth } from './firebase-config.js?v=20260707j';
+import { isAdminEmail } from './admin-config.js?v=20260707j';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707j';
+import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260707j';
 import {
     installIOSAdminLoginFixes,
     markAdminLoginReady,
     showAdminBootError
-} from './ios-vendor-login-fix.js?v=20260707i';
-import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+} from './ios-vendor-login-fix.js?v=20260707j';
+import {
+    signOut,
+    onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 window.__jbShowAdminBootError = showAdminBootError;
 
@@ -15,6 +18,9 @@ const passwordSection = document.getElementById('password-section');
 const adminSection = document.getElementById('admin-section');
 const loginBtn = document.getElementById('login-btn');
 const adminLoginError = document.getElementById('admin-login-error');
+
+let authListenerReady = false;
+let signInInFlight = false;
 
 function showLoginError(message) {
     if (!adminLoginError) {
@@ -61,11 +67,13 @@ function lockAdmin() {
 
 async function handleSignedInUser(user) {
     if (!user) {
+        lockAdmin();
         return false;
     }
 
     if (!isAdminUser(user)) {
         await signOut(auth);
+        lockAdmin();
         showLoginError('This Google account is not authorized for admin access.');
         return false;
     }
@@ -74,64 +82,82 @@ async function handleSignedInUser(user) {
     return true;
 }
 
-let adminRedirectPending = false;
+function setLoginButtonDisabled(disabled) {
+    if (loginBtn) {
+        loginBtn.disabled = disabled;
+    }
+}
 
 async function signInAsAdmin() {
-    if (!loginBtn) {
+    if (!loginBtn || signInInFlight) {
         return;
     }
 
-    loginBtn.disabled = true;
+    signInInFlight = true;
+    setLoginButtonDisabled(true);
     showLoginError('');
 
     try {
         const result = await signInWithGoogle();
         if (!result) {
-            adminRedirectPending = true;
             showLoginError('Redirecting to Google sign-in...');
             return;
         }
 
-        showLoginError('');
         await handleSignedInUser(result.user);
     } catch (error) {
         console.error('Admin Google sign-in failed:', error);
         showLoginError(getAuthErrorMessage(error));
     } finally {
-        if (!adminRedirectPending && loginBtn) {
-            loginBtn.disabled = false;
-        }
+        signInInFlight = false;
+        setLoginButtonDisabled(false);
     }
 }
 
-async function initAdminAuth() {
-    try {
-        const result = await resolveGoogleRedirectResult();
-        const redirectUser = result?.user;
-
-        if (redirectUser) {
-            adminRedirectPending = false;
-            await handleSignedInUser(redirectUser);
-            return;
-        }
-
-        const currentUser = await getAuthenticatedUser();
-        if (currentUser) {
-            adminRedirectPending = false;
-            await handleSignedInUser(currentUser);
-            return;
-        }
-
-        showLoginError('');
-    } catch (error) {
-        adminRedirectPending = false;
-        console.warn('Admin auth init:', error);
-        showLoginError('');
-    } finally {
-        if (loginBtn) {
-            loginBtn.disabled = false;
-        }
+async function restoreAdminSession() {
+    const redirectResult = await resolveGoogleRedirectResult();
+    if (redirectResult?.user) {
+        return handleSignedInUser(redirectResult.user);
     }
+
+    const currentUser = await getAuthenticatedUser();
+    if (currentUser) {
+        return handleSignedInUser(currentUser);
+    }
+
+    lockAdmin();
+    showLoginError('');
+    return false;
+}
+
+function attachAdminAuthListener() {
+    if (authListenerReady) {
+        return;
+    }
+
+    authListenerReady = true;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!window.__jbAdminLoginReady) {
+            return;
+        }
+
+        if (!user) {
+            lockAdmin();
+            return;
+        }
+
+        if (isAdminUser(user)) {
+            unlockAdmin();
+            return;
+        }
+
+        await signOut(auth);
+        lockAdmin();
+        if (!signInInFlight) {
+            showLoginError('This Google account is not authorized for admin access.');
+        }
+    });
 }
 
 window.__jbAdminLock = lockAdmin;
@@ -141,5 +167,16 @@ window.__jbAdminIsUser = isAdminUser;
 installIOSAdminLoginFixes();
 window.__jbAdminSignIn = signInAsAdmin;
 markAdminLoginReady();
+attachAdminAuthListener();
 
-initAdminAuth();
+restoreAdminSession().finally(() => {
+    setLoginButtonDisabled(false);
+});
+
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        restoreAdminSession().finally(() => {
+            setLoginButtonDisabled(false);
+        });
+    }
+});

@@ -1201,4 +1201,16 @@ body.admin-locked {
     body.admin-locked {
         min-height: -webkit-fill-available;
     }
+
+    body.vendor-locked,
+    body.admin-locked {
+        overscroll-behavior-y: contain;
+    }
+
+    .jb-ios-device #auth-section input,
+    .jb-ios-device #auth-section textarea,
+    .jb-ios-device #auth-section select {
+        scroll-margin-top: 0.75rem;
+        scroll-margin-bottom: 5.5rem;
+    }
 }

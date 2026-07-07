@@ -1,22 +1,6 @@
-import { isIOSDevice } from './device-utils.js?v=20260707i';
+import { isIOSDevice } from './device-utils.js?v=20260707j';
 
 export { isIOSDevice };
-
-function scrollActiveFieldIntoView(sectionSelector, buttonId) {
-    const active = document.activeElement;
-    const section = document.querySelector(sectionSelector);
-    if (!active || !section || !section.contains(active)) {
-        return;
-    }
-
-    window.requestAnimationFrame(() => {
-        active.scrollIntoView({ block: 'center', behavior: 'auto' });
-        const button = buttonId ? document.getElementById(buttonId) : null;
-        if (button) {
-            button.scrollIntoView({ block: 'nearest', behavior: 'auto' });
-        }
-    });
-}
 
 function bindActivate(element, handler) {
     if (!element || typeof handler !== 'function' || element.dataset.jbActivateBound === '1') {
@@ -44,7 +28,6 @@ function bindActivate(element, handler) {
     };
 
     if (isIOSDevice()) {
-        // Login buttons use portal-tap-bridge on iOS; other buttons use pointerup here.
         element.addEventListener('pointerup', run);
         return;
     }
@@ -76,54 +59,22 @@ export function bindVendorLoginButton(submitFn) {
             submitFn();
         });
     }
-
 }
 
-export function installIOSLoginScreenFixes({
-    sectionSelector = '#auth-section',
-    lockedClass = 'vendor-locked',
-    primaryButtonId = 'vendor-login-btn'
-} = {}) {
+export function installIOSLoginScreenFixes() {
     if (!isIOSDevice()) {
         return;
     }
 
     document.documentElement.classList.add('jb-ios-device');
-
-    const section = document.querySelector(sectionSelector);
-    if (!section) {
-        return;
-    }
-
-    const onFocus = () => scrollActiveFieldIntoView(sectionSelector, primaryButtonId);
-    section.addEventListener('focusin', onFocus);
-
-    if (window.visualViewport) {
-        const onViewportChange = () => {
-            if (document.body.classList.contains(lockedClass)) {
-                onFocus();
-            }
-        };
-
-        window.visualViewport.addEventListener('resize', onViewportChange);
-        window.visualViewport.addEventListener('scroll', onViewportChange);
-    }
 }
 
 export function installIOSVendorLoginFixes() {
-    installIOSLoginScreenFixes({
-        sectionSelector: '#auth-section',
-        lockedClass: 'vendor-locked',
-        primaryButtonId: 'vendor-login-btn'
-    });
+    installIOSLoginScreenFixes();
 }
 
 export function installIOSAdminLoginFixes() {
-    installIOSLoginScreenFixes({
-        sectionSelector: '#password-section',
-        lockedClass: 'admin-locked',
-        primaryButtonId: 'login-btn'
-    });
+    installIOSLoginScreenFixes();
 }
 
 export function markVendorLoginReady() {

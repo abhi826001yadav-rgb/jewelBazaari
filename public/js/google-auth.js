@@ -1,6 +1,6 @@
-import { auth } from './firebase-config.js?v=20260707i';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707i';
-import { isMobileAuthEnvironment } from './device-utils.js?v=20260707i';
+import { auth } from './firebase-config.js?v=20260707j';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707j';
+import { isMobileAuthEnvironment } from './device-utils.js?v=20260707j';
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -16,25 +16,6 @@ const POPUP_FALLBACK_CODES = new Set([
     'auth/popup-closed-by-user',
     'auth/cancelled-popup-request'
 ]);
-
-function hasPendingAuthRedirect() {
-    try {
-        const href = window.location.href;
-        if (/[?&#](apiKey|authUser|code|state)=/i.test(href)) {
-            return true;
-        }
-        if (href.includes('/__/auth/')) {
-            return true;
-        }
-
-        return Object.keys(sessionStorage).some((key) => (
-            key.startsWith('firebase:')
-            && /redirect/i.test(key)
-        ));
-    } catch {
-        return false;
-    }
-}
 
 function clearStaleRedirectState() {
     try {
@@ -73,8 +54,6 @@ export function createGoogleProvider(options = {}) {
 }
 
 export async function signInWithGoogle(options = {}) {
-    clearStaleRedirectState();
-
     const provider = createGoogleProvider(options);
     await ensureAuthPersistence();
 
@@ -82,6 +61,8 @@ export async function signInWithGoogle(options = {}) {
         await signInWithRedirect(auth, provider);
         return null;
     }
+
+    clearStaleRedirectState();
 
     try {
         return await signInWithPopup(auth, provider);
@@ -96,10 +77,6 @@ export async function signInWithGoogle(options = {}) {
 
 export async function resolveGoogleRedirectResult() {
     await auth.authStateReady();
-
-    if (!hasPendingAuthRedirect()) {
-        return null;
-    }
 
     try {
         return await getRedirectResult(auth);

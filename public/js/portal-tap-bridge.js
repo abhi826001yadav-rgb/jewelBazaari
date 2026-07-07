@@ -1,5 +1,6 @@
 (function () {
-    var PORTAL_VERSION = '20260707i';
+    var PORTAL_VERSION = '20260707j';
+    var touchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
     function showTapMessage(message) {
         var vendorStatus = document.getElementById('vendor-login-status');
@@ -47,13 +48,16 @@
             tapLock = true;
             window.setTimeout(function () {
                 tapLock = false;
-            }, 700);
+            }, 1000);
 
             invokeHandler(globalName);
         }
 
-        element.addEventListener('pointerup', onActivate);
-        element.addEventListener('click', onActivate);
+        if (touchDevice) {
+            element.addEventListener('pointerup', onActivate);
+        } else {
+            element.addEventListener('click', onActivate);
+        }
     }
 
     function bindAll() {
