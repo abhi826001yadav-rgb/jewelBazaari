@@ -16,6 +16,8 @@ export function getAuthErrorMessage(error) {
         'auth/popup-closed-by-user': 'Sign-in cancelled. Please try again.',
         'auth/popup-blocked': 'Pop-up blocked. Allow pop-ups for this site and try again.',
         'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
+        'auth/redirect-cancelled-by-user': 'Sign-in cancelled. Please try again.',
+        'auth/redirect-operation-pending': 'Sign-in is already in progress. Please wait a moment and try again.',
         'auth/internal-error': 'Google sign-in failed. Hard refresh (Ctrl+Shift+R), then confirm Firebase authorized domains include your Cloudflare URL, Google sign-in is enabled, and the Browser API key allows Identity Toolkit API.'
     };
 

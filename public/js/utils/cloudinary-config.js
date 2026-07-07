@@ -3,8 +3,9 @@
  * Step 1 of Cloudinary integration: expose only cloud name + unsigned preset.
  * API Secret must NEVER appear in client code or .env.example.
  */
-export const CLOUDINARY_CLOUD_NAME = 'dbhxyrnuc';
-export const CLOUDINARY_UPLOAD_PRESET = '';
+export const CLOUDINARY_CLOUD_NAME = 'dbhxymcuc';
+
+export const CLOUDINARY_UPLOAD_PRESET = 'jewelbazaari_vendor_upload';
 
 export function getCloudinaryUploadEndpoint() {
     const cloudName = String(CLOUDINARY_CLOUD_NAME || '').trim();
