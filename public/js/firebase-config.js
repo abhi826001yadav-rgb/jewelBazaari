@@ -1,15 +1,6 @@
 import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-    getAuth,
-    initializeAuth,
-    indexedDBLocalPersistence,
-    browserLocalPersistence,
-    browserSessionPersistence,
-    inMemoryPersistence,
-    browserPopupRedirectResolver
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { isIOSDevice } from "./device-utils.js?v=20260707j";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAgNhB28vIQRlMOrFGoV5E7FcNk3bqMjPU",
@@ -33,31 +24,5 @@ function getFirebaseApp() {
 }
 
 const app = getFirebaseApp();
-
-function createAuth() {
-    const persistence = isIOSDevice()
-        ? [browserLocalPersistence, browserSessionPersistence, inMemoryPersistence]
-        : [
-            indexedDBLocalPersistence,
-            browserLocalPersistence,
-            browserSessionPersistence,
-            inMemoryPersistence
-        ];
-
-    try {
-        return initializeAuth(app, {
-            persistence,
-            popupRedirectResolver: browserPopupRedirectResolver
-        });
-    } catch (error) {
-        if (error?.code === "auth/already-initialized") {
-            return getAuth(app);
-        }
-
-        console.warn("initializeAuth failed; falling back to getAuth.", error);
-        return getAuth(app);
-    }
-}
-
-export const auth = createAuth();
+export const auth = getAuth(app);
 export const db = getFirestore(app);

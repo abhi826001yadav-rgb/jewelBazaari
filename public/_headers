@@ -64,6 +64,12 @@
 /js/safe-storage.js
   Cache-Control: public, max-age=0, must-revalidate
 
+/js/auth-error-messages.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/js/admin-config.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 /js/firebase-product-service.js
   Cache-Control: public, max-age=0, must-revalidate
 

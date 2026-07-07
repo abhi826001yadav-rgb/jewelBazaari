@@ -1,6 +1,5 @@
 (function () {
-    var PORTAL_VERSION = '20260707j';
-    var touchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    var PORTAL_VERSION = '20260707k';
 
     function showTapMessage(message) {
         var vendorStatus = document.getElementById('vendor-login-status');
@@ -27,6 +26,10 @@
     }
 
     function bindTapTarget(id, globalName) {
+        if (id === 'login-btn') {
+            return;
+        }
+
         var element = document.getElementById(id);
         if (!element || element.dataset.jbTapBound === '1') {
             return;
@@ -34,6 +37,7 @@
 
         element.dataset.jbTapBound = '1';
         var tapLock = false;
+        var touchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
         function onActivate(event) {
             if (event) {
@@ -62,7 +66,6 @@
 
     function bindAll() {
         bindTapTarget('vendor-login-btn', '__jbVendorLoginSubmit');
-        bindTapTarget('login-btn', '__jbAdminSignIn');
     }
 
     if (document.readyState === 'loading') {
