@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
     getAuth,
     initializeAuth,
@@ -8,7 +8,7 @@ import {
     inMemoryPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { isIOSDevice } from "./device-utils.js?v=20260707c";
+import { isIOSDevice } from "./device-utils.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAgNhB28vIQRlMOrFGoV5E7FcNk3bqMjPU",
@@ -20,7 +20,18 @@ const firebaseConfig = {
   measurementId: "G-Z74N8C61NX"
 };
 
-const app = initializeApp(firebaseConfig);
+function getFirebaseApp() {
+    try {
+        return initializeApp(firebaseConfig);
+    } catch (error) {
+        if (error?.code === "app/duplicate-app") {
+            return getApp();
+        }
+        throw error;
+    }
+}
+
+const app = getFirebaseApp();
 
 function createAuth() {
     const persistence = isIOSDevice()
@@ -35,11 +46,11 @@ function createAuth() {
     try {
         return initializeAuth(app, { persistence });
     } catch (error) {
-        if (error?.code === 'auth/already-initialized') {
+        if (error?.code === "auth/already-initialized") {
             return getAuth(app);
         }
 
-        console.warn('initializeAuth failed; falling back to getAuth.', error);
+        console.warn("initializeAuth failed; falling back to getAuth.", error);
         return getAuth(app);
     }
 }

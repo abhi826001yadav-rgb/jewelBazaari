@@ -1,4 +1,4 @@
-import { isIOSDevice } from './device-utils.js?v=20260707c';
+import { isIOSDevice } from './device-utils.js';
 
 export { isIOSDevice };
 
@@ -43,8 +43,8 @@ function bindActivate(element, handler) {
         }
     };
 
-    element.addEventListener('pointerup', run);
     element.addEventListener('click', run);
+    element.addEventListener('touchend', run, { passive: false });
 }
 
 export function bindTapButton(button, handler) {

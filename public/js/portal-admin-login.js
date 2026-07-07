@@ -1,13 +1,13 @@
-import { auth } from './firebase-config.js?v=20260707c';
-import { isAdminEmail } from './admin-config.js?v=20260707c';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707c';
-import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260707c';
+import { auth } from './firebase-config.js';
+import { isAdminEmail } from './admin-config.js';
+import { getAuthErrorMessage } from './auth-error-messages.js';
+import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js';
 import {
     bindTapButton,
     installIOSAdminLoginFixes,
     markAdminLoginReady,
     showAdminBootError
-} from './ios-vendor-login-fix.js?v=20260707c';
+} from './ios-vendor-login-fix.js';
 import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 window.__jbShowAdminBootError = showAdminBootError;
@@ -86,7 +86,6 @@ async function signInAsAdmin() {
     showLoginError('');
 
     try {
-        showLoginError('Opening Google sign-in...');
         const result = await signInWithGoogle();
         if (!result) {
             adminRedirectPending = true;
@@ -107,17 +106,14 @@ async function signInAsAdmin() {
 
 async function initAdminAuth() {
     try {
-        showLoginError('Checking Google sign-in...');
         const result = await resolveGoogleRedirectResult();
         const redirectUser = result?.user;
         const currentUser = redirectUser || await getAuthenticatedUser();
 
         if (currentUser) {
             adminRedirectPending = false;
-            const signedIn = await handleSignedInUser(currentUser);
-            if (signedIn) {
-                return;
-            }
+            await handleSignedInUser(currentUser);
+            return;
         }
 
         showLoginError('');

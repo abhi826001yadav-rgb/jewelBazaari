@@ -19,10 +19,10 @@
     <meta name="twitter:description" content="Approved jewelBazaari vendor dashboard for managing jewellery listings.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260707c" as="style">
-    <script src="js/portal-tap-bridge.js?v=20260707c" defer></script>
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707d" as="style">
+    <script src="js/portal-tap-bridge.js?v=20260707d" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707c">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707d">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body { margin: 0; min-height: 100vh; }
@@ -430,7 +430,7 @@
         </div>
     </div>
 
-    <script type="module" src="js/portal-vendor-login.js?v=20260707c"></script>
+    <script type="module" src="js/portal-vendor-login.js?v=20260707d"></script>
     <script type="module">
         import { getProductsByVendorId } from './js/firebase-product-service.js';
         import {
@@ -897,23 +897,11 @@
         })();
     </script>
     <script>
-        window.addEventListener('error', function (event) {
-            if (typeof window.__jbShowVendorBootError === 'function') {
-                window.__jbShowVendorBootError(event.message || 'Unexpected page error.');
-            }
-        });
-        window.addEventListener('unhandledrejection', function (event) {
-            if (typeof window.__jbShowVendorBootError === 'function') {
-                const reason = event.reason;
-                const message = reason && reason.message ? reason.message : 'Unexpected login error.';
-                window.__jbShowVendorBootError(message);
-            }
-        });
         setTimeout(function () {
             if (!window.__jbVendorLoginReady && typeof window.__jbShowVendorBootError === 'function') {
-                window.__jbShowVendorBootError('Login did not load. Force-close Safari, reopen this page, and try again.');
+                window.__jbShowVendorBootError('Login did not load. Refresh the page and try again.');
             }
-        }, 5000);
+        }, 8000);
     </script>
 </body>
 </html>
