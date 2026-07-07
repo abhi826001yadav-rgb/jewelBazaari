@@ -1,13 +1,13 @@
-import { auth } from './firebase-config.js?v=20260707k';
-import { isAdminEmail } from './admin-config.js?v=20260707k';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707k';
-import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260707k';
+import { auth } from './firebase-config.js?v=20260707l';
+import { isAdminEmail } from './admin-config.js?v=20260707l';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707l';
+import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260707l';
 import {
     installIOSAdminLoginFixes,
     markAdminLoginReady,
     showAdminBootError
-} from './ios-vendor-login-fix.js?v=20260707k';
-import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+} from './ios-vendor-login-fix.js?v=20260707l';
+import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 window.__jbShowAdminBootError = showAdminBootError;
 
@@ -163,6 +163,10 @@ window.__jbAdminSignIn = signInAsAdmin;
 markAdminLoginReady();
 
 restoreAdminSession();
+
+onAuthStateChanged(auth, (user) => {
+    void handleSignedInUser(user, { showErrors: false });
+});
 
 window.addEventListener('pageshow', () => {
     restoreAdminSession();

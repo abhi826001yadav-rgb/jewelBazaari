@@ -1,6 +1,6 @@
-import { auth } from './firebase-config.js?v=20260707k';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707k';
-import { isMobileAuthEnvironment } from './device-utils.js?v=20260707k';
+import { auth } from './firebase-config.js?v=20260707l';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707l';
+import { isMobileAuthEnvironment } from './device-utils.js?v=20260707l';
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -62,15 +62,17 @@ export async function signInWithGoogle(options = {}) {
     }
 }
 
-export async function resolveGoogleRedirectResult() {
-    await auth.authStateReady();
+const redirectResultPromise = getRedirectResult(auth).catch((error) => {
+    console.warn('Google redirect result could not be restored:', error);
+    return null;
+});
 
-    try {
-        return await getRedirectResult(auth);
-    } catch (error) {
-        console.warn('Google redirect result could not be restored:', error);
-        return null;
-    }
+export function consumeRedirectResult() {
+    return redirectResultPromise;
+}
+
+export async function resolveGoogleRedirectResult() {
+    return consumeRedirectResult();
 }
 
 export async function getAuthenticatedUser() {
