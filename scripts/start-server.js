@@ -7,12 +7,12 @@ const {
   loadRedirects,
   resolveRedirect
 } = require('./cf-pages-utils');
-const { createLocalUploadHandler } = require('./local-upload-api');
+
 
 const projectRoot = path.join(__dirname, '..');
 const root = path.join(projectRoot, 'public');
 const port = Number(process.env.PORT || 3000);
-const handleLocalUpload = createLocalUploadHandler(projectRoot);
+
 
 const headerRules = loadHeaders(root);
 const redirects = loadRedirects(root);
@@ -34,11 +34,6 @@ const types = {
 
 const server = http.createServer(async (req, res) => {
   let urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
-
-  if (urlPath === '/api/upload-image') {
-    await handleLocalUpload(req, res);
-    return;
-  }
 
   const redirect = resolveRedirect(redirects, urlPath);
   if (redirect) {
@@ -81,5 +76,5 @@ const server = http.createServer(async (req, res) => {
 server.listen(port, () => {
   console.log(`jewelBazaari running at http://localhost:${port}`);
   console.log(`Loaded ${headerRules.length} _headers rules, ${redirects.length} _redirects`);
-  console.log('Vendor image uploads: POST /api/upload-image (requires .dev.vars Cloudinary settings)');
+  console.log('Vendor image uploads: direct to Cloudinary from the browser (see public/js/utils/cloudinary-config.js)');
 });

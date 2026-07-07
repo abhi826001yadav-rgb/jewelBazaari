@@ -1,5 +1,20 @@
 const FALLBACK_IMAGE = 'https://picsum.photos/id/1015/400/400';
 
+export function getProductImageAssets(product) {
+    if (!product) return [];
+
+    const urlKeys = ['imageUrl', 'imageUrl2', 'imageUrl3', 'imageUrl4', 'imageUrl5'];
+    const publicIdKeys = ['imagePublicId', 'imagePublicId2', 'imagePublicId3', 'imagePublicId4', 'imagePublicId5'];
+
+    return urlKeys
+        .map((urlKey, index) => ({
+            url: String(product[urlKey] || '').trim(),
+            publicId: String(product[publicIdKeys[index]] || '').trim()
+        }))
+        .filter((item) => item.url)
+        .slice(0, 5);
+}
+
 export function getProductImages(product) {
     if (!product) return [];
 

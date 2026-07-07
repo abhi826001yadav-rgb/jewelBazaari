@@ -28,6 +28,7 @@ const CSP = [
     "https://*.firebaseio.com",
     "https://*.firebaseapp.com",
     "https://*.cloudfunctions.net",
+    "https://api.cloudinary.com",
     "wss://*.firebaseio.com"
   ].join(' '),
   "frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com",

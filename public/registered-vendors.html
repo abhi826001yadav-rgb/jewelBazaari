@@ -368,12 +368,12 @@
                         </div>
                         <div>
                             <label for="p-images" class="block text-sm font-medium text-gray-700 mb-1">Jewellery Photos *</label>
-                            <input type="file" id="p-images" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple class="sr-only">
+                            <input type="file" id="p-images" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple class="sr-only">
                             <button type="button" id="p-images-trigger" class="jb-image-picker-btn">📷 Choose up to 5 photos</button>
                             <div id="image-preview-grid" class="jb-image-upload-grid mt-3 hidden" aria-live="polite"></div>
                             <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17] mt-3">
                                 <p class="font-semibold mb-1">Photo rules</p>
-                                <p>Upload up to <strong>5 photos</strong> per jewellery item. Images are saved in Cloudinary.</p>
+                                <p>Upload up to <strong>5 photos</strong> per jewellery item. Images upload directly to <strong>Cloudinary</strong>.</p>
                                 <p class="mt-2">Photos are auto-cropped to <strong>4:5</strong>, resized to <strong>1200 × 1500 px</strong>, and compressed to <strong>1 MB or less</strong>.</p>
                             </div>
                             <div class="progress-track mt-3 hidden" id="image-upload-progress-track" aria-hidden="true">
@@ -409,12 +409,14 @@
     </div>
 
     <script type="module">
+        import { getProductsByVendorId } from './js/firebase-product-service.js';
         import {
-            addProduct,
-            updateProduct,
+            createProductWithImages,
+            updateProductWithImages,
             deleteProduct,
-            getProductsByVendorId
-        } from './js/firebase-product-service.js';
+            ProductSaveError,
+            formatUploadedAssetsForCleanup
+        } from './js/services/product-service.js';
         import {
             loginVendor,
             logoutVendor,
@@ -422,9 +424,9 @@
         } from './js/vendor-service.js';
         import { escapeHtml, bindImageFallback, sanitizeImageUrl } from './js/security-utils.js';
         import { formatCartPrice } from './js/format-utils.js';
-        import { getProductImages } from './js/product-images.js';
-        import { uploadVendorImages, mapUrlsToProductFields, IMAGE_UPLOAD_LIMITS } from './js/cloudinary-image-upload.js';
-        import { formatImageSize } from './js/image-compress.js';
+        import { getProductImageAssets } from './js/product-images.js';
+        import { IMAGE_UPLOAD_LIMITS } from './js/components/vendor-image-picker.js';
+        import { formatImageSize } from './js/utils/image-compress.js';
 
         const authSection = document.getElementById('auth-section');
         const dashboardSection = document.getElementById('dashboard-section');
@@ -450,7 +452,7 @@
         let editingProductId = null;
         let vendorProducts = [];
         let selectedImageFiles = [];
-        let existingImageUrls = [];
+        let existingImages = [];
 
         function setStatus(element, message, type = 'info') {
             element.textContent = message;
@@ -514,7 +516,7 @@
             productForm.reset();
             editingProductId = null;
             selectedImageFiles = [];
-            existingImageUrls = [];
+            existingImages = [];
             renderImagePreviews();
             editBanner.classList.remove('is-visible');
             submitBtn.textContent = '✨ Upload Product';
@@ -529,12 +531,12 @@
             document.getElementById('p-description').value = product.description || '';
             document.getElementById('p-price').value = product.price || '';
             selectedImageFiles = [];
-            existingImageUrls = getProductImages(product);
+            existingImages = getProductImageAssets(product);
             renderImagePreviews();
         }
 
         function totalSelectedImages() {
-            return existingImageUrls.length + selectedImageFiles.length;
+            return existingImages.length + selectedImageFiles.length;
         }
 
         function renderImagePreviews() {
@@ -552,12 +554,12 @@
                 ? 'Maximum 5 photos selected'
                 : `📷 Add more photos (${total}/5)`;
 
-            existingImageUrls.forEach((url, index) => {
+            existingImages.forEach((asset, index) => {
                 const card = document.createElement('div');
                 card.className = 'jb-image-upload-card';
 
                 const image = document.createElement('img');
-                image.src = sanitizeImageUrl(url, '');
+                image.src = sanitizeImageUrl(asset.url, '');
                 image.alt = `Saved jewellery photo ${index + 1}`;
 
                 const meta = document.createElement('div');
@@ -570,7 +572,7 @@
                 removeBtn.setAttribute('aria-label', `Remove saved photo ${index + 1}`);
                 removeBtn.textContent = '×';
                 removeBtn.addEventListener('click', () => {
-                    existingImageUrls = existingImageUrls.filter((_, itemIndex) => itemIndex !== index);
+                    existingImages = existingImages.filter((_, itemIndex) => itemIndex !== index);
                     renderImagePreviews();
                 });
 
@@ -606,7 +608,7 @@
             });
         }
 
-        function collectProductPayload(imageFields = {}) {
+        function collectProductPayload() {
             const metalValue = document.getElementById('p-metal').value;
             const stoneValue = document.getElementById('p-stone').value;
             return {
@@ -617,29 +619,8 @@
                 metalType: metalValue,
                 stoneType: stoneValue,
                 vendor: currentVendor?.shopName || '',
-                vendorId: currentVendor?.vendorId || '',
-                ...imageFields
+                vendorId: currentVendor?.vendorId || ''
             };
-        }
-
-        async function resolveProductImageFields() {
-            if (!totalSelectedImages()) {
-                throw new Error('Please choose at least one jewellery photo.');
-            }
-
-            let uploadedUrls = [];
-            if (selectedImageFiles.length) {
-                uploadedUrls = await uploadVendorImages(selectedImageFiles, currentVendor?.vendorId, {
-                    onProgress: ({ completed, total }) => {
-                        const percent = Math.round((completed / total) * 100);
-                        imageUploadProgressFill.style.width = `${percent}%`;
-                        submitBtn.textContent = `Uploading photos (${completed}/${total})...`;
-                    }
-                });
-            }
-
-            const allUrls = [...existingImageUrls, ...uploadedUrls].slice(0, IMAGE_UPLOAD_LIMITS.maxImages);
-            return mapUrlsToProductFields(allUrls);
         }
 
         imageTrigger.addEventListener('click', () => {
@@ -857,28 +838,57 @@
                     ? 'Compressing and uploading photos to Cloudinary...'
                     : 'Saving product...', 'info');
 
-                const imageFields = await resolveProductImageFields();
-                const product = collectProductPayload(imageFields);
+                const productData = collectProductPayload();
 
                 if (isEditing) {
                     const existing = vendorProducts.find((item) => item.id === editingProductId);
                     if (!existing || !productBelongsToVendor(existing)) {
                         throw new Error('You can only edit your own uploads.');
                     }
-                    const saved = await updateProduct(editingProductId, product);
+
+                    const saved = await updateProductWithImages({
+                        productId: editingProductId,
+                        productData,
+                        vendorId: currentVendor?.vendorId,
+                        newFiles: selectedImageFiles,
+                        existingImages,
+                        onProgress: ({ completed, total, overallPercent }) => {
+                            const percent = overallPercent ?? Math.round((completed / total) * 100);
+                            imageUploadProgressFill.style.width = `${percent}%`;
+                            submitBtn.textContent = `Uploading photos (${completed}/${total})...`;
+                        }
+                    });
                     setStatus(uploadStatus, `"${saved.name}" was updated successfully.`, 'success');
                     resetProductForm();
                     await loadVendorListings();
                     switchTab('listings');
                 } else {
-                    const saved = await addProduct(product);
-                    setStatus(uploadStatus, `"${saved.name}" is now live across all matching sections.`, 'success');
+                    const saved = await createProductWithImages({
+                        files: selectedImageFiles,
+                        vendorId: currentVendor?.vendorId,
+                        productData,
+                        onProgress: ({ completed, total, overallPercent }) => {
+                            const percent = overallPercent ?? Math.round((completed / total) * 100);
+                            imageUploadProgressFill.style.width = `${percent}%`;
+                            submitBtn.textContent = `Uploading photos (${completed}/${total})...`;
+                        }
+                    });
+                    setStatus(uploadStatus, `"${saved.name}" uploaded successfully and is now live.`, 'success');
                     resetProductForm();
                     await loadVendorListings();
                 }
             } catch (error) {
                 console.error('Product save error:', error);
-                setStatus(uploadStatus, error.message || 'Could not save product.', 'error');
+                if (error instanceof ProductSaveError && error.phase === 'firestore' && error.uploadedAssets?.length) {
+                    const cleanupDetails = formatUploadedAssetsForCleanup(error.uploadedAssets);
+                    setStatus(
+                        uploadStatus,
+                        `${error.message} Cloudinary uploads completed and can be cleaned up later:\n${cleanupDetails}`,
+                        'error'
+                    );
+                } else {
+                    setStatus(uploadStatus, error.message || 'Could not save product.', 'error');
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = editingProductId ? '💾 Save Changes' : '✨ Upload Product';

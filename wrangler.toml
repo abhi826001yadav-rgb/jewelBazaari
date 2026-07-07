@@ -9,4 +9,5 @@ pages_build_output_dir = "public"
 # Brotli + gzip compression: automatic at the edge (Accept-Encoding: br, gzip).
 # HTTP/3 (QUIC): enable under Cloudflare Dashboard → Network → HTTP/3 (with QUIC).
 # Recommended zone settings: Always Use HTTPS, Automatic HTTPS Rewrites, TLS 1.3.
-# Vendor image uploads use Cloudinary via functions/api/upload-image.js (set env vars in Pages).
+# Vendor product images upload directly to Cloudinary from the browser (unsigned preset).
+# Configure public/js/utils/cloudinary-config.js — no API secret on Pages.

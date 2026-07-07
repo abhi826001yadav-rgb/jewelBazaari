@@ -1,5 +1,6 @@
-# Copy to .dev.vars for local `wrangler pages dev` (do not commit .dev.vars).
+# Copy to .dev.vars for local Firebase helpers only (do not commit .dev.vars).
 FIREBASE_API_KEY=AIzaSyAgNhB28vIQRlMOrFGoV5E7FcNk3bqMjPU
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+FIREBASE_PROJECT_ID=jewelbazaari
+
+# Cloudinary uploads are client-side only.
+# Set public/js/utils/cloudinary-config.js and .env.example instead.

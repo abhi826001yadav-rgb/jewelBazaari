@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { validateProductImageUrls } from './image-url-utils.js';
+import { validateProductImageUrls } from './utils/image-url-utils.js';
 import {
     collection,
     getDocs,
@@ -140,6 +140,45 @@ function buildProductId(categoryPrefix, yyyymmdd, hhmmss, serial) {
     return `${categoryPrefix}-${yyyymmdd}-${hhmmss}-${String(serial).padStart(4, '0')}`;
 }
 
+function appendOptionalImageFields(target, {
+    imageUrl,
+    imageUrl2,
+    imageUrl3,
+    imageUrl4,
+    imageUrl5,
+    imagePublicId,
+    imagePublicId2,
+    imagePublicId3,
+    imagePublicId4,
+    imagePublicId5
+}) {
+    const urlFields = [
+        ['imageUrl2', imageUrl2],
+        ['imageUrl3', imageUrl3],
+        ['imageUrl4', imageUrl4],
+        ['imageUrl5', imageUrl5]
+    ];
+    const publicIdFields = [
+        ['imagePublicId', imagePublicId],
+        ['imagePublicId2', imagePublicId2],
+        ['imagePublicId3', imagePublicId3],
+        ['imagePublicId4', imagePublicId4],
+        ['imagePublicId5', imagePublicId5]
+    ];
+
+    urlFields.forEach(([key, value]) => {
+        if (value) {
+            target[key] = value;
+        }
+    });
+
+    publicIdFields.forEach(([key, value]) => {
+        if (value) {
+            target[key] = value;
+        }
+    });
+}
+
 function normalizeProductData(product) {
     const metalType = (product.metalType || '').trim().toLowerCase();
     const stoneType = (product.stoneType || '').trim().toLowerCase();
@@ -171,21 +210,21 @@ function normalizeProductData(product) {
         createdAt: serverTimestamp()
     };
 
-    if (imageUrl2) {
-        normalized.imageUrl2 = imageUrl2;
+    if (product.imagePublicId) {
+        normalized.imagePublicId = String(product.imagePublicId).trim();
     }
 
-    if (imageUrl3) {
-        normalized.imageUrl3 = imageUrl3;
-    }
-
-    if (imageUrl4) {
-        normalized.imageUrl4 = imageUrl4;
-    }
-
-    if (imageUrl5) {
-        normalized.imageUrl5 = imageUrl5;
-    }
+    appendOptionalImageFields(normalized, {
+        imageUrl2,
+        imageUrl3,
+        imageUrl4,
+        imageUrl5,
+        imagePublicId: product.imagePublicId,
+        imagePublicId2: product.imagePublicId2,
+        imagePublicId3: product.imagePublicId3,
+        imagePublicId4: product.imagePublicId4,
+        imagePublicId5: product.imagePublicId5
+    });
 
     return normalized;
 }
@@ -336,6 +375,10 @@ export async function updateProduct(productId, product) {
         imageUrl
     };
 
+    if (product.imagePublicId) {
+        updateData.imagePublicId = String(product.imagePublicId).trim();
+    }
+
     if (!updateData.name) {
         throw new Error('Product name is required.');
     }
@@ -349,18 +392,17 @@ export async function updateProduct(productId, product) {
         throw new Error('Valid price is required.');
     }
 
-    if (imageUrl2) {
-        updateData.imageUrl2 = imageUrl2;
-    }
-    if (imageUrl3) {
-        updateData.imageUrl3 = imageUrl3;
-    }
-    if (imageUrl4) {
-        updateData.imageUrl4 = imageUrl4;
-    }
-    if (imageUrl5) {
-        updateData.imageUrl5 = imageUrl5;
-    }
+    appendOptionalImageFields(updateData, {
+        imageUrl2,
+        imageUrl3,
+        imageUrl4,
+        imageUrl5,
+        imagePublicId: product.imagePublicId,
+        imagePublicId2: product.imagePublicId2,
+        imagePublicId3: product.imagePublicId3,
+        imagePublicId4: product.imagePublicId4,
+        imagePublicId5: product.imagePublicId5
+    });
 
     await updateDoc(doc(db, PRODUCTS_COLLECTION, id), updateData);
     return { id, productId: id, productCode: id, ...updateData };
