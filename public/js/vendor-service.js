@@ -1,5 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
+import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js';
 import {
     signInWithGoogle as firebaseGoogleSignIn,
     resolveGoogleRedirectResult
@@ -197,7 +198,7 @@ async function linkVendorEmailPassword(user, email, password) {
 }
 
 export function saveVendorSession(vendor) {
-    sessionStorage.setItem(VENDOR_SESSION_KEY, JSON.stringify({
+    safeSetItem(sessionStorage, VENDOR_SESSION_KEY, JSON.stringify({
         vendorId: vendor.vendorId,
         shopName: vendor.shopName,
         email: vendor.email,
@@ -207,7 +208,7 @@ export function saveVendorSession(vendor) {
 }
 
 export function getVendorSession() {
-    const raw = sessionStorage.getItem(VENDOR_SESSION_KEY);
+    const raw = safeGetItem(sessionStorage, VENDOR_SESSION_KEY);
     if (!raw) {
         return null;
     }
@@ -215,13 +216,13 @@ export function getVendorSession() {
     try {
         return JSON.parse(raw);
     } catch {
-        sessionStorage.removeItem(VENDOR_SESSION_KEY);
+        safeRemoveItem(sessionStorage, VENDOR_SESSION_KEY);
         return null;
     }
 }
 
 export function clearVendorSession() {
-    sessionStorage.removeItem(VENDOR_SESSION_KEY);
+    safeRemoveItem(sessionStorage, VENDOR_SESSION_KEY);
 }
 
 export async function isVendorIdAvailable(vendorId) {
@@ -491,6 +492,10 @@ export async function loginVendor({ email, password }) {
             }
 
             throw new Error('Invalid registered email or vendor password.');
+        }
+
+        if (error?.code === 'auth/network-request-failed') {
+            throw new Error('Network error on this device. Check Wi‑Fi or mobile data, disable Private Browsing, then try again.');
         }
 
         throw new Error(getAuthErrorMessage(error));
