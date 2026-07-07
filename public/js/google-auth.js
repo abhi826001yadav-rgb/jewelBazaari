@@ -1,6 +1,6 @@
-import { auth } from './firebase-config.js';
-import { getAuthErrorMessage } from './auth-error-messages.js';
-import { isMobileAuthEnvironment } from './device-utils.js';
+import { auth } from './firebase-config.js?v=20260707c';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707c';
+import { isMobileAuthEnvironment } from './device-utils.js?v=20260707c';
 import {
     GoogleAuthProvider,
     signInWithPopup,

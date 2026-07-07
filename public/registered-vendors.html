@@ -19,10 +19,10 @@
     <meta name="twitter:description" content="Approved jewelBazaari vendor dashboard for managing jewellery listings.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260707b" as="style">
-    <script src="js/portal-tap-bridge.js" defer></script>
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707c" as="style">
+    <script src="js/portal-tap-bridge.js?v=20260707c" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707b">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707c">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body { margin: 0; min-height: 100vh; }
@@ -296,7 +296,7 @@
                     </div>
                     <p class="text-xs text-gray-500">Only approved vendors can access this portal.</p>
                     <p id="vendor-login-status" class="status-message hidden" role="status"></p>
-                    <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 px-4 rounded-2xl font-semibold transition">
+                    <button type="button" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 px-4 rounded-2xl font-semibold transition">
                         Login to Dashboard
                     </button>
                 </form>
@@ -430,6 +430,7 @@
         </div>
     </div>
 
+    <script type="module" src="js/portal-vendor-login.js?v=20260707c"></script>
     <script type="module">
         import { getProductsByVendorId } from './js/firebase-product-service.js';
         import {
@@ -440,29 +441,17 @@
             formatUploadedAssetsForCleanup
         } from './js/services/product-service.js';
         import {
-            loginVendor,
             logoutVendor,
             getCurrentApprovedVendor
         } from './js/vendor-service.js';
         import { escapeHtml, bindImageFallback, sanitizeImageUrl } from './js/security-utils.js';
-        import { safeGetItem, safeSetItem } from './js/safe-storage.js';
-        import {
-            installIOSVendorLoginFixes,
-            bindVendorLoginButton,
-            markVendorLoginReady,
-            showVendorBootError
-        } from './js/ios-vendor-login-fix.js';
         import { formatCartPrice } from './js/format-utils.js';
         import { getProductImageAssets } from './js/product-images.js';
         import { IMAGE_UPLOAD_LIMITS } from './js/components/vendor-image-picker.js';
         import { formatImageSize } from './js/utils/image-compress.js';
 
-        window.__jbShowVendorBootError = showVendorBootError;
-
         const authSection = document.getElementById('auth-section');
         const dashboardSection = document.getElementById('dashboard-section');
-        const vendorLoginForm = document.getElementById('vendor-login-form');
-        const vendorLoginStatus = document.getElementById('vendor-login-status');
         const vendorSessionBadge = document.getElementById('vendor-session-badge');
         const productForm = document.getElementById('product-form');
         const uploadStatus = document.getElementById('upload-status');
@@ -777,55 +766,9 @@
             }
         }
 
-        installIOSVendorLoginFixes();
-
-        const loginVendorEmailInput = document.getElementById('login-vendor-email');
-        const loginVendorPasswordInput = document.getElementById('login-vendor-password');
-        const rememberedVendorEmail = safeGetItem(localStorage, 'jb_last_vendor_email');
-        if (rememberedVendorEmail) {
-            loginVendorEmailInput.value = rememberedVendorEmail;
-        }
-
-        async function submitVendorLogin() {
-            clearStatus(vendorLoginStatus);
-
-            const email = loginVendorEmailInput.value.trim();
-            const password = loginVendorPasswordInput.value;
-            const loginBtn = document.getElementById('vendor-login-btn');
-
-            if (!email || !password) {
-                setStatus(vendorLoginStatus, 'Enter your registered email and vendor password.', 'error');
-                return;
-            }
-
-            try {
-                loginBtn.disabled = true;
-                const vendor = await loginVendor({
-                    email,
-                    password,
-                    onStatus: (message) => setStatus(vendorLoginStatus, message, 'info')
-                });
-                safeSetItem(localStorage, 'jb_last_vendor_email', vendor.email || email);
-                loginVendorPasswordInput.value = '';
-                loginVendorEmailInput.value = vendor.email || email;
-                showDashboard(vendor);
-            } catch (error) {
-                console.error('Vendor login error:', error);
-                if (error.code === 'vendor/pending-approval') {
-                    setStatus(vendorLoginStatus, error.message, 'info');
-                } else if (error.code === 'permission-denied') {
-                    setStatus(vendorLoginStatus, 'Login blocked by database permissions. Ask admin to deploy the latest Firestore rules.', 'error');
-                } else {
-                    setStatus(vendorLoginStatus, error.message || 'Login failed.', 'error');
-                }
-            } finally {
-                loginBtn.disabled = false;
-            }
-        }
-
-        bindVendorLoginButton(submitVendorLogin);
-        window.__jbVendorLoginSubmit = submitVendorLogin;
-        markVendorLoginReady();
+        window.addEventListener('jb:vendor-authenticated', (event) => {
+            showDashboard(event.detail.vendor);
+        });
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await logoutVendor();

@@ -1,4 +1,4 @@
-import { isIOSDevice } from './device-utils.js';
+import { isIOSDevice } from './device-utils.js?v=20260707c';
 
 export { isIOSDevice };
 
@@ -18,12 +18,12 @@ function scrollActiveFieldIntoView(sectionSelector, buttonId) {
     });
 }
 
-export function bindTapButton(button, handler) {
-    const element = typeof button === 'string' ? document.getElementById(button) : button;
-    if (!element || typeof handler !== 'function') {
+function bindActivate(element, handler) {
+    if (!element || typeof handler !== 'function' || element.dataset.jbActivateBound === '1') {
         return;
     }
 
+    element.dataset.jbActivateBound = '1';
     let running = false;
 
     const run = async (event) => {
@@ -43,8 +43,13 @@ export function bindTapButton(button, handler) {
         }
     };
 
+    element.addEventListener('pointerup', run);
     element.addEventListener('click', run);
-    element.addEventListener('touchend', run, { passive: false });
+}
+
+export function bindTapButton(button, handler) {
+    const element = typeof button === 'string' ? document.getElementById(button) : button;
+    bindActivate(element, handler);
 }
 
 export function bindVendorLoginButton(submitFn) {
@@ -54,31 +59,15 @@ export function bindVendorLoginButton(submitFn) {
         return;
     }
 
-    let submitting = false;
-
-    const run = async (event) => {
-        if (event) {
+    if (form && form.dataset.jbSubmitBound !== '1') {
+        form.dataset.jbSubmitBound = '1';
+        form.addEventListener('submit', (event) => {
             event.preventDefault();
-            event.stopPropagation();
-        }
-        if (submitting) {
-            return;
-        }
-
-        submitting = true;
-        try {
-            await submitFn();
-        } finally {
-            submitting = false;
-        }
-    };
-
-    if (form) {
-        form.addEventListener('submit', run);
+            submitFn();
+        });
     }
 
-    button.addEventListener('click', run);
-    button.addEventListener('touchend', run, { passive: false });
+    bindActivate(button, submitFn);
 }
 
 export function installIOSLoginScreenFixes({

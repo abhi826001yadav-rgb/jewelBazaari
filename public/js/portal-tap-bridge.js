@@ -1,9 +1,10 @@
 (function () {
+    var PORTAL_VERSION = '20260707c';
+
     function showTapMessage(message) {
         var vendorStatus = document.getElementById('vendor-login-status');
         var adminStatus = document.getElementById('admin-login-error');
-        var googleStatus = document.getElementById('google-auth-status');
-        var target = vendorStatus || adminStatus || googleStatus;
+        var target = vendorStatus || adminStatus;
 
         if (!target) {
             return;
@@ -33,6 +34,10 @@
         element.dataset.jbTapBound = '1';
 
         function onActivate(event) {
+            if (window.__jbVendorLoginReady || window.__jbAdminLoginReady) {
+                return;
+            }
+
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -40,14 +45,12 @@
             invokeHandler(globalName);
         }
 
-        element.addEventListener('click', onActivate);
-        element.addEventListener('touchend', onActivate, false);
+        element.addEventListener('pointerup', onActivate);
     }
 
     function bindAll() {
         bindTapTarget('vendor-login-btn', '__jbVendorLoginSubmit');
         bindTapTarget('login-btn', '__jbAdminSignIn');
-        bindTapTarget('google-signin-btn', '__jbGoogleSignIn');
     }
 
     if (document.readyState === 'loading') {
@@ -57,4 +60,5 @@
     }
 
     window.addEventListener('load', bindAll);
+    window.__jbPortalVersion = PORTAL_VERSION;
 })();

@@ -19,10 +19,10 @@
     <meta name="twitter:description" content="jewelBazaari admin access.">
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preload" href="css/mobile-responsive.css?v=20260707b" as="style">
-    <script src="js/portal-tap-bridge.js" defer></script>
+    <link rel="preload" href="css/mobile-responsive.css?v=20260707c" as="style">
+    <script src="js/portal-tap-bridge.js?v=20260707c" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707b">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707c">
     <link rel="stylesheet" href="css/accessibility.css">
     <style>
         html, body {
@@ -695,6 +695,7 @@
         </div>
     </div>
 
+    <script type="module" src="js/portal-admin-login.js?v=20260707c"></script>
     <script type="module">
         import { getAllProducts, updateProduct, deleteProduct } from './js/firebase-product-service.js';
         import { getProductImages } from './js/product-images.js';
@@ -712,27 +713,12 @@
             deleteCustomerQuery
         } from './js/customer-query-service.js';
         import { auth } from './js/firebase-config.js';
-        import { isAdminEmail } from './js/admin-config.js';
-        import { getAuthErrorMessage } from './js/auth-error-messages.js';
-        import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './js/google-auth.js';
-        import {
-            bindTapButton,
-            installIOSAdminLoginFixes,
-            markAdminLoginReady,
-            showAdminBootError
-        } from './js/ios-vendor-login-fix.js';
         import { escapeHtml, sanitizeImageUrl } from './js/security-utils.js';
         import {
             signOut,
             onAuthStateChanged
         } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-        window.__jbShowAdminBootError = showAdminBootError;
-
-        const passwordSection = document.getElementById('password-section');
-        const adminSection = document.getElementById('admin-section');
-        const loginBtn = document.getElementById('login-btn');
-        const adminLoginError = document.getElementById('admin-login-error');
         const adminLogoutBtn = document.getElementById('admin-logout-btn');
         const loadingState = document.getElementById('loading-state');
         const errorState = document.getElementById('error-state');
@@ -774,103 +760,15 @@
         let vendorsCache = [];
         let queriesCache = [];
 
-        function isAdminUser(user) {
-            return isAdminEmail(user?.email);
-        }
-
-        function showLoginError(message) {
-            if (!message) {
-                adminLoginError.classList.add('hidden');
-                adminLoginError.textContent = '';
-                return;
-            }
-
-            adminLoginError.textContent = message;
-            adminLoginError.classList.remove('hidden');
-        }
-
-        function unlockAdmin() {
-            document.body.classList.remove('admin-locked');
-            passwordSection.classList.add('is-hidden');
-            passwordSection.setAttribute('aria-hidden', 'true');
-            adminSection.classList.add('is-visible');
-            showLoginError('');
+        function loadAdminDashboard() {
             loadProducts();
             loadVendorRequests();
             loadCustomerQueries();
         }
 
-        function lockAdmin() {
-            document.body.classList.add('admin-locked');
-            passwordSection.classList.remove('is-hidden');
-            passwordSection.setAttribute('aria-hidden', 'false');
-            adminSection.classList.remove('is-visible');
-        }
-
-        async function handleSignedInUser(user) {
-            if (!user) {
-                return false;
-            }
-
-            if (!isAdminUser(user)) {
-                await signOut(auth);
-                showLoginError('This Google account is not authorized for admin access.');
-                return false;
-            }
-
-            unlockAdmin();
-            return true;
-        }
-
-        let adminRedirectPending = false;
-
-        async function signInAsAdmin() {
-            loginBtn.disabled = true;
-            showLoginError('');
-
-            try {
-                showLoginError('Opening Google sign-in...');
-                const result = await signInWithGoogle();
-                if (!result) {
-                    adminRedirectPending = true;
-                    showLoginError('Redirecting to Google sign-in...');
-                    return;
-                }
-
-                showLoginError('');
-                await handleSignedInUser(result.user);
-            } catch (error) {
-                showLoginError(getAuthErrorMessage(error));
-            } finally {
-                if (!adminRedirectPending) {
-                    loginBtn.disabled = false;
-                }
-            }
-        }
-
-        async function initAdminAuth() {
-            try {
-                showLoginError('Checking Google sign-in...');
-                const result = await resolveGoogleRedirectResult();
-                const redirectUser = result?.user;
-                const currentUser = redirectUser || await getAuthenticatedUser();
-
-                if (currentUser) {
-                    adminRedirectPending = false;
-                    const signedIn = await handleSignedInUser(currentUser);
-                    if (signedIn) {
-                        return;
-                    }
-                }
-
-                showLoginError('');
-            } catch (error) {
-                adminRedirectPending = false;
-                showLoginError(error.message || getAuthErrorMessage(error));
-            } finally {
-                loginBtn.disabled = false;
-            }
-        }
+        window.addEventListener('jb:admin-authenticated', () => {
+            loadAdminDashboard();
+        });
 
         function switchAdminTab(tab) {
             tabProducts.classList.toggle('is-active', tab === 'products');
@@ -1424,40 +1322,41 @@
             }
         });
 
-        installIOSAdminLoginFixes();
-        bindTapButton(loginBtn, signInAsAdmin);
-        window.__jbAdminSignIn = signInAsAdmin;
-
-        let adminAuthReady = false;
-
         adminLogoutBtn.addEventListener('click', async () => {
             await signOut(auth);
-            lockAdmin();
+            if (typeof window.__jbAdminLock === 'function') {
+                window.__jbAdminLock();
+            }
         });
 
         onAuthStateChanged(auth, async (user) => {
-            if (!adminAuthReady) {
+            if (!window.__jbAdminLoginReady) {
                 return;
             }
 
+            const isAdminUser = typeof window.__jbAdminIsUser === 'function'
+                ? window.__jbAdminIsUser
+                : () => false;
+
             if (isAdminUser(user)) {
-                unlockAdmin();
+                if (typeof window.__jbAdminUnlock === 'function') {
+                    window.__jbAdminUnlock();
+                }
+                loadAdminDashboard();
                 return;
             }
 
             if (!user) {
-                lockAdmin();
+                if (typeof window.__jbAdminLock === 'function') {
+                    window.__jbAdminLock();
+                }
                 return;
             }
 
             await signOut(auth);
-            lockAdmin();
-            showLoginError('This Google account is not authorized for admin access.');
-        });
-
-        initAdminAuth().finally(() => {
-            adminAuthReady = true;
-            markAdminLoginReady();
+            if (typeof window.__jbAdminLock === 'function') {
+                window.__jbAdminLock();
+            }
         });
     </script>
     <script>
