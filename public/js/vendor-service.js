@@ -1,9 +1,11 @@
 import { auth, db } from './firebase-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import {
-    GoogleAuthProvider,
+    signInWithGoogle as firebaseGoogleSignIn,
+    resolveGoogleRedirectResult
+} from './google-auth.js';
+import {
     EmailAuthProvider,
-    signInWithPopup,
     signInWithEmailAndPassword,
     linkWithCredential,
     fetchSignInMethodsForEmail,
@@ -244,18 +246,7 @@ export async function getVendorProfileByUid(uid) {
     return mapVendorDoc(snapshot.docs[0]);
 }
 
-export async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-
-    let userCredential;
-    try {
-        userCredential = await signInWithPopup(auth, provider);
-    } catch (error) {
-        throw new Error(getAuthErrorMessage(error));
-    }
-
-    const user = userCredential.user;
+async function buildGoogleSignInResult(user) {
     const email = normalizeEmail(user.email);
 
     if (!email) {
@@ -288,6 +279,28 @@ export async function signInWithGoogle() {
         photoURL: user.photoURL || '',
         profileCompleted: false
     };
+}
+
+export async function signInWithGoogle() {
+    try {
+        const userCredential = await firebaseGoogleSignIn();
+        if (!userCredential) {
+            return null;
+        }
+
+        return buildGoogleSignInResult(userCredential.user);
+    } catch (error) {
+        throw new Error(getAuthErrorMessage(error));
+    }
+}
+
+export async function resolveVendorGoogleRedirect() {
+    const result = await resolveGoogleRedirectResult();
+    if (!result?.user) {
+        return null;
+    }
+
+    return buildGoogleSignInResult(result.user);
 }
 
 export async function getVendorProfileByEmail(email) {

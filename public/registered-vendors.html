@@ -30,6 +30,31 @@
             font-family: 'Inter', system-ui, sans-serif;
         }
         body.vendor-locked { overflow: hidden; }
+        #vendor-login-btn {
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        @media (max-width: 768px) {
+            body.vendor-locked {
+                overflow: auto;
+                position: static;
+                width: auto;
+                min-height: 100dvh;
+            }
+            #auth-section {
+                position: relative;
+                inset: auto;
+                min-height: 100dvh;
+                align-items: flex-start;
+                padding-top: max(1.5rem, env(safe-area-inset-top));
+                padding-bottom: max(2rem, env(safe-area-inset-bottom));
+                -webkit-overflow-scrolling: touch;
+            }
+            #auth-section .luxury-card {
+                margin-bottom: 1.5rem;
+            }
+        }
         .luxury-card {
             background: #FAF7F2;
             border: 2px solid #9B7E4B;

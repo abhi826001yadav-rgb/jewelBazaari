@@ -169,6 +169,33 @@
             padding: 1.5rem 1rem;
             overflow-y: auto;
         }
+        #vendor-login-btn,
+        .google-signin-btn,
+        .vendor-choice-btn {
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        @media (max-width: 768px) {
+            body.vendor-locked {
+                overflow: auto;
+                position: static;
+                width: auto;
+                min-height: 100dvh;
+            }
+            #auth-section {
+                position: relative;
+                inset: auto;
+                min-height: 100dvh;
+                align-items: flex-start;
+                padding-top: max(1.5rem, env(safe-area-inset-top));
+                padding-bottom: max(2rem, env(safe-area-inset-bottom));
+                -webkit-overflow-scrolling: touch;
+            }
+            #auth-section .bg-white.rounded-3xl {
+                margin-bottom: 1.5rem;
+            }
+        }
         #auth-section.is-hidden {
             display: none !important;
             visibility: hidden !important;
@@ -615,6 +642,7 @@
         import { formatImageSize } from './js/utils/image-compress.js';
         import {
             signInWithGoogle,
+            resolveVendorGoogleRedirect,
             completeVendorProfile,
             loginVendor,
             logoutVendor,
@@ -754,6 +782,25 @@
             }
         }
 
+        async function applyGoogleSignInResult(result, autoContinue = true) {
+            if (result.profileCompleted) {
+                showAuthPage('login');
+                setPanelStatus(
+                    vendorLoginStatus,
+                    'This Google account already submitted an application. Login with your registered email and vendor password after admin approval.',
+                    'info'
+                );
+                return;
+            }
+
+            if (autoContinue) {
+                await openVendorSetupPage(result);
+                return;
+            }
+
+            showGoogleResumePanel(result, 'Google sign-in successful. Continue to Page 3.', 'success');
+        }
+
         async function handleGoogleSignIn(autoContinue = true) {
             clearPanelStatus(googleAuthStatus);
             const signInBtn = document.getElementById('google-signin-btn');
@@ -763,28 +810,35 @@
                 setPanelStatus(googleAuthStatus, 'Opening Google sign-in...', 'info');
 
                 const result = await signInWithGoogle();
-
-                if (result.profileCompleted) {
-                    showAuthPage('login');
-                    setPanelStatus(
-                        vendorLoginStatus,
-                        'This Google account already submitted an application. Login with your registered email and vendor password after admin approval.',
-                        'info'
-                    );
+                if (!result) {
+                    setPanelStatus(googleAuthStatus, 'Redirecting to Google sign-in...', 'info');
                     return;
                 }
 
-                if (autoContinue) {
-                    await openVendorSetupPage(result);
-                    return;
-                }
-
-                showGoogleResumePanel(result, 'Google sign-in successful. Continue to Page 3.', 'success');
+                await applyGoogleSignInResult(result, autoContinue);
             } catch (error) {
                 console.error('Google sign-in error:', error);
                 setPanelStatus(googleAuthStatus, error.message || 'Google sign-in failed.', 'error');
             } finally {
                 signInBtn.disabled = false;
+            }
+        }
+
+        async function initVendorGoogleRedirect() {
+            try {
+                const result = await resolveVendorGoogleRedirect();
+                if (!result) {
+                    return false;
+                }
+
+                showAuthPage('google');
+                await applyGoogleSignInResult(result, true);
+                return true;
+            } catch (error) {
+                console.error('Google redirect sign-in error:', error);
+                showAuthPage('google');
+                setPanelStatus(googleAuthStatus, error.message || 'Google sign-in failed.', 'error');
+                return true;
             }
         }
 
@@ -1095,6 +1149,11 @@
                 if (approvedVendor) {
                     finishAuthLoading();
                     showUploadPortal(approvedVendor);
+                    return;
+                }
+
+                const handledRedirect = await initVendorGoogleRedirect();
+                if (handledRedirect) {
                     return;
                 }
 
