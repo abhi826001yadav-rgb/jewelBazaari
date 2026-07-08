@@ -1,12 +1,12 @@
-import { auth } from './firebase-config.js?v=20260707l';
-import { isAdminEmail } from './admin-config.js?v=20260707l';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707l';
-import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260707l';
+import { auth } from './firebase-config.js?v=20260708a';
+import { isAdminEmail } from './admin-config.js?v=20260708a';
+import { getAuthErrorMessage } from './auth-error-messages.js?v=20260708a';
+import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260708a';
 import {
     installIOSAdminLoginFixes,
     markAdminLoginReady,
     showAdminBootError
-} from './ios-vendor-login-fix.js?v=20260707l';
+} from './ios-vendor-login-fix.js?v=20260708a';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 window.__jbShowAdminBootError = showAdminBootError;
@@ -17,6 +17,7 @@ const loginBtn = document.getElementById('login-btn');
 const adminLoginError = document.getElementById('admin-login-error');
 
 let signInInFlight = false;
+let sessionRestoreComplete = false;
 
 function showLoginError(message) {
     if (!adminLoginError) {
@@ -33,8 +34,21 @@ function showLoginError(message) {
     adminLoginError.classList.remove('hidden');
 }
 
+function getUserEmail(user) {
+    if (!user) {
+        return '';
+    }
+
+    if (user.email) {
+        return user.email;
+    }
+
+    const providerEmail = user.providerData?.find((provider) => provider.email)?.email;
+    return providerEmail || '';
+}
+
 function isAdminUser(user) {
-    return isAdminEmail(user?.email);
+    return isAdminEmail(getUserEmail(user));
 }
 
 function unlockAdmin() {
@@ -105,24 +119,29 @@ async function signInAsAdmin() {
             await signOut(auth);
         }
 
-        await signInWithGoogle({ forceRedirect: true });
+        const result = await signInWithGoogle();
+        if (result?.user) {
+            await handleSignedInUser(result.user);
+        }
     } catch (error) {
         console.error('Admin Google sign-in failed:', error);
+        showLoginError(getAuthErrorMessage(error));
+    } finally {
         signInInFlight = false;
         setLoginButtonDisabled(false);
-        showLoginError(getAuthErrorMessage(error));
     }
 }
 
 async function restoreAdminSession() {
     try {
+        await auth.authStateReady();
+
         const redirectResult = await resolveGoogleRedirectResult();
         if (redirectResult?.user) {
-            signInInFlight = false;
             return handleSignedInUser(redirectResult.user);
         }
 
-        const currentUser = await getAuthenticatedUser();
+        const currentUser = await getAuthenticatedUser({ maxAttempts: 8, delayMs: 150 });
         if (currentUser) {
             return handleSignedInUser(currentUser, { showErrors: false });
         }
@@ -133,11 +152,8 @@ async function restoreAdminSession() {
     } catch (error) {
         console.error('Admin session restore failed:', error);
         lockAdmin();
-        showLoginError('');
+        showLoginError(getAuthErrorMessage(error));
         return false;
-    } finally {
-        signInInFlight = false;
-        setLoginButtonDisabled(false);
     }
 }
 
@@ -147,10 +163,19 @@ function bindLoginButton() {
     }
 
     loginBtn.dataset.jbAdminBound = '1';
-    loginBtn.addEventListener('click', (event) => {
+
+    const onActivate = (event) => {
         event.preventDefault();
         signInAsAdmin();
-    });
+    };
+
+    const touchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (touchDevice) {
+        loginBtn.addEventListener('pointerup', onActivate);
+        return;
+    }
+
+    loginBtn.addEventListener('click', onActivate);
 }
 
 window.__jbAdminLock = lockAdmin;
@@ -162,12 +187,19 @@ bindLoginButton();
 window.__jbAdminSignIn = signInAsAdmin;
 markAdminLoginReady();
 
-restoreAdminSession();
+await restoreAdminSession();
+sessionRestoreComplete = true;
 
 onAuthStateChanged(auth, (user) => {
+    if (!sessionRestoreComplete) {
+        return;
+    }
+
     void handleSignedInUser(user, { showErrors: false });
 });
 
-window.addEventListener('pageshow', () => {
-    restoreAdminSession();
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        void restoreAdminSession();
+    }
 });

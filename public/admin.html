@@ -159,6 +159,22 @@
         #admin-login-error {
             line-height: 1.45;
         }
+        .admin-access-emblem {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 9999px;
+            background: linear-gradient(145deg, #FAF7F2 0%, #F3E8D4 100%);
+            border: 1px solid rgba(155, 126, 75, 0.45);
+            box-shadow: 0 8px 20px -12px rgba(74, 14, 23, 0.45);
+            margin-bottom: 1rem;
+        }
+        .admin-access-emblem svg {
+            width: 2rem;
+            height: 2rem;
+        }
         .admin-modify-btn {
             display: inline-flex;
             align-items: center;
@@ -416,8 +432,13 @@
         <div class="max-w-md w-full mx-4">
             <div class="bg-white rounded-3xl p-8 shadow-xl relative">
                 <div class="text-center mb-6">
-                    <div class="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                        <span class="text-3xl">ðŸ”</span>
+                    <div class="admin-access-emblem mx-auto" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#4A0E17" fill-opacity="0.12" stroke="#4A0E17" stroke-width="1.6" stroke-linejoin="round"/>
+                            <circle cx="12" cy="10" r="2.25" stroke="#9B7E4B" stroke-width="1.5"/>
+                            <path d="M8.75 14.75c.85-1.45 2-2.25 3.25-2.25s2.4.8 3.25 2.25" stroke="#9B7E4B" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M15.25 7.75l.9-.9a1.4 1.4 0 0 1 2 0l.35.35" stroke="#C5A880" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
                     </div>
                     <h1 class="admin-title text-2xl font-bold">Admin Access</h1>
                     <p class="text-gray-600 mt-2 text-sm">Sign in with your authorized Google account to manage jewellery and vendors</p>
@@ -437,7 +458,13 @@
                         </svg>
                         Sign in with Google
                     </button>
-                    <a href="index.html" class="jb-portal-home-btn" aria-label="Return to jewelBazaari homepage">ðŸ  Back to Home</a>
+                    <a href="index.html" class="jb-portal-home-btn" aria-label="Return to jewelBazaari homepage">
+                        <svg class="jb-home-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 10.5 12 3l9 7.5"></path>
+                            <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"></path>
+                        </svg>
+                        <span>Back to Home</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -448,7 +475,11 @@
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
                 <div>
                     <a href="index.html" class="inline-flex items-center gap-2 text-[#9B7E4B] hover:text-[#4A0E17] transition font-semibold text-sm mb-3">
-                        ðŸ  Back to Home
+                        <svg class="jb-home-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 10.5 12 3l9 7.5"></path>
+                            <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"></path>
+                        </svg>
+                        <span>Back to Home</span>
                     </a>
                     <h2 class="admin-title text-3xl font-bold">Admin Dashboard</h2>
                     <p class="text-gray-500 text-sm mt-1">Manage jewellery listings, vendor approvals, and customer queries.</p>
@@ -695,7 +726,7 @@
         </div>
     </div>
 
-    <script type="module" src="js/admin-entry.js?v=20260707l"></script>
+    <script type="module" src="js/admin-entry.js?v=20260708a"></script>
     <script>
         function isPortalAuthScript(url) {
             if (!url) {

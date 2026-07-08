@@ -20,10 +20,6 @@ const POPUP_FALLBACK_CODES = new Set([
 async function ensureAuthPersistence() {
     await auth.authStateReady();
 
-    if (!isMobileAuthEnvironment()) {
-        return;
-    }
-
     try {
         await setPersistence(auth, browserLocalPersistence);
     } catch (error) {
@@ -75,7 +71,21 @@ export async function resolveGoogleRedirectResult() {
     return consumeRedirectResult();
 }
 
-export async function getAuthenticatedUser() {
+export async function getAuthenticatedUser(options = {}) {
+    const maxAttempts = Number(options.maxAttempts || 1);
+    const delayMs = Number(options.delayMs || 150);
+
     await auth.authStateReady();
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (auth.currentUser) {
+            return auth.currentUser;
+        }
+
+        if (attempt < maxAttempts - 1) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs * (attempt + 1)));
+        }
+    }
+
     return auth.currentUser;
 }

@@ -148,7 +148,12 @@
             line-height: 1.4;
         }
         .status-success {
-            color: #166534;
+            color: #14532d;
+            background: #ecfdf5;
+            border: 1px solid #86efac;
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
         }
         .status-error {
             color: #B91C1C;
@@ -508,7 +513,11 @@
     <div id="upload-section">
         <div class="max-w-lg mx-auto mb-6 flex justify-between items-center px-2 gap-3">
             <a href="index.html" class="flex items-center gap-2 text-[#EAB308] hover:text-[#F4C95F] transition font-semibold text-sm">
-                🏠 Back to Home
+                <svg class="jb-home-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 10.5 12 3l9 7.5"></path>
+                    <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"></path>
+                </svg>
+                <span>Back to Home</span>
             </a>
             <div class="text-right">
                 <div id="vendor-session-badge" class="vendor-badge mb-1"></div>
@@ -581,21 +590,22 @@
                     <div id="image-preview-grid" class="jb-image-upload-grid mt-3 hidden" aria-live="polite"></div>
                     <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17] leading-relaxed mt-3">
                         <p class="font-semibold mb-2">Photo rules</p>
-                        <p>Upload up to <strong>5 photos</strong> per jewellery item. Images upload directly to <strong>Cloudinary</strong>.</p>
-                        <p class="mt-2">We auto-crop to a <strong>4:5 portrait ratio</strong>, resize to <strong>1200 × 1500 px</strong>, and compress each photo to <strong>1 MB or less</strong> in WebP format.</p>
+                        <p>Upload up to <strong>5 photos</strong> per jewellery item. Only images <strong>under 1 MB</strong> are allowed.</p>
+                        <p class="mt-2">For photos to display perfectly on jewelBazaari, use a <strong>4:5 portrait</strong> image sized <strong>1200 × 1500 px</strong>.</p>
+                        <p class="mt-2">After a successful upload, your photos are saved in the <strong>jewelBazaari database</strong> and your product goes live on the website.</p>
                         <p class="mt-2">Use bright, clear photos on a plain background for the best storefront display.</p>
                     </div>
                     <div class="progress-track mt-3 hidden" id="image-upload-progress-track" aria-hidden="true">
                         <div class="progress-fill" id="image-upload-progress-fill"></div>
                     </div>
                 </div>
-                <p id="upload-status" class="status-message hidden" role="status" aria-live="polite"></p>
                 <input type="number" id="p-price" required min="1" placeholder="Price (₹) *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
                 <input type="text" id="p-vendor" placeholder="Vendor / Shop Name" readonly class="w-full p-4 border-2 border-gray-200 rounded-2xl bg-gray-50 text-gray-700">
 
                 <button type="submit" id="upload-btn" class="w-full upload-btn py-4 mt-4 rounded-2xl text-lg tracking-wider shadow-lg">
                     ✨ Upload Product to jewelBazaari
                 </button>
+                <p id="upload-status" class="status-message hidden mt-4" role="status" aria-live="polite"></p>
             </form>
 
             <p class="text-center text-xs text-gray-500 mt-6">
@@ -981,10 +991,18 @@
             showAuthPortal('welcome');
         });
 
+        function getUploadSuccessMessage(productName) {
+            const label = productName ? `"${productName}"` : 'Your product';
+            return `Congratulations! ${label} has been successfully uploaded to the jewelBazaari database and it is live on jewelBazaari.`;
+        }
+
         function setUploadStatus(message, type = 'info') {
             uploadStatus.textContent = message;
             uploadStatus.classList.remove('hidden', 'status-success', 'status-error', 'status-info');
             uploadStatus.classList.add(`status-${type}`);
+            if (type === 'success') {
+                uploadStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
 
         function clearUploadStatus() {
@@ -1094,7 +1112,7 @@
             imageUploadProgressFill.style.width = '0%';
 
             try {
-                setUploadStatus('Compressing and uploading photos to Cloudinary...', 'info');
+                setUploadStatus('Saving your photos to jewelBazaari...', 'info');
                 const saved = await createProductWithImages({
                     files: selectedImageFiles,
                     vendorId: currentVendor?.vendorId,
@@ -1116,7 +1134,7 @@
                 });
 
                 uploadBtn.textContent = 'Saving product...';
-                setUploadStatus(`"${saved.name}" uploaded successfully and is now live.`, 'success');
+                setUploadStatus(getUploadSuccessMessage(saved.name), 'success');
                 productForm.reset();
                 selectedImageFiles = [];
                 renderImagePreviews();
@@ -1126,7 +1144,7 @@
                 if (error instanceof ProductSaveError && error.phase === 'firestore' && error.uploadedAssets?.length) {
                     const cleanupDetails = formatUploadedAssetsForCleanup(error.uploadedAssets);
                     setUploadStatus(
-                        `${error.message} Cloudinary uploads completed and can be cleaned up later:\n${cleanupDetails}`,
+                        `${error.message} Your photos were uploaded but could not be saved to jewelBazaari. Please try again.\n${cleanupDetails}`,
                         'error'
                     );
                 } else {

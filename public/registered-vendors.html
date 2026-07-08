@@ -158,7 +158,14 @@
             transition: width 0.2s ease;
         }
         .status-message { font-size: 0.875rem; line-height: 1.4; }
-        .status-success { color: #166534; }
+        .status-success {
+            color: #14532d;
+            background: #ecfdf5;
+            border: 1px solid #86efac;
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+        }
         .status-error { color: #B91C1C; }
         .status-info { color: #4A0E17; }
         #auth-section {
@@ -305,7 +312,13 @@
                     Not registered yet?
                     <a href="vendor-upload.html" class="text-[#9B7E4B] underline hover:text-[#4A0E17]">Become a Vendor</a>
                 </p>
-                <a href="index.html" class="jb-portal-home-btn" aria-label="Return to jewelBazaari homepage">🏠 Back to Home</a>
+                <a href="index.html" class="jb-portal-home-btn" aria-label="Return to jewelBazaari homepage">
+                    <svg class="jb-home-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 10.5 12 3l9 7.5"></path>
+                        <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"></path>
+                    </svg>
+                    <span>Back to Home</span>
+                </a>
             </div>
         </div>
     </div>
@@ -313,7 +326,11 @@
     <div id="dashboard-section">
         <div class="max-w-5xl mx-auto mb-6 flex flex-wrap justify-between items-center gap-3 px-2">
             <a href="index.html" class="flex items-center gap-2 text-[#EAB308] hover:text-[#F4C95F] transition font-semibold text-sm">
-                🏠 Back to Home
+                <svg class="jb-home-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 10.5 12 3l9 7.5"></path>
+                    <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"></path>
+                </svg>
+                <span>Back to Home</span>
             </a>
             <div class="text-right">
                 <div id="vendor-session-badge" class="vendor-badge mb-1"></div>
@@ -395,18 +412,19 @@
                             <div id="image-preview-grid" class="jb-image-upload-grid mt-3 hidden" aria-live="polite"></div>
                             <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17] mt-3">
                                 <p class="font-semibold mb-1">Photo rules</p>
-                                <p>Upload up to <strong>5 photos</strong> per jewellery item. Images upload directly to <strong>Cloudinary</strong>.</p>
-                                <p class="mt-2">Photos are auto-cropped to <strong>4:5</strong>, resized to <strong>1200 × 1500 px</strong>, and compressed to <strong>1 MB or less</strong>.</p>
+                                <p>Upload up to <strong>5 photos</strong> per jewellery item. Only images <strong>under 1 MB</strong> are allowed.</p>
+                                <p class="mt-2">For photos to display perfectly on jewelBazaari, use a <strong>4:5 portrait</strong> image sized <strong>1200 × 1500 px</strong>.</p>
+                                <p class="mt-2">After a successful upload, your photos are saved in the <strong>jewelBazaari database</strong> and your product goes live on the website.</p>
                             </div>
                             <div class="progress-track mt-3 hidden" id="image-upload-progress-track" aria-hidden="true">
                                 <div class="progress-fill" id="image-upload-progress-fill"></div>
                             </div>
                         </div>
                         <input type="number" id="p-price" required min="1" placeholder="Price (₹) *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                        <p id="upload-status" class="status-message hidden" role="status" aria-live="polite"></p>
                         <button type="submit" id="submit-btn" class="w-full upload-btn py-4 rounded-2xl text-lg shadow-lg">
                             ✨ Upload Product
                         </button>
+                        <p id="upload-status" class="status-message hidden mt-4" role="status" aria-live="polite"></p>
                     </form>
                 </div>
             </div>
@@ -474,10 +492,18 @@
         let selectedImageFiles = [];
         let existingImages = [];
 
+        function getUploadSuccessMessage(productName) {
+            const label = productName ? `"${productName}"` : 'Your product';
+            return `Congratulations! ${label} has been successfully uploaded to the jewelBazaari database and it is live on jewelBazaari.`;
+        }
+
         function setStatus(element, message, type = 'info') {
             element.textContent = message;
             element.classList.remove('hidden', 'status-success', 'status-error', 'status-info');
             element.classList.add(`status-${type}`);
+            if (type === 'success') {
+                element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
 
         function clearStatus(element) {
@@ -532,7 +558,7 @@
             }
         }
 
-        function resetProductForm() {
+        function resetProductForm({ keepStatus = false } = {}) {
             productForm.reset();
             editingProductId = null;
             selectedImageFiles = [];
@@ -540,7 +566,9 @@
             renderImagePreviews();
             editBanner.classList.remove('is-visible');
             submitBtn.textContent = '✨ Upload Product';
-            clearStatus(uploadStatus);
+            if (!keepStatus) {
+                clearStatus(uploadStatus);
+            }
         }
 
         function fillProductForm(product) {
@@ -823,7 +851,7 @@
 
             try {
                 setStatus(uploadStatus, selectedImageFiles.length
-                    ? 'Compressing and uploading photos to Cloudinary...'
+                    ? 'Saving your photos to jewelBazaari...'
                     : 'Saving product...', 'info');
 
                 const productData = collectProductPayload();
@@ -846,8 +874,8 @@
                             submitBtn.textContent = `Uploading photos (${completed}/${total})...`;
                         }
                     });
+                    resetProductForm({ keepStatus: true });
                     setStatus(uploadStatus, `"${saved.name}" was updated successfully.`, 'success');
-                    resetProductForm();
                     await loadVendorListings();
                     switchTab('listings');
                 } else {
@@ -861,8 +889,8 @@
                             submitBtn.textContent = `Uploading photos (${completed}/${total})...`;
                         }
                     });
-                    setStatus(uploadStatus, `"${saved.name}" uploaded successfully and is now live.`, 'success');
-                    resetProductForm();
+                    resetProductForm({ keepStatus: true });
+                    setStatus(uploadStatus, getUploadSuccessMessage(saved.name), 'success');
                     await loadVendorListings();
                 }
             } catch (error) {
@@ -871,7 +899,7 @@
                     const cleanupDetails = formatUploadedAssetsForCleanup(error.uploadedAssets);
                     setStatus(
                         uploadStatus,
-                        `${error.message} Cloudinary uploads completed and can be cleaned up later:\n${cleanupDetails}`,
+                        `${error.message} Your photos were uploaded but could not be saved to jewelBazaari. Please try again.\n${cleanupDetails}`,
                         'error'
                     );
                 } else {
