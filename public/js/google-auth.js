@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { shouldUseRedirectAuth } from './device-utils.js';
+import { shouldUseRedirectAuth, isIOSDevice } from './device-utils.js';
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -59,6 +59,10 @@ function hasAuthRedirectState() {
 }
 
 async function waitForRedirectUser(maxAttempts = 20, delayMs = 150) {
+    if (isIOSDevice()) {
+        maxAttempts = Math.max(maxAttempts, 45);
+        delayMs = Math.max(delayMs, 200);
+    }
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         if (auth.currentUser) {
             return auth.currentUser;

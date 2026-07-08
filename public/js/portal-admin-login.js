@@ -4,7 +4,7 @@ import {
     getAuthenticatedUser,
     consumeRedirectResult
 } from './google-auth.js';
-import { shouldUseRedirectAuth } from './device-utils.js';
+import { shouldUseRedirectAuth, isIOSDevice } from './device-utils.js';
 import { isAdminEmail } from './admin-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import {
@@ -24,6 +24,8 @@ let signInInFlight = false;
 let signInRedirectPending = false;
 let sessionRestoreComplete = false;
 let redirectRestoreInFlight = false;
+let adminSessionActive = false;
+let authNullLockTimer = null;
 
 function showLoginError(message) {
     if (!adminLoginError) {
@@ -68,13 +70,49 @@ function lockAdmin() {
     adminSection?.classList.remove('is-visible');
 }
 
+function clearAuthNullLockTimer() {
+    if (authNullLockTimer) {
+        window.clearTimeout(authNullLockTimer);
+        authNullLockTimer = null;
+    }
+}
+
+function scheduleLockOnAuthNull() {
+    if (!isIOSDevice()) {
+        adminSessionActive = false;
+        lockAdmin();
+        return;
+    }
+
+    if (adminSessionActive) {
+        return;
+    }
+
+    clearAuthNullLockTimer();
+    authNullLockTimer = window.setTimeout(async () => {
+        authNullLockTimer = null;
+        await auth.authStateReady();
+        if (auth.currentUser && isAdminUser(auth.currentUser)) {
+            await handleSignedInUser(auth.currentUser, { showErrors: false });
+            return;
+        }
+        if (!auth.currentUser) {
+            adminSessionActive = false;
+            lockAdmin();
+        }
+    }, 1500);
+}
+
 async function handleSignedInUser(user, { showErrors = true } = {}) {
     if (!user) {
-        lockAdmin();
+        scheduleLockOnAuthNull();
         return false;
     }
 
+    clearAuthNullLockTimer();
+
     if (!isAdminUser(user)) {
+        adminSessionActive = false;
         await signOut(auth);
         lockAdmin();
         showLoginError(showErrors ? 'This Google account is not authorized for admin access.' : '');
@@ -82,6 +120,7 @@ async function handleSignedInUser(user, { showErrors = true } = {}) {
     }
 
     unlockAdmin();
+    adminSessionActive = true;
     return true;
 }
 
@@ -144,13 +183,13 @@ async function restoreAdminSession() {
     try {
         const redirectResult = await consumeRedirectResult();
         if (redirectResult?.user) {
-            return handleSignedInUser(redirectResult.user);
+            return handleSignedInUser(redirectResult.user, { showErrors: true });
         }
 
         const useRedirect = shouldUseRedirectAuth();
         const currentUser = await getAuthenticatedUser({
-            maxAttempts: useRedirect ? 15 : 8,
-            delayMs: useRedirect ? 175 : 150
+            maxAttempts: useRedirect ? (isIOSDevice() ? 40 : 15) : 8,
+            delayMs: useRedirect ? (isIOSDevice() ? 200 : 175) : 150
         });
         if (currentUser) {
             return handleSignedInUser(currentUser, { showErrors: false });
@@ -184,11 +223,22 @@ onAuthStateChanged(auth, (user) => {
         return;
     }
 
-    void handleSignedInUser(user, { showErrors: false });
+    if (user) {
+        void handleSignedInUser(user, { showErrors: false });
+        return;
+    }
+
+    scheduleLockOnAuthNull();
 });
 
-window.addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-        void restoreAdminSession();
+window.addEventListener('pageshow', () => {
+    void restoreAdminSession();
+});
+
+window.addEventListener('focus', () => {
+    if (!isIOSDevice() || adminSessionActive || signInInFlight || redirectRestoreInFlight) {
+        return;
     }
+
+    void restoreAdminSession();
 });
