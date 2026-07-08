@@ -1,3 +1,5 @@
+import { PORTAL_VERSION } from './portal-version.js';
+
 export {
     isIOSDevice,
     bindTapButton,
@@ -12,4 +14,4 @@ export {
     installPortalBootGuards,
     installVendorBootGuards,
     installAdminBootGuards
-} from './ios-vendor-login-fix.js';
+} from `./ios-vendor-login-fix.js?v=${PORTAL_VERSION}`;

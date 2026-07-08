@@ -1,1 +1,1 @@
-export const PORTAL_VERSION = '20260708j';
+export const PORTAL_VERSION = '20260708k';
