@@ -11,7 +11,7 @@ import {
 
 /**
  * Cloudinary upload service — client-side direct upload using an unsigned preset.
- * Firebase Authentication happens before callers invoke these functions.
+ * Vendor portal gates access with a password; Firestore saves use open product rules.
  * API Secret is never used; only cloud name + unsigned preset are required.
  */
 
@@ -167,17 +167,6 @@ export function mapUploadsToProductFields(uploads = []) {
     });
 
     return fields;
-}
-
-export function mapExistingImagesToProductFields(images = []) {
-    const clean = images
-        .map((item) => ({
-            url: String(item?.url || item || '').trim(),
-            publicId: String(item?.publicId || '').trim()
-        }))
-        .filter((item) => item.url);
-
-    return mapUploadsToProductFields(clean);
 }
 
 export { IMAGE_UPLOAD_LIMITS };

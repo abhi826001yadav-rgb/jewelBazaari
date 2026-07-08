@@ -153,14 +153,5 @@
     "robots": "noindex, nofollow",
     "type": "website",
     "breadcrumb": []
-  },
-  "registered-vendors.html": {
-    "title": "Vendor Dashboard | jewelBazaari",
-    "description": "Approved jewelBazaari vendor dashboard for managing jewellery listings.",
-    "path": "/registered-vendors.html",
-    "image": "/images/logo.png",
-    "robots": "noindex, nofollow",
-    "type": "website",
-    "breadcrumb": []
   }
 }

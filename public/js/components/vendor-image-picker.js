@@ -2,7 +2,7 @@ import { IMAGE_UPLOAD_LIMITS, validateImageFile } from '../utils/image-compress.
 
 /**
  * Reusable vendor image picker helpers for preview + validation.
- * Used by vendor-upload.html and registered-vendors.html.
+ * Used by vendor-upload.html.
  */
 
 export function createImagePickerState() {

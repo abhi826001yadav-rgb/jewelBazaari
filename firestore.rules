@@ -2,33 +2,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAdmin() {
-      return request.auth != null
-        && request.auth.token.email in [
-          'abhi826001yadav@gmail.com',
-          'priankasuresh97@gmail.com'
-        ];
-    }
-
-    function vendorData(vendorId) {
-      return get(/databases/$(database)/documents/vendors/$(vendorId)).data;
-    }
-
-    function isApprovedVendorOwner(vendorId) {
-      return request.auth != null
-        && vendorId is string
-        && vendorId.size() > 0
-        && exists(/databases/$(database)/documents/vendors/$(vendorId))
-        && vendorData(vendorId).uid == request.auth.uid
-        && vendorData(vendorId).status == 'approved';
-    }
-
     function hasValidProductFields(data) {
       return data.name is string && data.name.size() > 0
         && data.price is number && data.price > 0
         && data.category is string && data.category.size() > 0
         && data.imageUrl is string && data.imageUrl.size() > 0
         && data.vendorId is string && data.vendorId.size() > 0;
+    }
+
+    function isAddToCartOnlyUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['addToCartCount'])
+        && request.resource.data.addToCartCount == resource.data.addToCartCount + 1;
     }
 
     function currentEpochDay() {
@@ -52,73 +36,40 @@ service cloud.firestore {
         && queryId == data.email.lower() + '_' + string(data.epochDay);
     }
 
-    match /vendors/{vendorId} {
-      allow read: if true;
-      allow create: if request.auth != null
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.status == 'pending'
-        && !request.resource.data.keys().hasAny(['vendorPasswordHash']);
-      allow update: if isAdmin()
-        && !request.resource.data.keys().hasAny(['vendorPasswordHash']);
-      allow delete: if false;
-    }
-
-    match /vendorIds/{vendorId} {
-      allow get: if true;
-      allow list: if request.auth != null;
-      allow create: if request.auth != null
-        && request.resource.data.uid == request.auth.uid
-        && !exists(/databases/$(database)/documents/vendorIds/$(vendorId));
-      allow update: if isAdmin();
-      allow delete: if false;
-    }
-
-    match /vendorEmails/{email} {
-      allow get: if true;
-      allow create: if isAdmin()
-        || (request.auth != null
-          && request.resource.data.uid == request.auth.uid
-          && !exists(/databases/$(database)/documents/vendorEmails/$(email)));
-      allow update: if isAdmin();
-      allow delete: if false;
-    }
-
-    match /vendorCredentials/{vendorId} {
-      allow get: if true;
-      allow list: if request.auth != null
-        && exists(/databases/$(database)/documents/vendors/$(vendorId))
-        && get(/databases/$(database)/documents/vendors/$(vendorId)).data.uid == request.auth.uid;
-      allow create: if request.auth != null
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['uid', 'vendorPasswordHash'])
-        && request.resource.data.vendorPasswordHash is string
-        && request.resource.data.vendorPasswordHash.size() == 64
-        && !exists(/databases/$(database)/documents/vendorCredentials/$(vendorId));
-      allow update, delete: if false;
-    }
-
+    // Password-gated vendor + admin portals write from the browser without Firebase Auth.
     match /products/{productId} {
       allow read: if true;
-      allow create: if isAdmin()
-        || (hasValidProductFields(request.resource.data)
-          && isApprovedVendorOwner(request.resource.data.vendorId));
-      allow update: if isAdmin()
-        || (request.auth != null
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['addToCartCount'])
-          && request.resource.data.addToCartCount == resource.data.addToCartCount + 1)
-        || (hasValidProductFields(request.resource.data)
-          && resource.data.vendorId == request.resource.data.vendorId
-          && isApprovedVendorOwner(resource.data.vendorId));
-      allow delete: if isAdmin()
-        || isApprovedVendorOwner(resource.data.vendorId);
+      allow create: if hasValidProductFields(request.resource.data);
+      allow update: if hasValidProductFields(request.resource.data) || isAddToCartOnlyUpdate();
+      allow delete: if true;
     }
 
     match /customerQueries/{queryId} {
-      allow read: if isAdmin();
+      allow read: if true;
       allow create: if isValidCustomerQuery(request.resource.data, queryId)
         && !exists(/databases/$(database)/documents/customerQueries/$(queryId));
-      allow update: if isAdmin() && hasValidCustomerQueryFields(request.resource.data);
-      allow delete: if isAdmin();
+      allow update: if hasValidCustomerQueryFields(request.resource.data);
+      allow delete: if true;
+    }
+
+    // Legacy vendor-registration collections — no longer used by the app.
+    match /vendors/{vendorId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /vendorIds/{vendorId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /vendorEmails/{email} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /vendorCredentials/{vendorId} {
+      allow read, write: if false;
     }
   }
 }

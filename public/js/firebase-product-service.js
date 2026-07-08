@@ -230,6 +230,7 @@ function normalizeProductData(product) {
 }
 
 export async function addProduct(product) {
+    await ensureClientAuth();
     const productData = normalizeProductData(product);
 
     if (!productData.name) {
@@ -263,7 +264,16 @@ export async function addProduct(product) {
                 productCode: productId
             };
 
-            await setDoc(doc(db, PRODUCTS_COLLECTION, productId), finalData);
+            try {
+                await setDoc(doc(db, PRODUCTS_COLLECTION, productId), finalData);
+            } catch (error) {
+                if (error?.code === 'permission-denied') {
+                    throw new Error(
+                        'Firestore blocked the product save. Deploy the updated firestore.rules (run scripts/deploy-firestore-rules.bat after firebase login).'
+                    );
+                }
+                throw error;
+            }
             saved = true;
             return { id: productId, ...finalData };
         }
@@ -342,6 +352,7 @@ export async function getProductsByCategory(category) {
  * Uses Firestore `in` query for efficiency; falls back to client-side filter.
  */
 export async function updateProduct(productId, product) {
+    await ensureClientAuth();
     const id = String(productId || '').trim();
     if (!id) {
         throw new Error('Product ID is required.');
@@ -408,44 +419,8 @@ export async function updateProduct(productId, product) {
     return { id, productId: id, productCode: id, ...updateData };
 }
 
-export async function getProductsByVendorId(vendorId, shopName = '') {
-    const normalizedVendorId = String(vendorId || '').trim().toLowerCase();
-    const normalizedShopName = String(shopName || '').trim().toLowerCase();
-
-    if (!normalizedVendorId && !normalizedShopName) {
-        return [];
-    }
-
-    try {
-        if (normalizedVendorId) {
-            const q = query(
-                collection(db, PRODUCTS_COLLECTION),
-                where('vendorId', '==', normalizedVendorId)
-            );
-            const snapshot = await getDocs(q);
-            const products = sortByNewest(snapshot.docs.map(mapDoc));
-            if (products.length > 0) {
-                return products;
-            }
-        }
-    } catch (error) {
-        console.warn('Vendor product query failed, falling back to client filter.', error);
-    }
-
-    const all = await getAllProducts();
-    return all.filter((product) => {
-        const productVendorId = String(product.vendorId || '').trim().toLowerCase();
-        const productShopName = String(product.vendor || '').trim().toLowerCase();
-
-        if (normalizedVendorId && productVendorId) {
-            return productVendorId === normalizedVendorId;
-        }
-
-        return normalizedShopName && productShopName === normalizedShopName;
-    });
-}
-
 export async function deleteProduct(productId) {
+    await ensureClientAuth();
     const id = String(productId || '').trim();
     if (!id) {
         throw new Error('Product ID is required.');
@@ -463,8 +438,15 @@ export async function deleteProduct(productId) {
 }
 
 async function ensureClientAuth() {
-    if (auth.currentUser) return;
-    await signInAnonymously(auth);
+    if (auth.currentUser) {
+        return;
+    }
+
+    try {
+        await signInAnonymously(auth);
+    } catch (error) {
+        console.warn('Anonymous Firebase auth unavailable; relying on open Firestore product rules.', error);
+    }
 }
 
 export async function incrementAddToCartCount(productId) {

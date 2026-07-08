@@ -87,7 +87,7 @@ if (!indexCache.includes('stale-while-revalidate')) {
   fail('/index.html is missing stale-while-revalidate');
 }
 
-for (const privatePage of ['/admin.html', '/vendor-upload.html', '/registered-vendors.html']) {
+for (const privatePage of ['/admin.html', '/vendor-upload.html']) {
   const cache = resolveHeaders(headerRules, privatePage)['Cache-Control'] || '';
   if (!cache.includes('no-store')) {
     fail(`${privatePage} must use no-store`);

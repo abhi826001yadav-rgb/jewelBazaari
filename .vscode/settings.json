@@ -2,6 +2,9 @@
   "liveServer.settings.host": "localhost",
   "liveServer.settings.port": 5500,
   "liveServer.settings.root": "/public",
+  "liveServer.settings.middleware": {
+    "setup": "live-server.middleware.js"
+  },
   "liveServer.settings.ignoreFiles": [
     ".vscode",
     ".git",

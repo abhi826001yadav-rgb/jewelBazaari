@@ -40,19 +40,6 @@ export function bindTapButton(button, handler) {
     bindActivate(element, handler);
 }
 
-export function bindVendorLoginForm(submitFn) {
-    const form = document.getElementById('vendor-login-form');
-    if (!form || typeof submitFn !== 'function' || form.dataset.jbSubmitBound === '1') {
-        return;
-    }
-
-    form.dataset.jbSubmitBound = '1';
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        submitFn();
-    });
-}
-
 export function installIOSVendorLoginFixes() {
     if (!isIOSDevice()) {
         return;
@@ -97,7 +84,7 @@ export function installPortalBootGuards({
     readyGlobal = '__jbVendorLoginReady',
     showBootError = showVendorBootError,
     exposeGlobal = '__jbShowVendorBootError',
-    scriptPattern = /portal-vendor-login|vendor-service|firebase-config|google-auth/i,
+    scriptPattern = /portal-vendor-access|firebase-config/i,
     rejectionPattern = /auth|firebase|google|module|vendor/i,
     timeoutMessage = 'Login did not load. Hard-refresh the page and try again.',
     bootErrorMessage = 'Login failed to load.',
@@ -141,8 +128,8 @@ export function installAdminBootGuards(options = {}) {
         readyGlobal: '__jbAdminLoginReady',
         showBootError: showAdminBootError,
         exposeGlobal: '__jbShowAdminBootError',
-        scriptPattern: /admin-entry|portal-admin-login|google-auth|firebase-config|admin-dashboard/i,
-        rejectionPattern: /auth|firebase|google|module/i,
+        scriptPattern: /admin-entry|portal-admin-login|firebase-config|admin-dashboard/i,
+        rejectionPattern: /firebase|module/i,
         timeoutMessage: 'Admin login did not load. Hard-refresh the page and try again.',
         bootErrorMessage: 'Admin login failed to load.',
         ...options

@@ -7,6 +7,12 @@
 /index             /index.html    301
 /home/             /index.html    301
 
+# Private portals (extensionless local + production URLs)
+/admin             /admin.html    301
+/admin/            /admin.html    301
+/vendor-upload     /vendor-upload.html    301
+/vendor-upload/    /vendor-upload.html    301
+
 # Order tracking
 /track-order       /track-order.html    301
 /track-order/      /track-order.html    301

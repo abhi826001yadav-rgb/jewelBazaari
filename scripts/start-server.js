@@ -47,11 +47,19 @@ const server = http.createServer(async (req, res) => {
 
   if (urlPath === '/') urlPath = '/index.html';
 
-  const filePath = path.normalize(path.join(root, urlPath));
+  let filePath = path.normalize(path.join(root, urlPath));
   if (!filePath.startsWith(root)) {
     res.writeHead(403);
     res.end('Forbidden');
     return;
+  }
+
+  if (!path.extname(urlPath) && !fs.existsSync(filePath)) {
+    const htmlPath = path.normalize(path.join(root, `${urlPath}.html`));
+    if (htmlPath.startsWith(root) && fs.existsSync(htmlPath)) {
+      urlPath = `${urlPath}.html`;
+      filePath = htmlPath;
+    }
   }
 
   fs.readFile(filePath, (err, data) => {

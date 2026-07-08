@@ -74,7 +74,7 @@
     }
 
     function bindAll() {
-        // Admin Google OAuth only — vendor login uses form submit (email/password).
+        // Admin password login — vendor login uses form submit (email/password).
         bindTapTarget('login-btn', '__jbAdminSignIn');
     }
 

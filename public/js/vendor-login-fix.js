@@ -1,7 +1,6 @@
 export {
     isIOSDevice,
     bindTapButton,
-    bindVendorLoginForm,
     bindAdminLoginButton,
     installIOSVendorLoginFixes,
     installPortalIOSFixes,

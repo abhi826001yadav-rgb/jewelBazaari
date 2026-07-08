@@ -3,7 +3,5 @@ Allow: /
 Disallow: /admin
 Disallow: /admin.html
 Disallow: /vendor-upload.html
-Disallow: /registered-vendors
-Disallow: /registered-vendors.html
 
 Sitemap: https://jewelbazaari.com/sitemap.xml

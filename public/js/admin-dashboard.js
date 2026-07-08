@@ -1,21 +1,11 @@
 import { getAllProducts, updateProduct, deleteProduct } from './firebase-product-service.js';
         import { getProductImages } from './product-images.js';
         import {
-            getAllVendorRequests,
-            approveVendor,
-            syncAllVendorEmailIndexes,
-            rejectVendor,
-            discontinueVendor,
-            VENDOR_STATUS
-        } from './vendor-service.js';
-        import {
             getAllCustomerQueries,
             updateCustomerQuery,
             deleteCustomerQuery
         } from './customer-query-service.js';
-        import { auth } from './google-auth.js';
         import { escapeHtml, sanitizeImageUrl } from './security-utils.js';
-        import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
         const adminLogoutBtn = document.getElementById('admin-logout-btn');
         const loadingState = document.getElementById('loading-state');
@@ -32,15 +22,7 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         const searchInput = document.getElementById('admin-search');
         const noSearchResults = document.getElementById('no-search-results');
         const tabProducts = document.getElementById('tab-products');
-        const tabVendors = document.getElementById('tab-vendors');
         const productsView = document.getElementById('products-view');
-        const vendorsView = document.getElementById('vendors-view');
-        const vendorsLoading = document.getElementById('vendors-loading');
-        const vendorsError = document.getElementById('vendors-error');
-        const vendorsEmpty = document.getElementById('vendors-empty');
-        const vendorsTableContainer = document.getElementById('vendors-table-container');
-        const vendorsTableBody = document.getElementById('vendors-table-body');
-        const pendingVendorCount = document.getElementById('pending-vendor-count');
         const tabQueries = document.getElementById('tab-queries');
         const queriesView = document.getElementById('queries-view');
         const queriesLoading = document.getElementById('queries-loading');
@@ -55,12 +37,10 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         const queryModifyStatus = document.getElementById('query-modify-status');
         const queryModifyIdLabel = document.getElementById('query-modify-id-label');
         let productsCache = [];
-        let vendorsCache = [];
         let queriesCache = [];
 
         function loadAdminDashboard() {
             loadProducts();
-            loadVendorRequests();
             loadCustomerQueries();
         }
 
@@ -70,16 +50,12 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
 
         function switchAdminTab(tab) {
             tabProducts.classList.toggle('is-active', tab === 'products');
-            tabVendors.classList.toggle('is-active', tab === 'vendors');
             tabQueries.classList.toggle('is-active', tab === 'queries');
             tabProducts.setAttribute('aria-selected', tab === 'products' ? 'true' : 'false');
-            tabVendors.setAttribute('aria-selected', tab === 'vendors' ? 'true' : 'false');
             tabQueries.setAttribute('aria-selected', tab === 'queries' ? 'true' : 'false');
             productsView.classList.toggle('is-active', tab === 'products');
-            vendorsView.classList.toggle('is-active', tab === 'vendors');
             queriesView.classList.toggle('is-active', tab === 'queries');
             productsView.hidden = tab !== 'products';
-            vendorsView.hidden = tab !== 'vendors';
             queriesView.hidden = tab !== 'queries';
         }
 
@@ -177,157 +153,6 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         function closeQueryModifyModal() {
             queryModifyModal.classList.remove('is-open');
             queryModifyForm.reset();
-        }
-
-        function formatVendorStatus(status) {
-            const normalized = String(status || 'pending').toLowerCase();
-            const labels = {
-                pending: 'Pending',
-                approved: 'Approved',
-                rejected: 'Rejected',
-                discontinued: 'Discontinued'
-            };
-            const safeKey = labels[normalized] ? normalized : 'pending';
-            const label = labels[safeKey];
-            return `<span class="vendor-status-badge vendor-status-${escapeHtml(safeKey)}">${escapeHtml(label)}</span>`;
-        }
-
-        function renderVendorActions(vendor) {
-            const status = vendor.status || VENDOR_STATUS.PENDING;
-            const id = escapeHtml(vendor.id);
-            const actions = [];
-
-            if (status === VENDOR_STATUS.PENDING) {
-                actions.push(`<button type="button" class="vendor-approve-btn" data-approve-id="${id}">Approve</button>`);
-                actions.push(`<button type="button" class="vendor-reject-btn" data-reject-id="${id}">Reject</button>`);
-            } else if (status === VENDOR_STATUS.APPROVED) {
-                actions.push(`<button type="button" class="vendor-discontinue-btn" data-discontinue-id="${id}">Discontinue</button>`);
-            } else if (status === VENDOR_STATUS.REJECTED || status === VENDOR_STATUS.DISCONTINUED) {
-                actions.push(`<button type="button" class="vendor-approve-btn" data-approve-id="${id}">Approve</button>`);
-            }
-
-            if (!actions.length) {
-                return 'â€”';
-            }
-
-            return `<div class="vendor-actions">${actions.join('')}</div>`;
-        }
-
-        function renderVendorRow(vendor, index) {
-            return `
-                <tr>
-                    <td class="font-semibold text-[#4A0E17]">${index}</td>
-                    <td class="font-semibold text-gray-800">${escapeHtml(vendor.shopName || 'â€”')}</td>
-                    <td class="text-xs text-gray-700 whitespace-nowrap">${escapeHtml(vendor.vendorId || vendor.id || 'â€”')}</td>
-                    <td class="text-xs text-gray-600">${escapeHtml(vendor.email || 'â€”')}</td>
-                    <td>${formatVendorStatus(vendor.status)}</td>
-                    <td>${renderVendorActions(vendor)}</td>
-                </tr>
-            `;
-        }
-
-        function updatePendingVendorCount() {
-            const pendingCount = vendorsCache.filter((vendor) => vendor.status === VENDOR_STATUS.PENDING).length;
-            pendingVendorCount.textContent = pendingCount ? `(${pendingCount})` : '';
-        }
-
-        function bindVendorActionButtons() {
-            vendorsTableBody.querySelectorAll('[data-approve-id]').forEach((button) => {
-                button.addEventListener('click', async () => {
-                    const vendor = vendorsCache.find((item) => item.id === button.dataset.approveId);
-                    if (!vendor) return;
-
-                    const confirmed = window.confirm(
-                        `Approve "${vendor.shopName}" (${vendor.vendorId})?\n\nThey will be able to log in and upload jewellery.`
-                    );
-                    if (!confirmed) return;
-
-                    try {
-                        button.disabled = true;
-                        await approveVendor(vendor.id);
-                        await loadVendorRequests();
-                    } catch (error) {
-                        console.error('Approve vendor failed:', error);
-                        alert(error.message || 'Failed to approve vendor.');
-                        button.disabled = false;
-                    }
-                });
-            });
-
-            vendorsTableBody.querySelectorAll('[data-reject-id]').forEach((button) => {
-                button.addEventListener('click', async () => {
-                    const vendor = vendorsCache.find((item) => item.id === button.dataset.rejectId);
-                    if (!vendor) return;
-
-                    const confirmed = window.confirm(
-                        `Reject "${vendor.shopName}" (${vendor.vendorId})?\n\nThey will not be able to upload jewellery.`
-                    );
-                    if (!confirmed) return;
-
-                    try {
-                        button.disabled = true;
-                        await rejectVendor(vendor.id);
-                        await loadVendorRequests();
-                    } catch (error) {
-                        console.error('Reject vendor failed:', error);
-                        alert(error.message || 'Failed to reject vendor.');
-                        button.disabled = false;
-                    }
-                });
-            });
-
-            vendorsTableBody.querySelectorAll('[data-discontinue-id]').forEach((button) => {
-                button.addEventListener('click', async () => {
-                    const vendor = vendorsCache.find((item) => item.id === button.dataset.discontinueId);
-                    if (!vendor) return;
-
-                    const confirmed = window.confirm(
-                        `Discontinue "${vendor.shopName}" (${vendor.vendorId})?\n\nThey will immediately lose access to upload jewellery on jewelBazaari.`
-                    );
-                    if (!confirmed) return;
-
-                    try {
-                        button.disabled = true;
-                        await discontinueVendor(vendor.id);
-                        await loadVendorRequests();
-                    } catch (error) {
-                        console.error('Discontinue vendor failed:', error);
-                        alert(error.message || 'Failed to discontinue vendor.');
-                        button.disabled = false;
-                    }
-                });
-            });
-        }
-
-        async function loadVendorRequests() {
-            try {
-                vendorsLoading.classList.remove('hidden');
-                vendorsError.classList.add('hidden');
-                vendorsEmpty.classList.add('hidden');
-                vendorsTableContainer.classList.add('hidden');
-
-                const vendors = await getAllVendorRequests();
-                await syncAllVendorEmailIndexes(vendors).catch((error) => {
-                    console.warn('Vendor email index sync skipped:', error);
-                });
-                vendorsCache = vendors;
-                updatePendingVendorCount();
-                vendorsLoading.classList.add('hidden');
-
-                if (!vendors.length) {
-                    vendorsEmpty.classList.remove('hidden');
-                    return;
-                }
-
-                vendorsTableBody.innerHTML = vendors.map((vendor, index) => renderVendorRow(vendor, index + 1)).join('');
-                vendorsTableContainer.classList.remove('hidden');
-                bindVendorActionButtons();
-            } catch (error) {
-                console.error('Failed to load vendor requests:', error);
-                vendorsLoading.classList.add('hidden');
-                vendorsError.textContent = 'Failed to load vendor requests. Please refresh and try again.';
-                vendorsError.classList.remove('hidden');
-            }
         }
 
         function renderRow(product, index) {
@@ -549,10 +374,6 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         });
 
         tabProducts.addEventListener('click', () => switchAdminTab('products'));
-        tabVendors.addEventListener('click', () => {
-            switchAdminTab('vendors');
-            loadVendorRequests();
-        });
         tabQueries.addEventListener('click', () => {
             switchAdminTab('queries');
             loadCustomerQueries();
@@ -620,8 +441,7 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             }
         });
 
-        adminLogoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
+        adminLogoutBtn.addEventListener('click', () => {
             if (typeof window.__jbAdminLock === 'function') {
                 window.__jbAdminLock();
             }
