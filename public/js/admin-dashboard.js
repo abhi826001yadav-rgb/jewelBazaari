@@ -1,4 +1,4 @@
-import { getAllProducts, updateProduct, deleteProduct } from './firebase-product-service.js?v=20260707l';
+import { getAllProducts, updateProduct, deleteProduct } from './firebase-product-service.js';
         import { getProductImages } from './product-images.js';
         import {
             getAllVendorRequests,
@@ -7,13 +7,13 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             rejectVendor,
             discontinueVendor,
             VENDOR_STATUS
-        } from './vendor-service.js?v=20260707l';
+        } from './vendor-service.js';
         import {
             getAllCustomerQueries,
             updateCustomerQuery,
             deleteCustomerQuery
-        } from './customer-query-service.js?v=20260707l';
-        import { auth } from './firebase-config.js?v=20260707l';
+        } from './customer-query-service.js';
+        import { auth } from './google-auth.js';
         import { escapeHtml, sanitizeImageUrl } from './security-utils.js';
         import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 

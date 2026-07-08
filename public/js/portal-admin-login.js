@@ -1,12 +1,16 @@
-import { auth } from './firebase-config.js?v=20260708a';
-import { isAdminEmail } from './admin-config.js?v=20260708a';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260708a';
-import { signInWithGoogle, resolveGoogleRedirectResult, getAuthenticatedUser } from './google-auth.js?v=20260708a';
+import {
+    auth,
+    signInWithGoogle,
+    resolveGoogleRedirectResult,
+    getAuthenticatedUser
+} from './google-auth.js';
+import { isAdminEmail } from './admin-config.js';
+import { getAuthErrorMessage } from './auth-error-messages.js';
 import {
     installIOSAdminLoginFixes,
     markAdminLoginReady,
     showAdminBootError
-} from './ios-vendor-login-fix.js?v=20260708a';
+} from './ios-vendor-login-fix.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 window.__jbShowAdminBootError = showAdminBootError;
@@ -18,6 +22,7 @@ const adminLoginError = document.getElementById('admin-login-error');
 
 let signInInFlight = false;
 let sessionRestoreComplete = false;
+let redirectRestoreInFlight = false;
 
 function showLoginError(message) {
     if (!adminLoginError) {
@@ -112,8 +117,6 @@ async function signInAsAdmin() {
     showLoginError('Opening Google sign-in...');
 
     try {
-        await auth.authStateReady();
-
         const existing = auth.currentUser;
         if (existing && !isAdminUser(existing)) {
             await signOut(auth);
@@ -133,6 +136,8 @@ async function signInAsAdmin() {
 }
 
 async function restoreAdminSession() {
+    redirectRestoreInFlight = true;
+
     try {
         await auth.authStateReady();
 
@@ -154,6 +159,8 @@ async function restoreAdminSession() {
         lockAdmin();
         showLoginError(getAuthErrorMessage(error));
         return false;
+    } finally {
+        redirectRestoreInFlight = false;
     }
 }
 
@@ -191,7 +198,7 @@ await restoreAdminSession();
 sessionRestoreComplete = true;
 
 onAuthStateChanged(auth, (user) => {
-    if (!sessionRestoreComplete) {
+    if (!sessionRestoreComplete || redirectRestoreInFlight || signInInFlight) {
         return;
     }
 

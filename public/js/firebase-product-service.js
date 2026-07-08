@@ -1,4 +1,4 @@
-import { auth, db } from './firebase-config.js?v=20260707k';
+import { auth, db } from './firebase-config.js';
 import { signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { validateProductImageUrls } from './utils/image-url-utils.js';
 import {

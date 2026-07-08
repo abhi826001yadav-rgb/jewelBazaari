@@ -20,7 +20,7 @@
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css?v=20260707k" as="style">
-    <script src="js/portal-tap-bridge.js?v=20260707k" defer></script>
+    <script src="js/portal-tap-bridge.js?v=20260708b" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707k">
     <link rel="stylesheet" href="css/accessibility.css">
@@ -615,6 +615,9 @@
     </div>
 
     <script type="module">
+        import { consumeRedirectResult, auth } from './js/google-auth.js';
+        await consumeRedirectResult();
+
         import {
             createProductWithImages,
             ProductSaveError,
@@ -631,17 +634,16 @@
             getCurrentApprovedVendor,
             getRegistrationProgress,
             watchVendorAuth
-        } from './js/vendor-service.js?v=20260707k';
-        import { auth } from './js/firebase-config.js?v=20260707k';
+        } from './js/vendor-service.js';
         import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-        import { safeGetItem, safeSetItem } from './js/safe-storage.js?v=20260707k';
+        import { safeGetItem, safeSetItem } from './js/safe-storage.js';
         import {
             installIOSVendorLoginFixes,
             bindTapButton,
             bindVendorLoginButton,
             markVendorLoginReady,
             showVendorBootError
-        } from './js/ios-vendor-login-fix.js?v=20260707k';
+        } from './js/ios-vendor-login-fix.js';
 
         window.__jbShowVendorBootError = showVendorBootError;
 
@@ -677,6 +679,7 @@
         let currentVendor = null;
         const authCard = document.getElementById('auth-card');
         let authReady = false;
+        let googleSignInInFlight = false;
 
         function finishAuthLoading() {
             if (authReady) return;
@@ -794,8 +797,14 @@
         }
 
         async function handleGoogleSignIn(autoContinue = true) {
+            if (googleSignInInFlight) {
+                return;
+            }
+
             clearPanelStatus(googleAuthStatus);
             const signInBtn = document.getElementById('google-signin-btn');
+
+            googleSignInInFlight = true;
 
             try {
                 signInBtn.disabled = true;
@@ -812,6 +821,7 @@
                 console.error('Google sign-in error:', error);
                 setPanelStatus(googleAuthStatus, error.message || 'Google sign-in failed.', 'error');
             } finally {
+                googleSignInInFlight = false;
                 signInBtn.disabled = false;
             }
         }
@@ -867,8 +877,6 @@
             clearPanelStatus(vendorSetupStatus);
             showAuthPage('google');
         });
-
-        document.getElementById('google-signin-btn').addEventListener('click', () => handleGoogleSignIn(true));
 
         document.getElementById('go-page3-setup-btn').addEventListener('click', async () => {
             const continueBtn = document.getElementById('go-page3-setup-btn');
@@ -1158,28 +1166,40 @@
             }
         });
 
+        async function restoreVendorSession() {
+            const approvedVendor = await getCurrentApprovedVendor();
+            if (approvedVendor) {
+                finishAuthLoading();
+                showUploadPortal(approvedVendor);
+                return true;
+            }
+
+            const handledRedirect = await initVendorGoogleRedirect();
+            if (handledRedirect) {
+                finishAuthLoading();
+                return true;
+            }
+
+            showAuthPage('welcome');
+            await resumeRegistrationIfNeeded();
+            return false;
+        }
+
         watchVendorAuth(async () => {
             try {
-                const approvedVendor = await getCurrentApprovedVendor();
-                if (approvedVendor) {
-                    finishAuthLoading();
-                    showUploadPortal(approvedVendor);
-                    return;
-                }
-
-                const handledRedirect = await initVendorGoogleRedirect();
-                if (handledRedirect) {
-                    return;
-                }
-
-                showAuthPage('welcome');
-                await resumeRegistrationIfNeeded();
+                await restoreVendorSession();
             } catch (error) {
                 console.error('Session restore failed:', error);
                 showAuthPage('welcome');
             } finally {
                 finishAuthLoading();
                 markVendorLoginReady();
+            }
+        });
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                void restoreVendorSession();
             }
         });
     </script>

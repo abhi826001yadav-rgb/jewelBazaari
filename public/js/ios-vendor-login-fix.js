@@ -1,4 +1,4 @@
-import { isIOSDevice } from './device-utils.js?v=20260707k';
+import { isIOSDevice } from './device-utils.js';
 
 export { isIOSDevice };
 

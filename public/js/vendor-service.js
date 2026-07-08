@@ -1,11 +1,10 @@
-import { auth, db } from './firebase-config.js?v=20260707k';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707k';
-import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js?v=20260707k';
-import { isIOSDevice } from './device-utils.js?v=20260707k';
+import { auth, db } from './firebase-config.js';
+import { getAuthErrorMessage } from './auth-error-messages.js';
+import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js';
 import {
     signInWithGoogle as firebaseGoogleSignIn,
     resolveGoogleRedirectResult
-} from './google-auth.js?v=20260707k';
+} from './google-auth.js';
 import {
     EmailAuthProvider,
     signInWithEmailAndPassword,
@@ -298,11 +297,12 @@ export async function signInWithGoogle() {
 
 export async function resolveVendorGoogleRedirect() {
     const result = await resolveGoogleRedirectResult();
-    if (!result?.user) {
+    const user = result?.user || auth.currentUser;
+    if (!user) {
         return null;
     }
 
-    return buildGoogleSignInResult(result.user);
+    return buildGoogleSignInResult(user);
 }
 
 export async function getVendorProfileByEmail(email) {

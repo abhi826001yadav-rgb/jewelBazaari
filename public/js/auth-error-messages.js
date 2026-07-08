@@ -18,7 +18,9 @@ export function getAuthErrorMessage(error) {
         'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
         'auth/redirect-cancelled-by-user': 'Sign-in cancelled. Please try again.',
         'auth/redirect-operation-pending': 'Sign-in is already in progress. Please wait a moment and try again.',
-        'auth/internal-error': 'Google sign-in failed. Hard refresh (Ctrl+Shift+R), then confirm Firebase authorized domains include your Cloudflare URL, Google sign-in is enabled, and the Browser API key allows Identity Toolkit API.'
+        'auth/internal-error': 'Google sign-in failed. Hard refresh (Ctrl+Shift+R), then confirm Firebase authorized domains include your Cloudflare URL, Google sign-in is enabled, and the Browser API key allows Identity Toolkit API.',
+        'auth/operation-not-supported-in-this-environment': 'Google sign-in is not supported in this browser view. Open the page in Safari or Chrome instead of an in-app browser.',
+        'auth/network-request-failed': 'Network error during sign-in. Check your connection and try again.'
     };
 
     return messages[code] || error?.message || 'Something went wrong. Please try again.';

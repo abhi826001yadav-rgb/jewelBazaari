@@ -1,6 +1,5 @@
-import { auth } from './firebase-config.js?v=20260707l';
-import { getAuthErrorMessage } from './auth-error-messages.js?v=20260707l';
-import { isMobileAuthEnvironment } from './device-utils.js?v=20260707l';
+import { auth } from './firebase-config.js';
+import { shouldUseRedirectAuth } from './device-utils.js';
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -11,25 +10,64 @@ import {
     browserSessionPersistence
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
+export { auth };
+
 const POPUP_FALLBACK_CODES = new Set([
     'auth/popup-blocked',
     'auth/popup-closed-by-user',
-    'auth/cancelled-popup-request'
+    'auth/cancelled-popup-request',
+    'auth/operation-not-supported-in-this-environment'
 ]);
 
-async function ensureAuthPersistence() {
-    await auth.authStateReady();
-
+const persistencePromise = (async () => {
     try {
+        await auth.authStateReady();
         await setPersistence(auth, browserLocalPersistence);
-    } catch (error) {
+    } catch {
         try {
             await setPersistence(auth, browserSessionPersistence);
         } catch {
-            // Firebase will fall back automatically.
+            // Firebase selects the best available persistence automatically.
         }
     }
+})();
+
+async function waitForRedirectUser(maxAttempts = 12, delayMs = 125) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (auth.currentUser) {
+            return auth.currentUser;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+
+    return auth.currentUser;
 }
+
+async function resolveRedirectResultInternal() {
+    await auth.authStateReady();
+
+    let result = null;
+
+    try {
+        result = await getRedirectResult(auth);
+    } catch (error) {
+        console.warn('Google redirect result could not be restored:', error);
+    }
+
+    const user = result?.user || await waitForRedirectUser();
+    if (!user) {
+        return null;
+    }
+
+    if (result?.user) {
+        return result;
+    }
+
+    return { user, providerId: 'google.com' };
+}
+
+const redirectResultPromise = resolveRedirectResultInternal();
 
 export function createGoogleProvider(options = {}) {
     const provider = new GoogleAuthProvider();
@@ -40,12 +78,16 @@ export function createGoogleProvider(options = {}) {
 export async function signInWithGoogle(options = {}) {
     const forceRedirect = options.forceRedirect === true;
     const provider = createGoogleProvider(options);
-    await ensureAuthPersistence();
+    const useRedirect = forceRedirect || shouldUseRedirectAuth();
 
-    if (forceRedirect || isMobileAuthEnvironment()) {
+    if (useRedirect) {
+        // Safari/iOS: do not await async work before redirect — preserves user gesture.
+        void persistencePromise;
         await signInWithRedirect(auth, provider);
         return null;
     }
+
+    await persistencePromise;
 
     try {
         return await signInWithPopup(auth, provider);
@@ -57,11 +99,6 @@ export async function signInWithGoogle(options = {}) {
         throw error;
     }
 }
-
-const redirectResultPromise = getRedirectResult(auth).catch((error) => {
-    console.warn('Google redirect result could not be restored:', error);
-    return null;
-});
 
 export function consumeRedirectResult() {
     return redirectResultPromise;

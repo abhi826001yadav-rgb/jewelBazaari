@@ -1,5 +1,5 @@
-import { consumeRedirectResult } from './google-auth.js?v=20260708a';
+import { consumeRedirectResult } from './google-auth.js';
 
 await consumeRedirectResult();
-await import('./portal-admin-login.js?v=20260708a');
-await import('./admin-dashboard.js?v=20260708a');
+await import('./portal-admin-login.js');
+await import('./admin-dashboard.js');
