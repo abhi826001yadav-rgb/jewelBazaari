@@ -1,5 +1,5 @@
 (function () {
-    var PORTAL_VERSION = '20260708n';
+    var PORTAL_VERSION = '20260708p';
 
     // Mirrors isIOSDevice() in device-utils.js — kept inline because this script
     // must load before ES modules to preserve mobile tap/gesture handling.

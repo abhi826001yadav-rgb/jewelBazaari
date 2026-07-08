@@ -345,10 +345,14 @@ textarea {
 }
 
 /* Admin only inside More menu — hide stray/cached copies elsewhere */
+.jb-header-nav a[href="/admin"],
 .jb-header-nav a[href="admin.html"],
 .jb-header-nav a[aria-label="Admin"],
+.jb-mobile-submenu:not(.jb-more-submenu) a[href="/admin"],
 .jb-mobile-submenu:not(.jb-more-submenu) a[href="admin.html"],
+.jb-nav-dropdown:not(.jb-more-dropdown) a[href="/admin"],
 .jb-nav-dropdown:not(.jb-more-dropdown) a[href="admin.html"],
+a[href="/admin"]:not(.jb-more-admin-link),
 a[href="admin.html"]:not(.jb-more-admin-link) {
     display: none !important;
 }

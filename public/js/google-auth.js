@@ -48,7 +48,21 @@ export function ensureAuthPersistence() {
     return persistencePromise;
 }
 
-function hasAuthRedirectState() {
+export function normalizeAuthRedirectPath() {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    const { pathname, search, hash } = window.location;
+    if (!/\.html$/i.test(pathname)) {
+        return;
+    }
+
+    const normalizedPath = pathname.replace(/\.html$/i, '');
+    window.history.replaceState(null, '', `${normalizedPath}${search}${hash}`);
+}
+
+export function hasAuthRedirectState() {
     if (typeof window === 'undefined') {
         return false;
     }
@@ -75,6 +89,7 @@ async function waitForRedirectUser(maxAttempts = 20, delayMs = 150) {
 }
 
 async function resolveRedirectResultInternal() {
+    normalizeAuthRedirectPath();
     let result = null;
 
     // CRITICAL (Safari/iOS): getRedirectResult must be the first auth operation on page load.
@@ -123,6 +138,7 @@ export async function signInWithGoogle(options = {}) {
 
     if (useRedirect) {
         // Safari/iOS: no async work before redirect — preserves the user gesture.
+        normalizeAuthRedirectPath();
         await signInWithRedirect(auth, provider);
         return { redirectInitiated: true };
     }
@@ -134,6 +150,7 @@ export async function signInWithGoogle(options = {}) {
         return await signInWithPopup(auth, provider);
     } catch (error) {
         if (POPUP_FALLBACK_CODES.has(error?.code)) {
+            normalizeAuthRedirectPath();
             await signInWithRedirect(auth, provider);
             return { redirectInitiated: true };
         }

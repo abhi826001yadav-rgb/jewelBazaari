@@ -2,7 +2,8 @@ import {
     auth,
     signInWithGoogle,
     getAuthenticatedUser,
-    consumeRedirectResult
+    consumeRedirectResult,
+    hasAuthRedirectState
 } from './google-auth.js';
 import { shouldUseRedirectAuth, isIOSDevice } from './device-utils.js';
 import { isAdminEmail } from './admin-config.js';
@@ -113,9 +114,12 @@ async function handleSignedInUser(user, { showErrors = true } = {}) {
 
     if (!isAdminUser(user)) {
         adminSessionActive = false;
+        const email = getUserEmail(user);
         await signOut(auth);
         lockAdmin();
-        showLoginError(showErrors ? 'This Google account is not authorized for admin access.' : '');
+        showLoginError(showErrors
+            ? `This Google account (${email || 'unknown'}) is not authorized for admin access.`
+            : '');
         return false;
     }
 
@@ -195,8 +199,14 @@ async function restoreAdminSession() {
             return handleSignedInUser(currentUser, { showErrors: false });
         }
 
-        lockAdmin();
-        showLoginError('');
+        if (!adminSessionActive) {
+            lockAdmin();
+            if (hasAuthRedirectState()) {
+                showLoginError('Sign-in could not finish. Open /admin (not /admin.html), disable Private Browsing, then try Google sign-in again.');
+            } else {
+                showLoginError('');
+            }
+        }
         return false;
     } catch (error) {
         console.error('Admin session restore failed:', error);
@@ -232,6 +242,9 @@ onAuthStateChanged(auth, (user) => {
 });
 
 window.addEventListener('pageshow', () => {
+    if (adminSessionActive) {
+        return;
+    }
     void restoreAdminSession();
 });
 
