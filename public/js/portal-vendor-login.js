@@ -2,6 +2,7 @@ import {
     restoreRememberedVendorEmail,
     submitVendorLogin as runVendorLogin
 } from './vendor-login-handler.js';
+import { ensureVendorLoginAuthReady } from './vendor-service.js';
 import {
     installIOSVendorLoginFixes,
     bindVendorLoginForm,
@@ -93,4 +94,5 @@ if (loginBtn) {
     loginBtn.textContent = 'Login to Dashboard';
 }
 
+await ensureVendorLoginAuthReady();
 markVendorLoginReady();

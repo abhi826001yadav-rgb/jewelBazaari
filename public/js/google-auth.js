@@ -123,7 +123,14 @@ async function resolveRedirectResultInternal() {
     return { user, providerId: 'google.com' };
 }
 
-const redirectResultPromise = resolveRedirectResultInternal();
+let redirectResultPromise = null;
+
+function ensureRedirectResultStarted() {
+    if (!redirectResultPromise) {
+        redirectResultPromise = resolveRedirectResultInternal();
+    }
+    return redirectResultPromise;
+}
 
 export function createGoogleProvider(options = {}) {
     const provider = new GoogleAuthProvider();
@@ -159,7 +166,7 @@ export async function signInWithGoogle(options = {}) {
 }
 
 export function consumeRedirectResult() {
-    return redirectResultPromise;
+    return ensureRedirectResultStarted();
 }
 
 export async function resolveGoogleRedirectResult() {

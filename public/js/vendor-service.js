@@ -4,8 +4,7 @@ import { getAuthErrorMessage } from './auth-error-messages.js';
 import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js';
 import {
     signInWithGoogle as firebaseGoogleSignIn,
-    resolveGoogleRedirectResult,
-    ensureAuthPersistence
+    resolveGoogleRedirectResult
 } from './google-auth.js';
 import {
     EmailAuthProvider,
@@ -225,6 +224,44 @@ export function getVendorSession() {
 
 export function clearVendorSession() {
     safeRemoveItem(sessionStorage, VENDOR_SESSION_KEY);
+}
+
+let vendorLoginAuthPreparePromise = null;
+
+/**
+ * Normal Safari keeps persisted Google/admin Firebase sessions that block vendor
+ * email/password sign-in. Private mode starts clean, which is why login works there.
+ */
+async function prepareVendorLoginAuth() {
+    if (vendorLoginAuthPreparePromise) {
+        return vendorLoginAuthPreparePromise;
+    }
+
+    vendorLoginAuthPreparePromise = (async () => {
+        await auth.authStateReady();
+        const user = auth.currentUser;
+        if (!user) {
+            return;
+        }
+
+        const session = getVendorSession();
+        if (!session?.vendorId) {
+            await signOut(auth).catch(() => {});
+            return;
+        }
+
+        const vendor = await getVendorByVendorId(session.vendorId);
+        if (!vendor || vendor.status !== VENDOR_STATUS.APPROVED || user.uid !== vendor.uid) {
+            clearVendorSession();
+            await signOut(auth).catch(() => {});
+        }
+    })();
+
+    return vendorLoginAuthPreparePromise;
+}
+
+export function ensureVendorLoginAuthReady() {
+    return prepareVendorLoginAuth();
 }
 
 export async function isVendorIdAvailable(vendorId) {
@@ -493,8 +530,17 @@ export async function loginVendor({ email, password, onStatus } = {}) {
     let userCredential;
     try {
         report('Signing in securely...');
-        await ensureAuthPersistence();
+        await prepareVendorLoginAuth();
         await auth.authStateReady();
+
+        if (auth.currentUser) {
+            const currentEmail = normalizeEmail(auth.currentUser.email || '');
+            if (currentEmail !== authEmail || auth.currentUser.uid !== vendor.uid) {
+                await signOut(auth);
+                await auth.authStateReady();
+            }
+        }
+
         userCredential = await signInWithEmailAndPassword(auth, authEmail, cleanPassword);
     } catch (error) {
         if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-login-credentials'].includes(error?.code)) {
@@ -515,7 +561,7 @@ export async function loginVendor({ email, password, onStatus } = {}) {
         }
 
         if (error?.code === 'auth/network-request-failed') {
-            throw new Error('Network error on this device. Check Wi‑Fi or mobile data, disable Private Browsing, then try again.');
+            throw new Error('Network error on this device. Check Wi‑Fi or mobile data, then try again.');
         }
 
         throw new Error(getAuthErrorMessage(error));
@@ -645,6 +691,7 @@ export async function discontinueVendor(vendorDocId) {
 }
 
 export async function getCurrentApprovedVendor() {
+    await prepareVendorLoginAuth();
     const session = getVendorSession();
     if (!session?.vendorId) {
         return null;
