@@ -3,7 +3,8 @@ import { getAuthErrorMessage } from './auth-error-messages.js';
 import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js';
 import {
     signInWithGoogle as firebaseGoogleSignIn,
-    resolveGoogleRedirectResult
+    resolveGoogleRedirectResult,
+    ensureAuthPersistence
 } from './google-auth.js';
 import {
     EmailAuthProvider,
@@ -487,6 +488,7 @@ export async function loginVendor({ email, password, onStatus } = {}) {
     let userCredential;
     try {
         report('Signing in securely...');
+        await ensureAuthPersistence();
         await auth.authStateReady();
         userCredential = await signInWithEmailAndPassword(auth, authEmail, cleanPassword);
     } catch (error) {

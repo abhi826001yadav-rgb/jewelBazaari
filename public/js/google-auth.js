@@ -19,20 +19,36 @@ const POPUP_FALLBACK_CODES = new Set([
     'auth/operation-not-supported-in-this-environment'
 ]);
 
-const persistencePromise = (async () => {
-    try {
-        await auth.authStateReady();
-        await setPersistence(auth, browserLocalPersistence);
-    } catch {
-        try {
-            await setPersistence(auth, browserSessionPersistence);
-        } catch {
-            // Firebase selects the best available persistence automatically.
-        }
-    }
-})();
+let persistenceConfigured = false;
+let persistencePromise = null;
 
-async function waitForRedirectUser(maxAttempts = 12, delayMs = 125) {
+/**
+ * Configure persistence only after redirect result is consumed.
+ * Calling setPersistence before getRedirectResult breaks Safari/iOS redirect completion.
+ */
+export function ensureAuthPersistence() {
+    if (persistenceConfigured) {
+        return persistencePromise || Promise.resolve();
+    }
+
+    persistencePromise = (async () => {
+        try {
+            await setPersistence(auth, browserLocalPersistence);
+        } catch {
+            try {
+                await setPersistence(auth, browserSessionPersistence);
+            } catch {
+                // initializeAuth() in firebase-config.js already selects the best fallback.
+            }
+        } finally {
+            persistenceConfigured = true;
+        }
+    })();
+
+    return persistencePromise;
+}
+
+async function waitForRedirectUser(maxAttempts = 20, delayMs = 150) {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         if (auth.currentUser) {
             return auth.currentUser;
@@ -45,15 +61,18 @@ async function waitForRedirectUser(maxAttempts = 12, delayMs = 125) {
 }
 
 async function resolveRedirectResultInternal() {
-    await auth.authStateReady();
-
     let result = null;
 
+    // CRITICAL (Safari/iOS): getRedirectResult must be the first auth operation on page load.
+    // Do not call authStateReady() or setPersistence() before this.
     try {
         result = await getRedirectResult(auth);
     } catch (error) {
         console.warn('Google redirect result could not be restored:', error);
     }
+
+    await ensureAuthPersistence();
+    await auth.authStateReady();
 
     const user = result?.user || await waitForRedirectUser();
     if (!user) {
@@ -81,13 +100,13 @@ export async function signInWithGoogle(options = {}) {
     const useRedirect = forceRedirect || shouldUseRedirectAuth();
 
     if (useRedirect) {
-        // Safari/iOS: do not await async work before redirect — preserves user gesture.
-        void persistencePromise;
+        // Safari/iOS: no async work before redirect — preserves the user gesture.
         await signInWithRedirect(auth, provider);
         return null;
     }
 
-    await persistencePromise;
+    await ensureAuthPersistence();
+    await auth.authStateReady();
 
     try {
         return await signInWithPopup(auth, provider);
@@ -112,6 +131,7 @@ export async function getAuthenticatedUser(options = {}) {
     const maxAttempts = Number(options.maxAttempts || 1);
     const delayMs = Number(options.delayMs || 150);
 
+    await consumeRedirectResult();
     await auth.authStateReady();
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {

@@ -1,14 +1,40 @@
+function getUserAgent() {
+    return navigator.userAgent || '';
+}
+
+/**
+ * iPhone, iPad, iPod, and iPadOS (desktop UA with touch).
+ */
 export function isIOSDevice() {
-    const ua = navigator.userAgent || '';
-    return /iPhone|iPad|iPod/i.test(ua)
-        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (typeof navigator === 'undefined') {
+        return false;
+    }
+
+    const uaData = navigator.userAgentData;
+    if (uaData?.mobile) {
+        const platform = String(uaData.platform || '').toLowerCase();
+        if (platform.includes('ios') || platform.includes('ipad')) {
+            return true;
+        }
+    }
+
+    const ua = getUserAgent();
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+        return true;
+    }
+
+    return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
 }
 
 /**
  * True Safari (WebKit), excluding Chromium/Firefox/Edge shells on iOS and desktop Chrome.
  */
 export function isSafariBrowser() {
-    const ua = navigator.userAgent || '';
+    if (typeof navigator === 'undefined') {
+        return false;
+    }
+
+    const ua = getUserAgent();
 
     if (/CriOS|FxiOS|EdgiOS|OPiOS|SamsungBrowser/i.test(ua)) {
         return false;
@@ -18,7 +44,15 @@ export function isSafariBrowser() {
         return false;
     }
 
-    return /Safari/i.test(ua);
+    if (/Safari/i.test(ua) && /AppleWebKit/i.test(ua)) {
+        return true;
+    }
+
+    if (typeof window !== 'undefined' && window.safari?.pushNotification) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -34,7 +68,7 @@ export function isMobileAuthEnvironment() {
         return true;
     }
 
-    const ua = navigator.userAgent || '';
+    const ua = getUserAgent();
     if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
         return true;
     }

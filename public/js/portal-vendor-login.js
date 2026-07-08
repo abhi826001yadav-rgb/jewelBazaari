@@ -1,3 +1,4 @@
+import { consumeRedirectResult } from './google-auth.js';
 import { loginVendor } from './vendor-service.js';
 import { safeGetItem, safeSetItem } from './safe-storage.js';
 import {
@@ -8,6 +9,8 @@ import {
 } from './ios-vendor-login-fix.js';
 
 window.__jbShowVendorBootError = showVendorBootError;
+
+await consumeRedirectResult();
 
 const vendorLoginStatus = document.getElementById('vendor-login-status');
 const loginVendorEmailInput = document.getElementById('login-vendor-email');
@@ -94,3 +97,9 @@ installIOSVendorLoginFixes();
 bindVendorLoginButton(submitVendorLogin);
 window.__jbVendorLoginSubmit = submitVendorLogin;
 markVendorLoginReady();
+
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        void consumeRedirectResult();
+    }
+});

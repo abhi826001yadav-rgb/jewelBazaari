@@ -2,8 +2,10 @@ import {
     auth,
     signInWithGoogle,
     resolveGoogleRedirectResult,
-    getAuthenticatedUser
+    getAuthenticatedUser,
+    consumeRedirectResult
 } from './google-auth.js';
+import { shouldUseRedirectAuth } from './device-utils.js';
 import { isAdminEmail } from './admin-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import {
@@ -139,14 +141,18 @@ async function restoreAdminSession() {
     redirectRestoreInFlight = true;
 
     try {
-        await auth.authStateReady();
+        await consumeRedirectResult();
 
         const redirectResult = await resolveGoogleRedirectResult();
         if (redirectResult?.user) {
             return handleSignedInUser(redirectResult.user);
         }
 
-        const currentUser = await getAuthenticatedUser({ maxAttempts: 8, delayMs: 150 });
+        const safariRestore = shouldUseRedirectAuth();
+        const currentUser = await getAuthenticatedUser({
+            maxAttempts: safariRestore ? 15 : 8,
+            delayMs: safariRestore ? 175 : 150
+        });
         if (currentUser) {
             return handleSignedInUser(currentUser, { showErrors: false });
         }
