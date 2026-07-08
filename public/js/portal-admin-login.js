@@ -120,7 +120,10 @@ async function signInAsAdmin() {
 
     try {
         const existing = auth.currentUser;
-        if (existing && !isAdminUser(existing)) {
+        const useRedirect = shouldUseRedirectAuth();
+
+        // Safari/iOS: any await before signInWithRedirect breaks the tap gesture chain.
+        if (existing && !isAdminUser(existing) && !useRedirect) {
             await signOut(auth);
         }
 
@@ -170,33 +173,11 @@ async function restoreAdminSession() {
     }
 }
 
-function bindLoginButton() {
-    if (!loginBtn || loginBtn.dataset.jbAdminBound === '1') {
-        return;
-    }
-
-    loginBtn.dataset.jbAdminBound = '1';
-
-    const onActivate = (event) => {
-        event.preventDefault();
-        signInAsAdmin();
-    };
-
-    const touchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    if (touchDevice) {
-        loginBtn.addEventListener('pointerup', onActivate);
-        return;
-    }
-
-    loginBtn.addEventListener('click', onActivate);
-}
-
 window.__jbAdminLock = lockAdmin;
 window.__jbAdminUnlock = unlockAdmin;
 window.__jbAdminIsUser = isAdminUser;
 
 installIOSAdminLoginFixes();
-bindLoginButton();
 window.__jbAdminSignIn = signInAsAdmin;
 markAdminLoginReady();
 

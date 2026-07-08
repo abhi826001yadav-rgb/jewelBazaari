@@ -20,7 +20,7 @@
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css?v=20260707k" as="style">
-    <script src="js/portal-tap-bridge.js?v=20260708c" defer></script>
+    <script src="js/portal-tap-bridge.js?v=20260708e" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707k">
     <link rel="stylesheet" href="css/accessibility.css">
@@ -499,7 +499,7 @@
                         </div>
                         <p class="auth-note">Login only works after admin approves your vendor application.</p>
                         <p id="vendor-login-status" class="status-message hidden" role="status"></p>
-                        <button type="button" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
+                        <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
                             Login to Vendor Portal
                         </button>
                     </form>
@@ -952,7 +952,14 @@
             loginVendorEmailInput.value = rememberedVendorEmail;
         }
 
+        let vendorLoginInFlight = false;
+
         async function submitVendorLogin() {
+            if (vendorLoginInFlight) {
+                return;
+            }
+
+            vendorLoginInFlight = true;
             clearPanelStatus(vendorLoginStatus);
 
             const email = loginVendorEmailInput.value.trim();
@@ -961,6 +968,7 @@
 
             if (!email || !password) {
                 setPanelStatus(vendorLoginStatus, 'Enter your registered email and vendor password.', 'error');
+                vendorLoginInFlight = false;
                 return;
             }
 
@@ -984,6 +992,7 @@
                     setPanelStatus(vendorLoginStatus, error.message || 'Login failed.', 'error');
                 }
             } finally {
+                vendorLoginInFlight = false;
                 loginBtn.disabled = false;
             }
         }

@@ -1,5 +1,11 @@
 (function () {
-    var PORTAL_VERSION = '20260708c';
+    var PORTAL_VERSION = '20260708e';
+
+    function isIOSDevice() {
+        var ua = navigator.userAgent || '';
+        return /iPhone|iPad|iPod/i.test(ua) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
 
     function showTapMessage(message) {
         var vendorStatus = document.getElementById('vendor-login-status');
@@ -26,10 +32,6 @@
     }
 
     function bindTapTarget(id, globalName) {
-        if (id === 'login-btn') {
-            return;
-        }
-
         var element = document.getElementById(id);
         if (!element || element.dataset.jbTapBound === '1') {
             return;
@@ -57,7 +59,7 @@
             invokeHandler(globalName);
         }
 
-        if (touchDevice) {
+        if (touchDevice && !isIOSDevice()) {
             element.addEventListener('pointerup', onActivate);
         } else {
             element.addEventListener('click', onActivate);
@@ -66,6 +68,7 @@
 
     function bindAll() {
         bindTapTarget('vendor-login-btn', '__jbVendorLoginSubmit');
+        bindTapTarget('login-btn', '__jbAdminSignIn');
     }
 
     if (document.readyState === 'loading') {

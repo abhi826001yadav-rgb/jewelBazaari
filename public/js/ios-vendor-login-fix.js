@@ -27,11 +27,8 @@ function bindActivate(element, handler) {
         }
     };
 
-    if (isIOSDevice()) {
-        element.addEventListener('pointerup', run);
-        return;
-    }
-
+    // iPhone Safari: pointerup alone is unreliable on form buttons; click is synthesized reliably
+    // when touch-action: manipulation is set (see portal login CSS).
     element.addEventListener('click', run);
 }
 
@@ -50,6 +47,10 @@ export function bindVendorLoginButton(submitFn) {
     const form = document.getElementById('vendor-login-form');
     if (!button || typeof submitFn !== 'function') {
         return;
+    }
+
+    if (button.dataset.jbTapBound !== '1') {
+        bindActivate(button, submitFn);
     }
 
     if (form && form.dataset.jbSubmitBound !== '1') {

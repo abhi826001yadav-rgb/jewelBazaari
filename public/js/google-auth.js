@@ -48,6 +48,16 @@ export function ensureAuthPersistence() {
     return persistencePromise;
 }
 
+function hasAuthRedirectState() {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    const search = window.location.search || '';
+    const hash = window.location.hash || '';
+    return /(?:^|[?&#])(?:state|code|apiKey)=/i.test(`${search}${hash}`);
+}
+
 async function waitForRedirectUser(maxAttempts = 20, delayMs = 150) {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         if (auth.currentUser) {
@@ -74,13 +84,21 @@ async function resolveRedirectResultInternal() {
     await ensureAuthPersistence();
     await auth.authStateReady();
 
-    const user = result?.user || await waitForRedirectUser();
-    if (!user) {
+    if (result?.user) {
+        return result;
+    }
+
+    if (auth.currentUser) {
+        return { user: auth.currentUser, providerId: 'google.com' };
+    }
+
+    if (!hasAuthRedirectState()) {
         return null;
     }
 
-    if (result?.user) {
-        return result;
+    const user = await waitForRedirectUser();
+    if (!user) {
+        return null;
     }
 
     return { user, providerId: 'google.com' };

@@ -10,8 +10,6 @@ import {
 
 window.__jbShowVendorBootError = showVendorBootError;
 
-await consumeRedirectResult();
-
 const vendorLoginStatus = document.getElementById('vendor-login-status');
 const loginVendorEmailInput = document.getElementById('login-vendor-email');
 const loginVendorPasswordInput = document.getElementById('login-vendor-password');
@@ -43,7 +41,15 @@ if (loginVendorEmailInput) {
     }
 }
 
+let vendorLoginInFlight = false;
+
 async function submitVendorLogin() {
+    if (vendorLoginInFlight) {
+        return;
+    }
+
+    vendorLoginInFlight = true;
+
     clearStatus();
 
     const email = loginVendorEmailInput?.value.trim() || '';
@@ -52,6 +58,7 @@ async function submitVendorLogin() {
 
     if (!email || !password) {
         setStatus('Enter your registered email and vendor password.', 'error');
+        vendorLoginInFlight = false;
         return;
     }
 
@@ -87,6 +94,7 @@ async function submitVendorLogin() {
             setStatus(error.message || 'Login failed.', 'error');
         }
     } finally {
+        vendorLoginInFlight = false;
         if (loginBtn) {
             loginBtn.disabled = false;
         }
@@ -97,6 +105,8 @@ installIOSVendorLoginFixes();
 bindVendorLoginButton(submitVendorLogin);
 window.__jbVendorLoginSubmit = submitVendorLogin;
 markVendorLoginReady();
+
+await consumeRedirectResult();
 
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
