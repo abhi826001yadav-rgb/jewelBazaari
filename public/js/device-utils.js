@@ -56,11 +56,27 @@ export function isSafariBrowser() {
 }
 
 /**
- * OAuth redirect is required on iOS and small-touch mobile (ITP, popup blocking, gesture timing).
- * Desktop browsers — including desktop Safari — use popup with automatic redirect fallback.
+ * Android Chrome handles OAuth popups reliably; redirect there risks double-tap races.
+ */
+export function isAndroidChrome() {
+    const ua = getUserAgent();
+    return /Android/i.test(ua) &&
+        /Chrome/i.test(ua) &&
+        !/Edg|OPR|SamsungBrowser|Firefox|FxiOS/i.test(ua);
+}
+
+/**
+ * OAuth redirect is required on iOS and other small-touch mobile (ITP, popup blocking).
+ * Desktop and Android Chrome use popup with automatic redirect fallback.
  */
 export function shouldUseRedirectAuth() {
-    return isIOSDevice() || isMobileAuthEnvironment();
+    if (isIOSDevice()) {
+        return true;
+    }
+    if (isAndroidChrome()) {
+        return false;
+    }
+    return isMobileAuthEnvironment();
 }
 
 export function isMobileAuthEnvironment() {

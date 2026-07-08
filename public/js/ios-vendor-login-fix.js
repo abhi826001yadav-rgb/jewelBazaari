@@ -150,5 +150,10 @@ export function installAdminBootGuards(options = {}) {
 }
 
 export function bindAdminLoginButton(handler) {
-    bindActivate(document.getElementById('login-btn'), handler);
+    const element = document.getElementById('login-btn');
+    // portal-tap-bridge.js owns login-btn activation (pointerup on Android, click elsewhere).
+    if (element?.id && PORTAL_BRIDGE_BUTTON_IDS.has(element.id)) {
+        return;
+    }
+    bindActivate(element, handler);
 }

@@ -21,6 +21,7 @@ const loginBtn = document.getElementById('login-btn');
 const adminLoginError = document.getElementById('admin-login-error');
 
 let signInInFlight = false;
+let signInRedirectPending = false;
 let sessionRestoreComplete = false;
 let redirectRestoreInFlight = false;
 
@@ -105,6 +106,7 @@ async function signInAsAdmin() {
     }
 
     signInInFlight = true;
+    signInRedirectPending = false;
     if (loginBtn) {
         loginBtn.disabled = true;
     }
@@ -115,6 +117,10 @@ async function signInAsAdmin() {
         await clearNonAdminSession(useRedirect);
 
         const result = await signInWithGoogle();
+        if (result?.redirectInitiated) {
+            signInRedirectPending = true;
+            return;
+        }
         if (result?.user) {
             await handleSignedInUser(result.user);
         }
@@ -122,6 +128,9 @@ async function signInAsAdmin() {
         console.error('Admin Google sign-in failed:', error);
         showLoginError(getAuthErrorMessage(error));
     } finally {
+        if (signInRedirectPending) {
+            return;
+        }
         signInInFlight = false;
         if (loginBtn) {
             loginBtn.disabled = false;

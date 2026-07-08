@@ -120,7 +120,7 @@ export async function signInWithGoogle(options = {}) {
     if (useRedirect) {
         // Safari/iOS: no async work before redirect — preserves the user gesture.
         await signInWithRedirect(auth, provider);
-        return null;
+        return { redirectInitiated: true };
     }
 
     await ensureAuthPersistence();
@@ -131,7 +131,7 @@ export async function signInWithGoogle(options = {}) {
     } catch (error) {
         if (POPUP_FALLBACK_CODES.has(error?.code)) {
             await signInWithRedirect(auth, provider);
-            return null;
+            return { redirectInitiated: true };
         }
         throw error;
     }

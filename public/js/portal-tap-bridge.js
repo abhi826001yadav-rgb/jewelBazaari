@@ -1,5 +1,5 @@
 (function () {
-    var PORTAL_VERSION = '20260708g';
+    var PORTAL_VERSION = '20260708h';
 
     // Mirrors isIOSDevice() in device-utils.js — kept inline because this script
     // must load before ES modules to preserve mobile tap/gesture handling.
@@ -62,7 +62,12 @@
         }
 
         if (touchDevice && !isIOSDevice()) {
+            // Android: pointerup only — a follow-up click would fire signIn twice (auth/argument-error).
             element.addEventListener('pointerup', onActivate);
+            element.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            });
         } else {
             element.addEventListener('click', onActivate);
         }
