@@ -1,6 +1,5 @@
-import { PORTAL_VERSION } from './portal-version.js';
-import { loginVendor } from `./vendor-service.js?v=${PORTAL_VERSION}`;
-import { safeGetItem, safeSetItem } from `./safe-storage.js?v=${PORTAL_VERSION}`;
+import { loginVendor } from './vendor-service.js';
+import { safeGetItem, safeSetItem } from './safe-storage.js';
 
 export function restoreRememberedVendorEmail(input) {
     if (!input) {

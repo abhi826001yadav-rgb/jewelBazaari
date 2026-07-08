@@ -1,14 +1,13 @@
-import { PORTAL_VERSION } from './portal-version.js';
 import {
     restoreRememberedVendorEmail,
     submitVendorLogin as runVendorLogin
-} from `./vendor-login-handler.js?v=${PORTAL_VERSION}`;
+} from './vendor-login-handler.js';
 import {
     installIOSVendorLoginFixes,
     bindVendorLoginForm,
     markVendorLoginReady,
     installVendorBootGuards
-} from `./vendor-login-fix.js?v=${PORTAL_VERSION}`;
+} from './vendor-login-fix.js';
 
 const vendorLoginStatus = document.getElementById('vendor-login-status');
 const loginVendorEmailInput = document.getElementById('login-vendor-email');
