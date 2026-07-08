@@ -12,7 +12,7 @@ import {
     markAdminLoginReady,
     installAdminBootGuards,
     bindAdminLoginButton
-} from './ios-vendor-login-fix.js';
+} from './vendor-login-fix.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const passwordSection = document.getElementById('password-section');

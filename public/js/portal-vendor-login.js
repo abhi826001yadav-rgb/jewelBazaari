@@ -7,7 +7,7 @@ import {
     bindVendorLoginForm,
     markVendorLoginReady,
     installVendorBootGuards
-} from './ios-vendor-login-fix.js';
+} from './vendor-login-fix.js';
 
 const vendorLoginStatus = document.getElementById('vendor-login-status');
 const loginVendorEmailInput = document.getElementById('login-vendor-email');

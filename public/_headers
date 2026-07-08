@@ -49,6 +49,9 @@
 /js/ios-vendor-login-fix.js
   Cache-Control: public, max-age=0, must-revalidate
 
+/js/vendor-login-fix.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 /js/vendor-login-handler.js
   Cache-Control: public, max-age=0, must-revalidate
 
