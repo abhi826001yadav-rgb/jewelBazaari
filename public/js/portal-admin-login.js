@@ -1,7 +1,6 @@
 import {
     auth,
     signInWithGoogle,
-    resolveGoogleRedirectResult,
     getAuthenticatedUser,
     consumeRedirectResult
 } from './google-auth.js';
@@ -9,13 +8,11 @@ import { shouldUseRedirectAuth } from './device-utils.js';
 import { isAdminEmail } from './admin-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import {
-    installIOSAdminLoginFixes,
+    installIOSVendorLoginFixes,
     markAdminLoginReady,
     showAdminBootError
 } from './ios-vendor-login-fix.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-
-window.__jbShowAdminBootError = showAdminBootError;
 
 const passwordSection = document.getElementById('password-section');
 const adminSection = document.getElementById('admin-section');
@@ -42,16 +39,11 @@ function showLoginError(message) {
 }
 
 function getUserEmail(user) {
-    if (!user) {
-        return '';
+    if (!user?.email) {
+        return user?.providerData?.find((provider) => provider.email)?.email || '';
     }
 
-    if (user.email) {
-        return user.email;
-    }
-
-    const providerEmail = user.providerData?.find((provider) => provider.email)?.email;
-    return providerEmail || '';
+    return user.email;
 }
 
 function isAdminUser(user) {
@@ -60,26 +52,18 @@ function isAdminUser(user) {
 
 function unlockAdmin() {
     document.body.classList.remove('admin-locked');
-    if (passwordSection) {
-        passwordSection.classList.add('is-hidden');
-        passwordSection.setAttribute('aria-hidden', 'true');
-    }
-    if (adminSection) {
-        adminSection.classList.add('is-visible');
-    }
+    passwordSection?.classList.add('is-hidden');
+    passwordSection?.setAttribute('aria-hidden', 'true');
+    adminSection?.classList.add('is-visible');
     showLoginError('');
     window.dispatchEvent(new CustomEvent('jb:admin-authenticated'));
 }
 
 function lockAdmin() {
     document.body.classList.add('admin-locked');
-    if (passwordSection) {
-        passwordSection.classList.remove('is-hidden');
-        passwordSection.setAttribute('aria-hidden', 'false');
-    }
-    if (adminSection) {
-        adminSection.classList.remove('is-visible');
-    }
+    passwordSection?.classList.remove('is-hidden');
+    passwordSection?.setAttribute('aria-hidden', 'false');
+    adminSection?.classList.remove('is-visible');
 }
 
 async function handleSignedInUser(user, { showErrors = true } = {}) {
@@ -91,11 +75,7 @@ async function handleSignedInUser(user, { showErrors = true } = {}) {
     if (!isAdminUser(user)) {
         await signOut(auth);
         lockAdmin();
-        if (showErrors) {
-            showLoginError('This Google account is not authorized for admin access.');
-        } else {
-            showLoginError('');
-        }
+        showLoginError(showErrors ? 'This Google account is not authorized for admin access.' : '');
         return false;
     }
 
@@ -103,19 +83,15 @@ async function handleSignedInUser(user, { showErrors = true } = {}) {
     return true;
 }
 
-function setLoginButtonDisabled(disabled) {
-    if (loginBtn) {
-        loginBtn.disabled = disabled;
-    }
-}
-
 async function signInAsAdmin() {
-    if (!loginBtn || signInInFlight) {
+    if (signInInFlight) {
         return;
     }
 
     signInInFlight = true;
-    setLoginButtonDisabled(true);
+    if (loginBtn) {
+        loginBtn.disabled = true;
+    }
     showLoginError('Opening Google sign-in...');
 
     try {
@@ -136,7 +112,9 @@ async function signInAsAdmin() {
         showLoginError(getAuthErrorMessage(error));
     } finally {
         signInInFlight = false;
-        setLoginButtonDisabled(false);
+        if (loginBtn) {
+            loginBtn.disabled = false;
+        }
     }
 }
 
@@ -144,17 +122,15 @@ async function restoreAdminSession() {
     redirectRestoreInFlight = true;
 
     try {
-        await consumeRedirectResult();
-
-        const redirectResult = await resolveGoogleRedirectResult();
+        const redirectResult = await consumeRedirectResult();
         if (redirectResult?.user) {
             return handleSignedInUser(redirectResult.user);
         }
 
-        const safariRestore = shouldUseRedirectAuth();
+        const useRedirect = shouldUseRedirectAuth();
         const currentUser = await getAuthenticatedUser({
-            maxAttempts: safariRestore ? 15 : 8,
-            delayMs: safariRestore ? 175 : 150
+            maxAttempts: useRedirect ? 15 : 8,
+            delayMs: useRedirect ? 175 : 150
         });
         if (currentUser) {
             return handleSignedInUser(currentUser, { showErrors: false });
@@ -173,12 +149,35 @@ async function restoreAdminSession() {
     }
 }
 
-window.__jbAdminLock = lockAdmin;
-window.__jbAdminUnlock = unlockAdmin;
-window.__jbAdminIsUser = isAdminUser;
+function installAdminBootGuards() {
+    window.__jbShowAdminBootError = showAdminBootError;
 
-installIOSAdminLoginFixes();
+    window.addEventListener('error', (event) => {
+        if (!/admin-entry|portal-admin-login|google-auth|firebase-config|admin-dashboard/i.test(event.filename || '')) {
+            return;
+        }
+        showAdminBootError(event.message || 'Admin login failed to load.');
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+        const message = event.reason?.message || '';
+        if (!message || !/auth|firebase|google|module/i.test(message)) {
+            return;
+        }
+        showAdminBootError(message);
+    });
+
+    window.setTimeout(() => {
+        if (!window.__jbAdminLoginReady) {
+            showAdminBootError('Admin login did not load. Hard-refresh the page and try again.');
+        }
+    }, 5000);
+}
+
+installIOSVendorLoginFixes();
+installAdminBootGuards();
 window.__jbAdminSignIn = signInAsAdmin;
+window.__jbAdminLock = lockAdmin;
 markAdminLoginReady();
 
 await restoreAdminSession();

@@ -30,12 +30,6 @@
             background: linear-gradient(135deg, #1F1A17 0%, #2C211F 100%);
             font-family: 'Inter', system-ui, sans-serif;
         }
-        #vendor-login-btn {
-            min-height: 44px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            cursor: pointer;
-        }
         #vendor-login-form input {
             font-size: 16px;
         }
@@ -43,29 +37,6 @@
             background: #FAF7F2;
             border: 2px solid #9B7E4B;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
-        }
-        .vendor-home-link-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            width: 100%;
-            min-height: 44px;
-            margin-top: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            border: 1px solid rgba(155, 126, 75, 0.45);
-            background: #fff;
-            color: #4A0E17;
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-decoration: none;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .vendor-home-link-btn:hover {
-            background: #FAF7F2;
-            color: #9B7E4B;
         }
         h2 {
             font-family: 'Playfair Display', Georgia, serif;
@@ -448,7 +419,7 @@
         </div>
     </div>
 
-    <script type="module" src="js/portal-vendor-login.js?v=20260708e"></script>
+    <script type="module" src="js/portal-vendor-login.js?v=20260708f"></script>
     <script type="module">
         import { getProductsByVendorId } from './js/firebase-product-service.js';
         import {
@@ -923,25 +894,6 @@
                 console.error('Session restore failed:', error);
             }
         })();
-    </script>
-    <script>
-        window.addEventListener('error', function (event) {
-            if (typeof window.__jbShowVendorBootError === 'function') {
-                window.__jbShowVendorBootError(event.message || 'Vendor login failed to load.');
-            }
-        });
-        window.addEventListener('unhandledrejection', function (event) {
-            if (typeof window.__jbShowVendorBootError === 'function') {
-                var reason = event.reason;
-                var message = reason && reason.message ? reason.message : 'Vendor login error.';
-                window.__jbShowVendorBootError(message);
-            }
-        });
-        setTimeout(function () {
-            if (!window.__jbVendorLoginReady && typeof window.__jbShowVendorBootError === 'function') {
-                window.__jbShowVendorBootError('Login did not load. Hard-refresh the page and try again.');
-            }
-        }, 5000);
     </script>
 </body>
 </html>

@@ -640,12 +640,10 @@
         import {
             installIOSVendorLoginFixes,
             bindTapButton,
-            bindVendorLoginButton,
+            bindVendorLoginForm,
             markVendorLoginReady,
-            showVendorBootError
+            installVendorBootGuards
         } from './js/ios-vendor-login-fix.js';
-
-        window.__jbShowVendorBootError = showVendorBootError;
 
         const authSection = document.getElementById('auth-section');
         const uploadSection = document.getElementById('upload-section');
@@ -944,11 +942,16 @@
         });
 
         installIOSVendorLoginFixes();
+        installVendorBootGuards({
+            scriptPattern: /vendor-upload|vendor-service|google-auth|firebase-config/i,
+            timeoutMessage: 'Login did not load. Force-close Safari, reopen this page, and try again.'
+        });
 
         const loginVendorEmailInput = document.getElementById('login-vendor-email');
         const loginVendorPasswordInput = document.getElementById('login-vendor-password');
+        const vendorLoginBtn = document.getElementById('vendor-login-btn');
         const rememberedVendorEmail = safeGetItem(localStorage, 'jb_last_vendor_email');
-        if (rememberedVendorEmail) {
+        if (rememberedVendorEmail && loginVendorEmailInput) {
             loginVendorEmailInput.value = rememberedVendorEmail;
         }
 
@@ -962,9 +965,8 @@
             vendorLoginInFlight = true;
             clearPanelStatus(vendorLoginStatus);
 
-            const email = loginVendorEmailInput.value.trim();
-            const password = loginVendorPasswordInput.value;
-            const loginBtn = document.getElementById('vendor-login-btn');
+            const email = loginVendorEmailInput?.value.trim() || '';
+            const password = loginVendorPasswordInput?.value || '';
 
             if (!email || !password) {
                 setPanelStatus(vendorLoginStatus, 'Enter your registered email and vendor password.', 'error');
@@ -973,12 +975,16 @@
             }
 
             try {
-                loginBtn.disabled = true;
+                if (vendorLoginBtn) {
+                    vendorLoginBtn.disabled = true;
+                }
+
                 const vendor = await loginVendor({
                     email,
                     password,
                     onStatus: (message) => setPanelStatus(vendorLoginStatus, message, 'info')
                 });
+
                 safeSetItem(localStorage, 'jb_last_vendor_email', vendor.email || email);
                 showUploadPortal(vendor);
             } catch (error) {
@@ -993,11 +999,13 @@
                 }
             } finally {
                 vendorLoginInFlight = false;
-                loginBtn.disabled = false;
+                if (vendorLoginBtn) {
+                    vendorLoginBtn.disabled = false;
+                }
             }
         }
 
-        bindVendorLoginButton(submitVendorLogin);
+        bindVendorLoginForm(submitVendorLogin);
         bindTapButton('google-signin-btn', () => handleGoogleSignIn(true));
         window.__jbVendorLoginSubmit = submitVendorLogin;
         window.__jbGoogleSignIn = () => handleGoogleSignIn(true);
@@ -1211,25 +1219,6 @@
                 void restoreVendorSession();
             }
         });
-    </script>
-    <script>
-        window.addEventListener('error', function (event) {
-            if (typeof window.__jbShowVendorBootError === 'function') {
-                window.__jbShowVendorBootError(event.message || 'Unexpected page error.');
-            }
-        });
-        window.addEventListener('unhandledrejection', function (event) {
-            if (typeof window.__jbShowVendorBootError === 'function') {
-                const reason = event.reason;
-                const message = reason && reason.message ? reason.message : 'Unexpected login error.';
-                window.__jbShowVendorBootError(message);
-            }
-        });
-        setTimeout(function () {
-            if (!window.__jbVendorLoginReady && typeof window.__jbShowVendorBootError === 'function') {
-                window.__jbShowVendorBootError('Login did not load. Force-close Safari, reopen this page, and try again.');
-            }
-        }, 5000);
     </script>
 </body>
 </html>

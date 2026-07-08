@@ -20,7 +20,7 @@
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css?v=20260707l" as="style">
-    <script src="js/portal-tap-bridge.js?v=20260708d" defer></script>
+    <script src="js/portal-tap-bridge.js?v=20260708e" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707l">
     <link rel="stylesheet" href="css/accessibility.css">
@@ -124,32 +124,6 @@
             display: block;
         }
 
-        .admin-home-btn {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            z-index: 10;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.35rem;
-            min-height: 44px;
-            min-width: 44px;
-            padding: 0.5rem 0.75rem;
-            border-radius: 9999px;
-            border: 1px solid rgba(155, 126, 75, 0.45);
-            background: #fff;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #4A0E17;
-            text-decoration: none;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .admin-home-btn:hover {
-            color: #9B7E4B;
-            background: #FAF7F2;
-        }
         #login-btn {
             min-height: 44px;
             touch-action: manipulation;
@@ -726,38 +700,6 @@
         </div>
     </div>
 
-    <script type="module" src="js/admin-entry.js?v=20260708d"></script>
-    <script>
-        function isPortalAuthScript(url) {
-            if (!url) {
-                return false;
-            }
-            return /admin-entry|portal-admin-login|google-auth|firebase-config|admin-dashboard|portal-tap-bridge/i.test(url);
-        }
-
-        window.addEventListener('error', function (event) {
-            if (!isPortalAuthScript(event.filename)) {
-                return;
-            }
-            if (typeof window.__jbShowAdminBootError === 'function') {
-                window.__jbShowAdminBootError(event.message || 'Admin login failed to load.');
-            }
-        });
-        window.addEventListener('unhandledrejection', function (event) {
-            var reason = event.reason;
-            var message = reason && reason.message ? reason.message : '';
-            if (!message || !/auth|firebase|google|module/i.test(message)) {
-                return;
-            }
-            if (typeof window.__jbShowAdminBootError === 'function') {
-                window.__jbShowAdminBootError(message);
-            }
-        });
-        setTimeout(function () {
-            if (!window.__jbAdminLoginReady && typeof window.__jbShowAdminBootError === 'function') {
-                window.__jbShowAdminBootError('Admin login did not load. Hard-refresh the page (Ctrl+Shift+R) and try again.');
-            }
-        }, 5000);
-    </script>
+    <script type="module" src="js/admin-entry.js?v=20260708f"></script>
 </body>
 </html>

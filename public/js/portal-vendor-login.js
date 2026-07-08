@@ -1,18 +1,16 @@
-import { consumeRedirectResult } from './google-auth.js';
 import { loginVendor } from './vendor-service.js';
 import { safeGetItem, safeSetItem } from './safe-storage.js';
 import {
     installIOSVendorLoginFixes,
-    bindVendorLoginButton,
+    bindVendorLoginForm,
     markVendorLoginReady,
-    showVendorBootError
+    installVendorBootGuards
 } from './ios-vendor-login-fix.js';
-
-window.__jbShowVendorBootError = showVendorBootError;
 
 const vendorLoginStatus = document.getElementById('vendor-login-status');
 const loginVendorEmailInput = document.getElementById('login-vendor-email');
 const loginVendorPasswordInput = document.getElementById('login-vendor-password');
+const loginBtn = document.getElementById('vendor-login-btn');
 
 function setStatus(message, type = 'info') {
     if (!vendorLoginStatus) {
@@ -49,12 +47,10 @@ async function submitVendorLogin() {
     }
 
     vendorLoginInFlight = true;
-
     clearStatus();
 
     const email = loginVendorEmailInput?.value.trim() || '';
     const password = loginVendorPasswordInput?.value || '';
-    const loginBtn = document.getElementById('vendor-login-btn');
 
     if (!email || !password) {
         setStatus('Enter your registered email and vendor password.', 'error');
@@ -102,14 +98,9 @@ async function submitVendorLogin() {
 }
 
 installIOSVendorLoginFixes();
-bindVendorLoginButton(submitVendorLogin);
+installVendorBootGuards({
+    scriptPattern: /portal-vendor-login|vendor-service|firebase-config/i
+});
+bindVendorLoginForm(submitVendorLogin);
 window.__jbVendorLoginSubmit = submitVendorLogin;
 markVendorLoginReady();
-
-await consumeRedirectResult();
-
-window.addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-        void consumeRedirectResult();
-    }
-});
