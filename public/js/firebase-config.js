@@ -5,7 +5,8 @@ import {
     indexedDBLocalPersistence,
     browserLocalPersistence,
     browserSessionPersistence,
-    inMemoryPersistence
+    inMemoryPersistence,
+    browserPopupRedirectResolver
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -38,7 +39,8 @@ function getFirebaseAuth(app) {
                 browserLocalPersistence,
                 browserSessionPersistence,
                 inMemoryPersistence
-            ]
+            ],
+            popupRedirectResolver: browserPopupRedirectResolver
         });
     } catch (error) {
         if (error?.code === 'auth/already-initialized') {

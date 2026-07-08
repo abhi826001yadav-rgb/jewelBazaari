@@ -22,7 +22,8 @@ export function getAuthErrorMessage(error) {
         'auth/network-request-failed': 'Network error during sign-in. Check your connection, disable Private Browsing, then try again.',
         'auth/missing-or-invalid-nonce': 'Sign-in session expired. Close this tab, reopen the page, and try Google sign-in again.',
         'auth/invalid-credential': 'Sign-in could not be completed. Check your credentials, hard refresh the page, and try again.',
-        'auth/account-exists-with-different-credential': 'This email is linked to a different sign-in method. Use the method you registered with.'
+        'auth/account-exists-with-different-credential': 'This email is linked to a different sign-in method. Use the method you registered with.',
+        'auth/argument-error': 'Google sign-in could not start. Hard refresh the page (Ctrl+Shift+R) and try again.'
     };
 
     if (code === 'auth/internal-error' && typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent || '')) {
