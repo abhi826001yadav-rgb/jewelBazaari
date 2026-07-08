@@ -20,7 +20,8 @@
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css?v=20260707k" as="style">
-    <script src="js/portal-tap-bridge.js?v=20260708h" defer></script>
+    <link rel="modulepreload" href="js/portal-vendor-login.js?v=20260708i">
+    <script src="js/portal-tap-bridge.js?v=20260708i" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707k">
     <link rel="stylesheet" href="css/accessibility.css">
@@ -274,8 +275,8 @@
                     </div>
                     <p class="text-xs text-gray-500">Only approved vendors can access this portal.</p>
                     <p id="vendor-login-status" class="status-message hidden" role="status"></p>
-                    <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 px-4 rounded-2xl font-semibold transition">
-                        Login to Dashboard
+                    <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 px-4 rounded-2xl font-semibold transition" disabled aria-busy="true">
+                        Loading login...
                     </button>
                 </form>
 
@@ -419,7 +420,7 @@
         </div>
     </div>
 
-    <script type="module" src="js/portal-vendor-login.js?v=20260708g"></script>
+    <script type="module" src="js/portal-vendor-login.js?v=20260708i"></script>
     <script type="module">
         import { getProductsByVendorId } from './js/firebase-product-service.js';
         import {

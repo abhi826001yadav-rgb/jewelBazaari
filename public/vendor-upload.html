@@ -20,7 +20,7 @@
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css?v=20260707k" as="style">
-    <script src="js/portal-tap-bridge.js?v=20260708h" defer></script>
+    <script src="js/portal-tap-bridge.js?v=20260708i" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707k">
     <link rel="stylesheet" href="css/accessibility.css">
@@ -499,8 +499,8 @@
                         </div>
                         <p class="auth-note">Login only works after admin approves your vendor application.</p>
                         <p id="vendor-login-status" class="status-message hidden" role="status"></p>
-                        <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition">
-                            Login to Vendor Portal
+                        <button type="submit" id="vendor-login-btn" class="w-full bg-[#4A0E17] hover:bg-black text-white py-3 rounded-2xl font-semibold transition" disabled aria-busy="true">
+                            Loading login...
                         </button>
                     </form>
                     <button type="button" id="back-to-welcome-from-login" class="auth-back-link">← Back to Page 1</button>
@@ -993,6 +993,13 @@
         bindTapButton('google-signin-btn', () => handleGoogleSignIn(true));
         window.__jbVendorLoginSubmit = submitVendorLogin;
         window.__jbGoogleSignIn = () => handleGoogleSignIn(true);
+
+        if (vendorLoginBtn) {
+            vendorLoginBtn.disabled = false;
+            vendorLoginBtn.removeAttribute('aria-busy');
+            vendorLoginBtn.textContent = 'Login to Vendor Portal';
+        }
+
         markVendorLoginReady();
 
         document.getElementById('logout-btn').addEventListener('click', async () => {

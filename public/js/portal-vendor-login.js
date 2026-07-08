@@ -36,6 +36,11 @@ function clearStatus() {
 
 restoreRememberedVendorEmail(loginVendorEmailInput);
 
+if (loginBtn) {
+    loginBtn.disabled = true;
+    loginBtn.setAttribute('aria-busy', 'true');
+}
+
 let vendorLoginInFlight = false;
 
 async function submitVendorLogin() {
@@ -81,4 +86,11 @@ installVendorBootGuards({
 });
 bindVendorLoginForm(submitVendorLogin);
 window.__jbVendorLoginSubmit = submitVendorLogin;
+
+if (loginBtn) {
+    loginBtn.disabled = false;
+    loginBtn.removeAttribute('aria-busy');
+    loginBtn.textContent = 'Login to Dashboard';
+}
+
 markVendorLoginReady();

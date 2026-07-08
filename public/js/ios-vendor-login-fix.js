@@ -30,7 +30,7 @@ function bindActivate(element, handler) {
     element.addEventListener('click', run);
 }
 
-const PORTAL_BRIDGE_BUTTON_IDS = new Set(['vendor-login-btn', 'login-btn']);
+const PORTAL_BRIDGE_BUTTON_IDS = new Set(['login-btn']);
 
 export function bindTapButton(button, handler) {
     const element = typeof button === 'string' ? document.getElementById(button) : button;

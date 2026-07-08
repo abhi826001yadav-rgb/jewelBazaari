@@ -24,7 +24,12 @@ export function formatVendorLoginError(error) {
         };
     }
 
-    return { message: error.message || 'Login failed.', type: 'error' };
+    const message = error.message || 'Login failed.';
+    if (/approved vendor registration|not authorized|not approved|under admin review/i.test(message)) {
+        return { message, type: 'info' };
+    }
+
+    return { message, type: 'error' };
 }
 
 export async function submitVendorLogin({

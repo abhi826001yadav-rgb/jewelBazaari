@@ -455,6 +455,10 @@ function assertVendorCanLogin(vendor) {
         pendingError.code = 'vendor/pending-approval';
         throw pendingError;
     }
+
+    if (vendor.status !== VENDOR_STATUS.APPROVED) {
+        throw new Error('Your vendor account is not approved yet. Contact jewelBazaari support if you believe this is a mistake.');
+    }
 }
 
 export async function loginVendor({ email, password, onStatus } = {}) {

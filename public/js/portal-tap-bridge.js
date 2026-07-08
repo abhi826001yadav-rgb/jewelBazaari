@@ -1,5 +1,5 @@
 (function () {
-    var PORTAL_VERSION = '20260708h';
+    var PORTAL_VERSION = '20260708i';
 
     // Mirrors isIOSDevice() in device-utils.js — kept inline because this script
     // must load before ES modules to preserve mobile tap/gesture handling.
@@ -74,7 +74,7 @@
     }
 
     function bindAll() {
-        bindTapTarget('vendor-login-btn', '__jbVendorLoginSubmit');
+        // Admin Google OAuth only — vendor login uses form submit (email/password).
         bindTapTarget('login-btn', '__jbAdminSignIn');
     }
 
