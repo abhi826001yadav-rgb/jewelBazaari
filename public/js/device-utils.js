@@ -56,11 +56,11 @@ export function isSafariBrowser() {
 }
 
 /**
- * OAuth redirect is required on mobile and Safari (ITP, popup blocking, gesture timing).
- * Desktop Chrome/Edge keep the faster popup flow.
+ * OAuth redirect is required on iOS and small-touch mobile (ITP, popup blocking, gesture timing).
+ * Desktop browsers — including desktop Safari — use popup with automatic redirect fallback.
  */
 export function shouldUseRedirectAuth() {
-    return isIOSDevice() || isSafariBrowser() || isMobileAuthEnvironment();
+    return isIOSDevice() || isMobileAuthEnvironment();
 }
 
 export function isMobileAuthEnvironment() {

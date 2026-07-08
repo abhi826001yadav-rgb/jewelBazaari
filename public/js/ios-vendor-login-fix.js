@@ -61,6 +61,9 @@ export function installIOSVendorLoginFixes() {
     document.documentElement.classList.add('jb-ios-device');
 }
 
+/** Alias — same iOS layout fixes apply to admin and vendor portals. */
+export const installPortalIOSFixes = installIOSVendorLoginFixes;
+
 export function markVendorLoginReady() {
     window.__jbVendorLoginReady = true;
 }
@@ -90,30 +93,62 @@ export function showAdminBootError(message) {
     status.classList.remove('hidden');
 }
 
-export function installVendorBootGuards({
+export function installPortalBootGuards({
+    readyGlobal = '__jbVendorLoginReady',
+    showBootError = showVendorBootError,
+    exposeGlobal = '__jbShowVendorBootError',
     scriptPattern = /portal-vendor-login|vendor-service|firebase-config|google-auth/i,
-    timeoutMessage = 'Login did not load. Hard-refresh the page and try again.'
+    rejectionPattern = /auth|firebase|google|module|vendor/i,
+    timeoutMessage = 'Login did not load. Hard-refresh the page and try again.',
+    bootErrorMessage = 'Login failed to load.',
+    timeoutMs = 5000
 } = {}) {
-    window.__jbShowVendorBootError = showVendorBootError;
+    window[exposeGlobal] = showBootError;
 
     window.addEventListener('error', (event) => {
         if (!scriptPattern.test(event.filename || '')) {
             return;
         }
-        showVendorBootError(event.message || 'Vendor login failed to load.');
+        showBootError(event.message || bootErrorMessage);
     });
 
     window.addEventListener('unhandledrejection', (event) => {
         const message = event.reason?.message || '';
-        if (!message || !/auth|firebase|google|module|vendor/i.test(message)) {
+        if (!message || !rejectionPattern.test(message)) {
             return;
         }
-        showVendorBootError(message);
+        showBootError(message);
     });
 
     window.setTimeout(() => {
-        if (!window.__jbVendorLoginReady) {
-            showVendorBootError(timeoutMessage);
+        if (!window[readyGlobal]) {
+            showBootError(timeoutMessage);
         }
-    }, 5000);
+    }, timeoutMs);
+}
+
+export function installVendorBootGuards(options = {}) {
+    return installPortalBootGuards({
+        readyGlobal: '__jbVendorLoginReady',
+        showBootError: showVendorBootError,
+        exposeGlobal: '__jbShowVendorBootError',
+        ...options
+    });
+}
+
+export function installAdminBootGuards(options = {}) {
+    return installPortalBootGuards({
+        readyGlobal: '__jbAdminLoginReady',
+        showBootError: showAdminBootError,
+        exposeGlobal: '__jbShowAdminBootError',
+        scriptPattern: /admin-entry|portal-admin-login|google-auth|firebase-config|admin-dashboard/i,
+        rejectionPattern: /auth|firebase|google|module/i,
+        timeoutMessage: 'Admin login did not load. Hard-refresh the page and try again.',
+        bootErrorMessage: 'Admin login failed to load.',
+        ...options
+    });
+}
+
+export function bindAdminLoginButton(handler) {
+    bindActivate(document.getElementById('login-btn'), handler);
 }

@@ -20,7 +20,7 @@
     <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preload" href="css/mobile-responsive.css?v=20260707k" as="style">
-    <script src="js/portal-tap-bridge.js?v=20260708e" defer></script>
+    <script src="js/portal-tap-bridge.js?v=20260708g" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/mobile-responsive.css?v=20260707k">
     <link rel="stylesheet" href="css/accessibility.css">
@@ -629,14 +629,16 @@
             signInWithGoogle,
             resolveVendorGoogleRedirect,
             completeVendorProfile,
-            loginVendor,
             logoutVendor,
             getCurrentApprovedVendor,
             getRegistrationProgress,
             watchVendorAuth
         } from './js/vendor-service.js';
         import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-        import { safeGetItem, safeSetItem } from './js/safe-storage.js';
+        import {
+            restoreRememberedVendorEmail,
+            submitVendorLogin as runVendorLogin
+        } from './js/vendor-login-handler.js';
         import {
             installIOSVendorLoginFixes,
             bindTapButton,
@@ -943,17 +945,15 @@
 
         installIOSVendorLoginFixes();
         installVendorBootGuards({
-            scriptPattern: /vendor-upload|vendor-service|google-auth|firebase-config/i,
+            scriptPattern: /vendor-upload|vendor-service|vendor-login-handler|google-auth|firebase-config/i,
             timeoutMessage: 'Login did not load. Force-close Safari, reopen this page, and try again.'
         });
 
         const loginVendorEmailInput = document.getElementById('login-vendor-email');
         const loginVendorPasswordInput = document.getElementById('login-vendor-password');
         const vendorLoginBtn = document.getElementById('vendor-login-btn');
-        const rememberedVendorEmail = safeGetItem(localStorage, 'jb_last_vendor_email');
-        if (rememberedVendorEmail && loginVendorEmailInput) {
-            loginVendorEmailInput.value = rememberedVendorEmail;
-        }
+
+        restoreRememberedVendorEmail(loginVendorEmailInput);
 
         let vendorLoginInFlight = false;
 
@@ -965,37 +965,21 @@
             vendorLoginInFlight = true;
             clearPanelStatus(vendorLoginStatus);
 
-            const email = loginVendorEmailInput?.value.trim() || '';
-            const password = loginVendorPasswordInput?.value || '';
-
-            if (!email || !password) {
-                setPanelStatus(vendorLoginStatus, 'Enter your registered email and vendor password.', 'error');
-                vendorLoginInFlight = false;
-                return;
-            }
-
             try {
                 if (vendorLoginBtn) {
                     vendorLoginBtn.disabled = true;
                 }
 
-                const vendor = await loginVendor({
-                    email,
-                    password,
-                    onStatus: (message) => setPanelStatus(vendorLoginStatus, message, 'info')
+                const result = await runVendorLogin({
+                    email: loginVendorEmailInput?.value,
+                    password: loginVendorPasswordInput?.value,
+                    emailInput: loginVendorEmailInput,
+                    onStatus: (message) => setPanelStatus(vendorLoginStatus, message, 'info'),
+                    onSuccess: (vendor) => showUploadPortal(vendor)
                 });
 
-                safeSetItem(localStorage, 'jb_last_vendor_email', vendor.email || email);
-                showUploadPortal(vendor);
-            } catch (error) {
-                console.error('Vendor login error:', error);
-
-                if (error.code === 'vendor/pending-approval') {
-                    setPanelStatus(vendorLoginStatus, error.message, 'info');
-                } else if (error.code === 'permission-denied') {
-                    setPanelStatus(vendorLoginStatus, 'Login blocked by database permissions. Ask admin to deploy the latest Firestore rules.', 'error');
-                } else {
-                    setPanelStatus(vendorLoginStatus, error.message || 'Login failed.', 'error');
+                if (!result.ok) {
+                    setPanelStatus(vendorLoginStatus, result.error.message, result.error.type);
                 }
             } finally {
                 vendorLoginInFlight = false;

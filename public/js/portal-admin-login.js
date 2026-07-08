@@ -8,9 +8,10 @@ import { shouldUseRedirectAuth } from './device-utils.js';
 import { isAdminEmail } from './admin-config.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import {
-    installIOSVendorLoginFixes,
+    installPortalIOSFixes,
     markAdminLoginReady,
-    showAdminBootError
+    installAdminBootGuards,
+    bindAdminLoginButton
 } from './ios-vendor-login-fix.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
@@ -83,6 +84,21 @@ async function handleSignedInUser(user, { showErrors = true } = {}) {
     return true;
 }
 
+async function clearNonAdminSession(useRedirect) {
+    const existing = auth.currentUser;
+    if (!existing || isAdminUser(existing)) {
+        return;
+    }
+
+    // Redirect flow: never await before signInWithRedirect (breaks iOS gesture chain).
+    if (useRedirect) {
+        void signOut(auth);
+        return;
+    }
+
+    await signOut(auth);
+}
+
 async function signInAsAdmin() {
     if (signInInFlight) {
         return;
@@ -95,13 +111,8 @@ async function signInAsAdmin() {
     showLoginError('Opening Google sign-in...');
 
     try {
-        const existing = auth.currentUser;
         const useRedirect = shouldUseRedirectAuth();
-
-        // Safari/iOS: any await before signInWithRedirect breaks the tap gesture chain.
-        if (existing && !isAdminUser(existing) && !useRedirect) {
-            await signOut(auth);
-        }
+        await clearNonAdminSession(useRedirect);
 
         const result = await signInWithGoogle();
         if (result?.user) {
@@ -149,35 +160,11 @@ async function restoreAdminSession() {
     }
 }
 
-function installAdminBootGuards() {
-    window.__jbShowAdminBootError = showAdminBootError;
-
-    window.addEventListener('error', (event) => {
-        if (!/admin-entry|portal-admin-login|google-auth|firebase-config|admin-dashboard/i.test(event.filename || '')) {
-            return;
-        }
-        showAdminBootError(event.message || 'Admin login failed to load.');
-    });
-
-    window.addEventListener('unhandledrejection', (event) => {
-        const message = event.reason?.message || '';
-        if (!message || !/auth|firebase|google|module/i.test(message)) {
-            return;
-        }
-        showAdminBootError(message);
-    });
-
-    window.setTimeout(() => {
-        if (!window.__jbAdminLoginReady) {
-            showAdminBootError('Admin login did not load. Hard-refresh the page and try again.');
-        }
-    }, 5000);
-}
-
-installIOSVendorLoginFixes();
+installPortalIOSFixes();
 installAdminBootGuards();
 window.__jbAdminSignIn = signInAsAdmin;
 window.__jbAdminLock = lockAdmin;
+bindAdminLoginButton(signInAsAdmin);
 markAdminLoginReady();
 
 await restoreAdminSession();

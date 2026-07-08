@@ -1,6 +1,8 @@
 (function () {
-    var PORTAL_VERSION = '20260708e';
+    var PORTAL_VERSION = '20260708g';
 
+    // Mirrors isIOSDevice() in device-utils.js — kept inline because this script
+    // must load before ES modules to preserve mobile tap/gesture handling.
     function isIOSDevice() {
         var ua = navigator.userAgent || '';
         return /iPhone|iPad|iPod/i.test(ua) ||

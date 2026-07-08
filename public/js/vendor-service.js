@@ -1,4 +1,5 @@
 import { auth, db } from './firebase-config.js';
+import { isIOSDevice } from './device-utils.js';
 import { getAuthErrorMessage } from './auth-error-messages.js';
 import { safeGetItem, safeSetItem, safeRemoveItem } from './safe-storage.js';
 import {
