@@ -4,15 +4,31 @@ import {
     installAdminBootGuards,
     bindAdminLoginButton
 } from './vendor-login-fix.js';
+import { auth } from './firebase-config.js';
+import {
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    signOut,
+    onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-const ADMIN_PASSWORD = '7338917927';
+/** Only these Google accounts may access the admin dashboard. */
+const ADMIN_EMAILS = new Set([
+    'abhishekyadav98.official@gmail.com',
+    'priankasureshupsc@gmail.com'
+]);
+
 const SESSION_KEY = 'jb_admin_authenticated';
 
 const passwordSection = document.getElementById('password-section');
 const adminSection = document.getElementById('admin-section');
 const loginBtn = document.getElementById('login-btn');
-const passwordInput = document.getElementById('admin-password');
 const adminLoginError = document.getElementById('admin-login-error');
+
+let adminUnlocked = false;
+let rejectingUnauthorized = false;
 
 function showLoginError(message) {
     if (!adminLoginError) {
@@ -29,12 +45,8 @@ function showLoginError(message) {
     adminLoginError.classList.remove('hidden');
 }
 
-function isSessionActive() {
-    try {
-        return sessionStorage.getItem(SESSION_KEY) === '1';
-    } catch {
-        return false;
-    }
+function isAllowedAdminEmail(email) {
+    return ADMIN_EMAILS.has(String(email || '').trim().toLowerCase());
 }
 
 function setSessionActive(active) {
@@ -50,6 +62,12 @@ function setSessionActive(active) {
 }
 
 function unlockAdmin() {
+    if (adminUnlocked) {
+        return;
+    }
+
+    adminUnlocked = true;
+    setSessionActive(true);
     document.body.classList.remove('admin-locked');
     passwordSection?.classList.add('is-hidden');
     passwordSection?.setAttribute('aria-hidden', 'true');
@@ -58,19 +76,68 @@ function unlockAdmin() {
     window.dispatchEvent(new CustomEvent('jb:admin-authenticated'));
 }
 
-function lockAdmin() {
+function applyLockedUi() {
+    adminUnlocked = false;
     setSessionActive(false);
     document.body.classList.add('admin-locked');
     passwordSection?.classList.remove('is-hidden');
     passwordSection?.setAttribute('aria-hidden', 'false');
     adminSection?.classList.remove('is-visible');
-    if (passwordInput) {
-        passwordInput.value = '';
+}
+
+async function lockAdmin() {
+    applyLockedUi();
+    try {
+        if (auth.currentUser) {
+            await signOut(auth);
+        }
+    } catch {
+        // Ignore sign-out failures; UI is already locked.
     }
 }
 
-function verifyPassword(password) {
-    return String(password || '').trim() === ADMIN_PASSWORD;
+function createGoogleProvider() {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    provider.addScope('email');
+    provider.addScope('profile');
+    return provider;
+}
+
+function mapAuthError(error) {
+    const code = error?.code || '';
+    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        return '';
+    }
+    if (code === 'auth/popup-blocked') {
+        return 'Pop-up blocked. Allow pop-ups for this site and try again.';
+    }
+    if (code === 'auth/network-request-failed') {
+        return 'Network error. Check your connection and try again.';
+    }
+    if (code === 'auth/unauthorized-domain') {
+        return 'This domain is not authorized for Google sign-in. Add it in Firebase Console.';
+    }
+    return error?.message || 'Google sign-in failed. Please try again.';
+}
+
+async function rejectUnauthorizedUser() {
+    if (rejectingUnauthorized) {
+        return;
+    }
+
+    rejectingUnauthorized = true;
+    applyLockedUi();
+    showLoginError('This Google account is not authorized for admin access.');
+    try {
+        if (auth.currentUser) {
+            await signOut(auth);
+        }
+    } catch {
+        // Ignore.
+    } finally {
+        rejectingUnauthorized = false;
+    }
 }
 
 async function signInAsAdmin() {
@@ -78,33 +145,37 @@ async function signInAsAdmin() {
         return;
     }
 
-    const password = passwordInput?.value || '';
-    if (!password) {
-        showLoginError('Please enter the admin password.');
-        passwordInput?.focus();
-        return;
-    }
+    showLoginError('');
 
     if (loginBtn) {
         loginBtn.disabled = true;
     }
 
-    if (verifyPassword(password)) {
-        setSessionActive(true);
-        if (passwordInput) {
-            passwordInput.value = '';
+    try {
+        // Prefer popup; fall back to redirect when the browser blocks pop-ups (common on mobile).
+        try {
+            await signInWithPopup(auth, createGoogleProvider());
+            // onAuthStateChanged handles allowlist + unlock.
+        } catch (popupError) {
+            const code = popupError?.code || '';
+            if (
+                code === 'auth/popup-blocked' ||
+                code === 'auth/operation-not-supported-in-this-environment'
+            ) {
+                await signInWithRedirect(auth, createGoogleProvider());
+                return;
+            }
+            throw popupError;
         }
-        unlockAdmin();
-    } else {
-        showLoginError('Incorrect password. Please try again.');
-        if (passwordInput) {
-            passwordInput.value = '';
-            passwordInput.focus();
+    } catch (error) {
+        const message = mapAuthError(error);
+        if (message) {
+            showLoginError(message);
         }
-    }
-
-    if (loginBtn) {
-        loginBtn.disabled = false;
+    } finally {
+        if (loginBtn) {
+            loginBtn.disabled = false;
+        }
     }
 }
 
@@ -115,15 +186,33 @@ window.__jbAdminLock = lockAdmin;
 bindAdminLoginButton(signInAsAdmin);
 markAdminLoginReady();
 
-passwordInput?.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        void signInAsAdmin();
-    }
-});
+// Clear any legacy password-based session; require a live Google admin session.
+applyLockedUi();
 
-if (isSessionActive()) {
-    unlockAdmin();
-} else {
-    lockAdmin();
-}
+void (async () => {
+    try {
+        await getRedirectResult(auth);
+        // Allowlist is enforced in onAuthStateChanged.
+    } catch (error) {
+        const message = mapAuthError(error);
+        if (message) {
+            showLoginError(message);
+        }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            if (!rejectingUnauthorized) {
+                applyLockedUi();
+            }
+            return;
+        }
+
+        if (isAllowedAdminEmail(user.email)) {
+            unlockAdmin();
+            return;
+        }
+
+        await rejectUnauthorizedUser();
+    });
+})();

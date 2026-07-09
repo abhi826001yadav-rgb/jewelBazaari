@@ -74,7 +74,7 @@
     }
 
     function bindAll() {
-        // Admin password login — vendor login uses form submit (email/password).
+        // Admin Google sign-in — vendor portal uses its own password button.
         bindTapTarget('login-btn', '__jbAdminSignIn');
     }
 
