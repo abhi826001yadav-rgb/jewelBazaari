@@ -239,6 +239,101 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
+        .jb-image-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.65rem;
+        }
+        .jb-image-upload-card {
+            position: relative;
+            border: 2px solid #E5E7EB;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: #fff;
+        }
+        .jb-image-upload-card img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+        }
+        .jb-image-upload-meta {
+            padding: 0.35rem 0.45rem;
+            font-size: 0.65rem;
+            color: #4A0E17;
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .jb-image-remove-btn {
+            position: absolute;
+            top: 0.35rem;
+            right: 0.35rem;
+            width: 1.6rem;
+            height: 1.6rem;
+            border: none;
+            border-radius: 9999px;
+            background: rgba(74, 14, 23, 0.88);
+            color: #fff;
+            font-size: 0.95rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .jb-image-picker-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 2.75rem;
+            border: 2px dashed #9B7E4B;
+            border-radius: 0.75rem;
+            background: #fff;
+            color: #4A0E17;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        .jb-image-picker-btn:hover:not(:disabled) {
+            background: #FFF8EE;
+        }
+        .jb-image-picker-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        .jb-clear-photos-btn {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid #b91c1c;
+            background: #fff;
+            color: #b91c1c;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .jb-clear-photos-btn:hover:not(:disabled) {
+            background: #fef2f2;
+        }
+        .jb-clear-photos-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .progress-track {
+            width: 100%;
+            height: 0.45rem;
+            background: #E5E7EB;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #9B7E4B, #4A0E17);
+            transition: width 0.2s ease;
+        }
         .admin-search-wrap {
             margin-bottom: 1.25rem;
         }
@@ -525,21 +620,19 @@
                     <label for="m-description" class="block text-xs font-semibold text-gray-600 mb-1">Description</label>
                     <textarea id="m-description" rows="3" class="modify-field resize-none"></textarea>
                 </div>
-                <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-[#4A0E17] leading-relaxed">
-                    <p class="font-semibold mb-1">Cloudinary image URL</p>
-                    <p>Paste the Cloudinary <strong>secure_url</strong> (https://res.cloudinary.com/...).</p>
-                </div>
                 <div>
-                    <label for="m-image-url-1" class="block text-xs font-semibold text-gray-600 mb-1">Image URL 1 *</label>
-                    <input type="url" id="m-image-url-1" required placeholder="https://res.cloudinary.com/..." class="modify-field">
-                </div>
-                <div>
-                    <label for="m-image-url-2" class="block text-xs font-semibold text-gray-600 mb-1">Image URL 2</label>
-                    <input type="url" id="m-image-url-2" placeholder="https://res.cloudinary.com/..." class="modify-field">
-                </div>
-                <div>
-                    <label for="m-image-url-3" class="block text-xs font-semibold text-gray-600 mb-1">Image URL 3</label>
-                    <input type="url" id="m-image-url-3" placeholder="https://res.cloudinary.com/..." class="modify-field">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Product photos * (up to 3)</label>
+                    <input type="file" id="m-images" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple class="sr-only">
+                    <button type="button" id="m-images-trigger" class="jb-image-picker-btn">📷 Choose up to 3 photos</button>
+                    <div id="m-image-preview-grid" class="jb-image-upload-grid mt-3 hidden" aria-live="polite"></div>
+                    <button type="button" id="m-clear-photos-btn" class="jb-clear-photos-btn hidden">Remove all photos</button>
+                    <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-[#4A0E17] leading-relaxed mt-3">
+                        <p class="font-semibold mb-1">Admin photo tools</p>
+                        <p>Upload up to <strong>3 photos</strong> (JPG/PNG). Remove any single photo with ×, or clear all. Saving updates the live product on the website.</p>
+                    </div>
+                    <div class="progress-track mt-3 hidden" id="m-image-upload-progress-track" aria-hidden="true">
+                        <div class="progress-fill" id="m-image-upload-progress-fill"></div>
+                    </div>
                 </div>
                 <div>
                     <label for="m-price" class="block text-xs font-semibold text-gray-600 mb-1">Price (â‚¹) *</label>
@@ -602,6 +695,6 @@
         </div>
     </div>
 
-    <script type="module" src="js/admin-entry.js?v=20260708s"></script>
+    <script type="module" src="js/admin-entry.js?v=20260709a"></script>
 </body>
 </html>

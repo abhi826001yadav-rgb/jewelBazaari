@@ -13,6 +13,7 @@ import {
     getDoc,
     updateDoc,
     deleteDoc,
+    deleteField,
     increment
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -376,6 +377,25 @@ export async function getProductsByCategory(category) {
  * Gemstones page: stoneType is set AND stoneType is not "diamond".
  * Uses Firestore `in` query for efficiency; falls back to client-side filter.
  */
+function applyImageSlotForUpdate(target, urlKey, publicIdKey, urlValue, publicIdValue) {
+    const cleanUrl = String(urlValue || '').trim();
+    const cleanPublicId = String(publicIdValue || '').trim();
+
+    if (cleanUrl) {
+        target[urlKey] = cleanUrl;
+        if (cleanPublicId) {
+            target[publicIdKey] = cleanPublicId;
+        } else {
+            target[publicIdKey] = deleteField();
+        }
+        return;
+    }
+
+    // Empty slot: remove from Firestore so deleted seller/admin photos leave the website.
+    target[urlKey] = deleteField();
+    target[publicIdKey] = deleteField();
+}
+
 export async function updateProduct(productId, product) {
     await ensureClientAuth();
     const id = String(productId || '').trim();
@@ -408,12 +428,9 @@ export async function updateProduct(productId, product) {
         stoneType,
         vendor: (product.vendor || 'Verified Vendor').trim(),
         vendorId: (product.vendorId || '').trim().toLowerCase(),
-        imageUrl
+        imageUrl,
+        updatedAt: serverTimestamp()
     };
-
-    if (product.imagePublicId) {
-        updateData.imagePublicId = String(product.imagePublicId).trim();
-    }
 
     if (!updateData.name) {
         throw new Error('Product name is required.');
@@ -428,20 +445,45 @@ export async function updateProduct(productId, product) {
         throw new Error('Valid price is required.');
     }
 
-    appendOptionalImageFields(updateData, {
-        imageUrl2,
-        imageUrl3,
-        imageUrl4,
-        imageUrl5,
-        imagePublicId: product.imagePublicId,
-        imagePublicId2: product.imagePublicId2,
-        imagePublicId3: product.imagePublicId3,
-        imagePublicId4: product.imagePublicId4,
-        imagePublicId5: product.imagePublicId5
-    });
+    // Primary image always required; public id may be optional for legacy products.
+    const primaryPublicId = String(product.imagePublicId || '').trim();
+    if (primaryPublicId) {
+        updateData.imagePublicId = primaryPublicId;
+    } else {
+        updateData.imagePublicId = deleteField();
+    }
+
+    applyImageSlotForUpdate(updateData, 'imageUrl2', 'imagePublicId2', imageUrl2, product.imagePublicId2);
+    applyImageSlotForUpdate(updateData, 'imageUrl3', 'imagePublicId3', imageUrl3, product.imagePublicId3);
+    applyImageSlotForUpdate(updateData, 'imageUrl4', 'imagePublicId4', imageUrl4, product.imagePublicId4);
+    applyImageSlotForUpdate(updateData, 'imageUrl5', 'imagePublicId5', imageUrl5, product.imagePublicId5);
 
     await updateDoc(doc(db, PRODUCTS_COLLECTION, id), updateData);
-    return { id, productId: id, productCode: id, ...updateData };
+
+    // Return a plain object (without deleteField sentinels) for local UI refresh.
+    return {
+        id,
+        productId: id,
+        productCode: id,
+        name: updateData.name,
+        description: updateData.description,
+        price: updateData.price,
+        category: updateData.category,
+        metalType: updateData.metalType,
+        stoneType: updateData.stoneType,
+        vendor: updateData.vendor,
+        vendorId: updateData.vendorId,
+        imageUrl,
+        imageUrl2: imageUrl2 || '',
+        imageUrl3: imageUrl3 || '',
+        imageUrl4: imageUrl4 || '',
+        imageUrl5: imageUrl5 || '',
+        imagePublicId: primaryPublicId,
+        imagePublicId2: String(product.imagePublicId2 || '').trim(),
+        imagePublicId3: String(product.imagePublicId3 || '').trim(),
+        imagePublicId4: String(product.imagePublicId4 || '').trim(),
+        imagePublicId5: String(product.imagePublicId5 || '').trim()
+    };
 }
 
 export async function deleteProduct(productId) {

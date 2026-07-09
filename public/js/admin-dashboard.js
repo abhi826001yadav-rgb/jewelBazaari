@@ -1,11 +1,25 @@
 import { getAllProducts, updateProduct, deleteProduct } from './firebase-product-service.js';
-        import { getProductImages } from './product-images.js';
+        import { getProductImageAssets, getProductImages } from './product-images.js';
         import {
             getAllCustomerQueries,
             updateCustomerQuery,
             deleteCustomerQuery
         } from './customer-query-service.js';
         import { escapeHtml, sanitizeImageUrl } from './security-utils.js';
+        import {
+            IMAGE_UPLOAD_LIMITS,
+            addFilesToPicker,
+            getTriggerLabel,
+            removeExistingImage,
+            removeSelectedFile,
+            resetImagePicker,
+            totalSelectedImages
+        } from './components/vendor-image-picker.js';
+        import {
+            mapUploadsToProductFields,
+            uploadImages
+        } from './services/cloudinary-upload-service.js';
+        import { formatImageSize } from './utils/image-compress.js';
 
         const adminLogoutBtn = document.getElementById('admin-logout-btn');
         const loadingState = document.getElementById('loading-state');
@@ -18,6 +32,12 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         const modifyCloseBtn = document.getElementById('modify-close-btn');
         const modifyStatus = document.getElementById('modify-status');
         const modifyProductIdLabel = document.getElementById('modify-product-id-label');
+        const modifyImageInput = document.getElementById('m-images');
+        const modifyImageTrigger = document.getElementById('m-images-trigger');
+        const modifyImagePreviewGrid = document.getElementById('m-image-preview-grid');
+        const modifyClearPhotosBtn = document.getElementById('m-clear-photos-btn');
+        const modifyImageProgressTrack = document.getElementById('m-image-upload-progress-track');
+        const modifyImageProgressFill = document.getElementById('m-image-upload-progress-fill');
         const searchWrap = document.getElementById('search-wrap');
         const searchInput = document.getElementById('admin-search');
         const noSearchResults = document.getElementById('no-search-results');
@@ -38,6 +58,16 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         const queryModifyIdLabel = document.getElementById('query-modify-id-label');
         let productsCache = [];
         let queriesCache = [];
+        let modifyImageState = {
+            existingImages: [],
+            selectedFiles: [],
+            /** Cloudinary folder id (sanitized). */
+            uploadVendorId: '',
+            /** Original Firestore vendorId (do not invent one on save). */
+            vendorId: '',
+            vendorName: ''
+        };
+        const modifyPreviewObjectUrls = new Set();
 
         function loadAdminDashboard() {
             loadProducts();
@@ -245,7 +275,7 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
 
         async function loadProducts() {
             try {
-                const products = await getAllProducts();
+                const products = await getAllProducts({ forceRefresh: true });
                 const sorted = [...products].sort(
                     (a, b) => getCreatedAtMillis(a) - getCreatedAtMillis(b)
                 );
@@ -270,6 +300,93 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             else modifyStatus.classList.add('text-gray-600');
         }
 
+        function revokeModifyPreviewUrls() {
+            modifyPreviewObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+            modifyPreviewObjectUrls.clear();
+        }
+
+        function resetModifyImageProgress() {
+            if (!modifyImageProgressTrack || !modifyImageProgressFill) return;
+            modifyImageProgressTrack.classList.add('hidden');
+            modifyImageProgressFill.style.width = '0%';
+        }
+
+        function renderModifyImagePreviews() {
+            if (!modifyImagePreviewGrid || !modifyImageTrigger) return;
+
+            revokeModifyPreviewUrls();
+            modifyImagePreviewGrid.innerHTML = '';
+            modifyImageTrigger.textContent = getTriggerLabel(modifyImageState);
+            modifyImageTrigger.disabled = totalSelectedImages(modifyImageState) >= IMAGE_UPLOAD_LIMITS.maxImages;
+
+            const total = totalSelectedImages(modifyImageState);
+            if (modifyClearPhotosBtn) {
+                modifyClearPhotosBtn.classList.toggle('hidden', total === 0);
+            }
+
+            if (!total) {
+                modifyImagePreviewGrid.classList.add('hidden');
+                return;
+            }
+
+            modifyImagePreviewGrid.classList.remove('hidden');
+
+            modifyImageState.existingImages.forEach((asset, index) => {
+                const card = document.createElement('div');
+                card.className = 'jb-image-upload-card';
+
+                const image = document.createElement('img');
+                image.src = sanitizeImageUrl(asset.url, asset.url);
+                image.alt = `Current product photo ${index + 1}`;
+
+                const meta = document.createElement('div');
+                meta.className = 'jb-image-upload-meta';
+                meta.textContent = `Current photo ${index + 1}`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'jb-image-remove-btn';
+                removeBtn.setAttribute('aria-label', `Remove photo ${index + 1}`);
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => {
+                    removeExistingImage(modifyImageState, index);
+                    renderModifyImagePreviews();
+                });
+
+                card.append(image, meta, removeBtn);
+                modifyImagePreviewGrid.appendChild(card);
+            });
+
+            modifyImageState.selectedFiles.forEach((file, index) => {
+                const card = document.createElement('div');
+                card.className = 'jb-image-upload-card';
+
+                const objectUrl = URL.createObjectURL(file);
+                modifyPreviewObjectUrls.add(objectUrl);
+
+                const image = document.createElement('img');
+                image.src = objectUrl;
+                image.alt = `New product photo ${index + 1}`;
+
+                const meta = document.createElement('div');
+                meta.className = 'jb-image-upload-meta';
+                meta.textContent = `New • ${formatImageSize(file.size)}`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'jb-image-remove-btn';
+                removeBtn.setAttribute('aria-label', `Remove new photo ${index + 1}`);
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => {
+                    removeSelectedFile(modifyImageState, index);
+                    renderModifyImagePreviews();
+                });
+
+                card.append(image, meta, removeBtn);
+                modifyImagePreviewGrid.appendChild(card);
+            });
+        }
+
         function openModifyModal(product) {
             const productId = product.productId || product.productCode || product.id || '';
             document.getElementById('m-id').value = product.id;
@@ -278,11 +395,29 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             document.getElementById('m-stone').value = product.stoneType || '';
             document.getElementById('m-name').value = product.name || '';
             document.getElementById('m-description').value = product.description || '';
-            document.getElementById('m-image-url-1').value = product.imageUrl || '';
-            document.getElementById('m-image-url-2').value = product.imageUrl2 || '';
-            document.getElementById('m-image-url-3').value = product.imageUrl3 || '';
             document.getElementById('m-price').value = product.price || '';
             document.getElementById('m-vendor').value = product.vendor || '';
+
+            resetImagePicker(modifyImageState);
+            modifyImageState.existingImages = getProductImageAssets(product)
+                .map((asset) => ({
+                    url: asset.url,
+                    publicId: asset.publicId || ''
+                }))
+                .filter((asset) => asset.url);
+            modifyImageState.selectedFiles = [];
+            modifyImageState.vendorId = String(product.vendorId || '').trim().toLowerCase();
+            modifyImageState.vendorName = product.vendor || '';
+            modifyImageState.uploadVendorId = String(product.vendorId || product.vendor || 'admin')
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9_-]+/g, '-')
+                .replace(/^-+|-+$/g, '') || 'admin';
+
+            if (modifyImageInput) modifyImageInput.value = '';
+            resetModifyImageProgress();
+            renderModifyImagePreviews();
+
             modifyProductIdLabel.textContent = `Product ID: ${productId}`;
             modifyStatus.classList.add('hidden');
             modifyModal.classList.add('is-open');
@@ -291,6 +426,22 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         function closeModifyModal() {
             modifyModal.classList.remove('is-open');
             modifyForm.reset();
+            resetImagePicker(modifyImageState);
+            modifyImageState.vendorId = '';
+            modifyImageState.uploadVendorId = '';
+            modifyImageState.vendorName = '';
+            if (modifyImageInput) modifyImageInput.value = '';
+            revokeModifyPreviewUrls();
+            resetModifyImageProgress();
+            if (modifyImagePreviewGrid) {
+                modifyImagePreviewGrid.innerHTML = '';
+                modifyImagePreviewGrid.classList.add('hidden');
+            }
+            if (modifyClearPhotosBtn) modifyClearPhotosBtn.classList.add('hidden');
+            if (modifyImageTrigger) {
+                modifyImageTrigger.textContent = getTriggerLabel(modifyImageState);
+                modifyImageTrigger.disabled = false;
+            }
         }
 
         function bindModifyButtons() {
@@ -306,6 +457,52 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
         modifyModal.addEventListener('click', (event) => {
             if (event.target === modifyModal) closeModifyModal();
         });
+
+        if (modifyImageTrigger && modifyImageInput) {
+            modifyImageTrigger.addEventListener('click', () => {
+                if (totalSelectedImages(modifyImageState) >= IMAGE_UPLOAD_LIMITS.maxImages) {
+                    setModifyStatus(
+                        `You can keep a maximum of ${IMAGE_UPLOAD_LIMITS.maxImages} photos per product.`,
+                        'error'
+                    );
+                    return;
+                }
+                modifyImageInput.click();
+            });
+
+            modifyImageInput.addEventListener('change', () => {
+                const incoming = Array.from(modifyImageInput.files || []);
+                modifyImageInput.value = '';
+                if (!incoming.length) return;
+
+                const { acceptedCount, errors } = addFilesToPicker(modifyImageState, incoming);
+                if (errors.length) {
+                    setModifyStatus(errors[0], errors[0].includes('allowed') ? 'info' : 'error');
+                } else if (acceptedCount < incoming.length) {
+                    setModifyStatus(
+                        `Only the first ${IMAGE_UPLOAD_LIMITS.maxImages} photos were kept. Remove a photo to add another.`,
+                        'info'
+                    );
+                } else {
+                    modifyStatus.classList.add('hidden');
+                }
+                renderModifyImagePreviews();
+            });
+        }
+
+        if (modifyClearPhotosBtn) {
+            modifyClearPhotosBtn.addEventListener('click', () => {
+                if (!totalSelectedImages(modifyImageState)) return;
+                const confirmed = window.confirm(
+                    'Remove all photos from this product?\n\nYou must add at least one photo before saving.'
+                );
+                if (!confirmed) return;
+                resetImagePicker(modifyImageState);
+                if (modifyImageInput) modifyImageInput.value = '';
+                renderModifyImagePreviews();
+                setModifyStatus('All photos removed. Add at least one photo before saving.', 'info');
+            });
+        }
 
         document.getElementById('modify-delete-btn').addEventListener('click', async () => {
             const productId = document.getElementById('m-id').value;
@@ -340,10 +537,62 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             event.preventDefault();
             const productId = document.getElementById('m-id').value;
             const saveBtn = document.getElementById('modify-save-btn');
+            const deleteBtn = document.getElementById('modify-delete-btn');
+
+            if (!totalSelectedImages(modifyImageState)) {
+                setModifyStatus('Please keep or upload at least one product photo.', 'error');
+                modifyImageTrigger?.focus();
+                return;
+            }
 
             try {
                 saveBtn.disabled = true;
-                setModifyStatus('Saving changes...', 'info');
+                deleteBtn.disabled = true;
+                resetModifyImageProgress();
+
+                let uploadedAssets = [];
+                if (modifyImageState.selectedFiles.length) {
+                    setModifyStatus('Uploading new photos...', 'info');
+                    if (modifyImageProgressTrack && modifyImageProgressFill) {
+                        modifyImageProgressTrack.classList.remove('hidden');
+                        modifyImageProgressFill.style.width = '0%';
+                    }
+
+                    uploadedAssets = await uploadImages(
+                        modifyImageState.selectedFiles,
+                        modifyImageState.uploadVendorId || modifyImageState.vendorId || 'admin',
+                        {
+                            onProgress: (progress) => {
+                                if (modifyImageProgressFill) {
+                                    modifyImageProgressFill.style.width = `${progress.overallPercent || 0}%`;
+                                }
+                                setModifyStatus(
+                                    `Uploading photos ${progress.currentIndex}/${progress.total} (${progress.overallPercent}%)...`,
+                                    'info'
+                                );
+                            }
+                        }
+                    );
+                }
+
+                setModifyStatus('Saving updated product to the website...', 'info');
+
+                const finalAssets = [
+                    ...modifyImageState.existingImages.map((asset) => ({
+                        url: asset.url,
+                        publicId: asset.publicId || ''
+                    })),
+                    ...uploadedAssets.map((asset) => ({
+                        url: asset.url,
+                        publicId: asset.publicId || ''
+                    }))
+                ].slice(0, IMAGE_UPLOAD_LIMITS.maxImages);
+
+                if (!finalAssets.length) {
+                    throw new Error('Please keep or upload at least one product photo.');
+                }
+
+                const imageFields = mapUploadsToProductFields(finalAssets);
 
                 await updateProduct(productId, {
                     name: document.getElementById('m-name').value,
@@ -352,13 +601,18 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
                     category: document.getElementById('m-category').value,
                     metalType: document.getElementById('m-metal').value,
                     stoneType: document.getElementById('m-stone').value,
-                    imageUrl: document.getElementById('m-image-url-1').value,
-                    imageUrl2: document.getElementById('m-image-url-2').value,
-                    imageUrl3: document.getElementById('m-image-url-3').value,
-                    vendor: document.getElementById('m-vendor').value
+                    vendor: document.getElementById('m-vendor').value,
+                    vendorId: modifyImageState.vendorId || '',
+                    ...imageFields,
+                    // Explicit empty slots so Firestore clears removed photos.
+                    imageUrl2: imageFields.imageUrl2 || '',
+                    imageUrl3: imageFields.imageUrl3 || '',
+                    imagePublicId: imageFields.imagePublicId || '',
+                    imagePublicId2: imageFields.imagePublicId2 || '',
+                    imagePublicId3: imageFields.imagePublicId3 || ''
                 });
 
-                setModifyStatus('Product updated successfully.', 'success');
+                setModifyStatus('Product updated successfully. Changes are live on the website.', 'success');
                 closeModifyModal();
                 await loadProducts();
             } catch (error) {
@@ -366,6 +620,8 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
                 setModifyStatus(error.message || 'Failed to update product.', 'error');
             } finally {
                 saveBtn.disabled = false;
+                deleteBtn.disabled = false;
+                resetModifyImageProgress();
             }
         });
 
