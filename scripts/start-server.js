@@ -11,7 +11,8 @@ const {
 
 const projectRoot = path.join(__dirname, '..');
 const root = path.join(projectRoot, 'public');
-const port = Number(process.env.PORT || 3000);
+// Prefer 5500 (VS Code Live Server default) so bookmarks/links match; fallback 3000.
+const port = Number(process.env.PORT || 5500);
 
 
 const headerRules = loadHeaders(root);
@@ -32,6 +33,28 @@ const types = {
   '.woff2': 'font/woff2'
 };
 
+/**
+ * Production _headers are applied for realistic local testing, but two
+ * directives break plain http://localhost navigation:
+ *  - upgrade-insecure-requests (forces https://localhost, which is not served)
+ *  - Strict-Transport-Security (pins browsers to HTTPS for localhost)
+ */
+function resolveLocalHeaders(urlPath) {
+  const headers = { ...resolveHeaders(headerRules, urlPath) };
+
+  delete headers['Strict-Transport-Security'];
+
+  if (headers['Content-Security-Policy']) {
+    headers['Content-Security-Policy'] = headers['Content-Security-Policy']
+      .replace(/;\s*upgrade-insecure-requests/gi, '')
+      .replace(/upgrade-insecure-requests\s*;?\s*/gi, '')
+      .replace(/;;+/g, ';')
+      .trim();
+  }
+
+  return headers;
+}
+
 const server = http.createServer(async (req, res) => {
   let urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
 
@@ -39,7 +62,7 @@ const server = http.createServer(async (req, res) => {
   if (redirect) {
     res.writeHead(redirect.status, {
       Location: redirect.to,
-      ...resolveHeaders(headerRules, urlPath)
+      ...resolveLocalHeaders(urlPath)
     });
     res.end();
     return;
@@ -64,13 +87,13 @@ const server = http.createServer(async (req, res) => {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      res.writeHead(404, resolveHeaders(headerRules, urlPath));
+      res.writeHead(404, resolveLocalHeaders(urlPath));
       res.end('Not found');
       return;
     }
 
     const ext = path.extname(filePath).toLowerCase();
-    const resolved = resolveHeaders(headerRules, urlPath);
+    const resolved = resolveLocalHeaders(urlPath);
     const contentType = resolved['Content-Type'] || types[ext] || 'application/octet-stream';
 
     res.writeHead(200, {
@@ -84,5 +107,6 @@ const server = http.createServer(async (req, res) => {
 server.listen(port, () => {
   console.log(`jewelBazaari running at http://localhost:${port}`);
   console.log(`Loaded ${headerRules.length} _headers rules, ${redirects.length} _redirects`);
+  console.log('Local mode: HSTS + upgrade-insecure-requests disabled so http://localhost works');
   console.log('Vendor image uploads: direct to Cloudinary from the browser (see public/js/utils/cloudinary-config.js)');
 });

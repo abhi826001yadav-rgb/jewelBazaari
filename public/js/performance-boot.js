@@ -46,11 +46,15 @@ export function initLinkPrefetch() {
 
     const prefetch = (href) => {
         const clean = String(href || '').trim();
-        if (!clean || prefetched.has(clean) || !clean.endsWith('.html')) return;
+        if (!clean || prefetched.has(clean) || clean.startsWith('#') || clean.startsWith('mailto:') || clean.startsWith('tel:')) return;
 
         try {
             const url = new URL(clean, window.location.href);
             if (url.origin !== window.location.origin) return;
+            // Prefetch same-origin document navigations (clean CF Pages paths or .html)
+            const path = url.pathname;
+            if (!path || path === window.location.pathname) return;
+            if (path.includes('.') && !path.endsWith('.html')) return;
         } catch {
             return;
         }

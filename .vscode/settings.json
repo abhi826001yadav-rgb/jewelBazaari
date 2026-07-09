@@ -2,13 +2,22 @@
   "liveServer.settings.host": "localhost",
   "liveServer.settings.port": 5500,
   "liveServer.settings.root": "/public",
-  "liveServer.settings.middleware": {
-    "setup": "live-server.middleware.js"
-  },
+  "liveServer.settings.CustomBrowser": "chrome",
   "liveServer.settings.ignoreFiles": [
+    ".vscode/**",
+    ".git/**",
+    "**/*.md",
+    "scripts/**",
+    "functions/**",
+    "node_modules/**"
+  ],
+  "liveServer.settings.fileToExclude": [
     ".vscode",
     ".git",
-    "**/*.md",
-    "scripts/**"
-  ]
+    "scripts",
+    "functions",
+    "node_modules"
+  ],
+  "liveServer.settings.donotShowInfoMsg": true,
+  "liveServer.settings.NoBrowser": false
 }

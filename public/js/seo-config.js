@@ -14,8 +14,13 @@ export function getPageSeo(pageKey = '') {
 }
 
 export function getCurrentPageKey() {
-    const path = window.location.pathname.split('/').pop() || 'index.html';
-    return path.includes(' ') ? path : (path || 'index.html');
+    let path = window.location.pathname.split('/').filter(Boolean).pop() || 'index.html';
+    if (path.includes(' ')) return path;
+    // Cloudflare Pages clean URLs (/gold) must map back to SEO keys (gold.html)
+    if (path && !path.endsWith('.html') && !path.includes('.')) {
+        path = `${path}.html`;
+    }
+    return path || 'index.html';
 }
 
 export function absoluteUrl(path = '/') {

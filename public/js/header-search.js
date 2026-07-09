@@ -123,7 +123,7 @@ function wireHeaderSearchInput(input) {
         }
 
         const query = normalizeQuery(input.value);
-        window.location.href = query ? `all-jewellery.html?q=${encodeURIComponent(query)}` : 'all-jewellery.html';
+        window.location.href = query ? `all-jewellery.html?q=${encodeURIComponent(query)}` : 'all-jewellery';
     }
 
     function hideSuggestions() {

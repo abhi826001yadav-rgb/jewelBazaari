@@ -69,13 +69,13 @@ function sanitizeHomepageHeader() {
     const nav = document.querySelector('.jb-header-layout .jb-header-nav');
     if (!nav) return;
 
-    nav.querySelectorAll('a[href="/admin"], a[href="admin.html"], a[aria-label="Admin"], a[aria-label="Home"]').forEach((link) => {
+    nav.querySelectorAll('a[href="/admin.html"], a[href="admin.html"], a[aria-label="Admin"], a[aria-label="Home"]').forEach((link) => {
         link.remove();
     });
 }
 
 function sanitizeAdminLinks() {
-    document.querySelectorAll('a[href="/admin"], a[href="admin.html"]').forEach((link) => {
+    document.querySelectorAll('a[href="/admin.html"], a[href="admin.html"]').forEach((link) => {
         const inMore = link.closest('.jb-more-submenu, .jb-more-dropdown');
         if (!inMore) {
             link.remove();
