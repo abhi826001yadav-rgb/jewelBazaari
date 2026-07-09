@@ -17,7 +17,10 @@ const REQUIRED_GLOBAL_HEADERS = [
   'Referrer-Policy'
 ];
 
-const IMMUTABLE_PREFIXES = ['/css/', '/js/', '/images/'];
+// Images may use long-lived immutable caching (static filenames).
+// JS/CSS are NOT content-hashed — they must revalidate, not immutable.
+const LONG_CACHE_PREFIXES = ['/images/'];
+const REVALIDATE_PREFIXES = ['/css/', '/js/'];
 const HTML_PAGES = fs
   .readdirSync(root)
   .filter((name) => name.endsWith('.html'))
@@ -32,6 +35,13 @@ function fail(message) {
 
 function ok(message) {
   console.log(`OK: ${message}`);
+}
+
+function isNoStoreCache(cache) {
+  return (
+    cache.includes('no-store') ||
+    (cache.includes('no-cache') && cache.includes('must-revalidate'))
+  );
 }
 
 if (!fs.existsSync(path.join(root, '_headers'))) {
@@ -64,7 +74,15 @@ for (const name of REQUIRED_GLOBAL_HEADERS) {
   }
 }
 
-for (const prefix of IMMUTABLE_PREFIXES) {
+// Clean URLs (/gold, /) only match /* on Cloudflare — must never cache HTML-like responses
+const rootCache = resolveHeaders(headerRules, '/')['Cache-Control'] || '';
+if (!isNoStoreCache(rootCache)) {
+  fail('/* (homepage / clean URLs) must use no-cache/no-store so HTML is never cached');
+} else {
+  ok('/* defaults to no-store for clean HTML URLs');
+}
+
+for (const prefix of LONG_CACHE_PREFIXES) {
   const sample = `${prefix}sample.asset`;
   const cache = resolveHeaders(headerRules, sample)['Cache-Control'] || '';
   if (!cache.includes('immutable')) {
@@ -75,16 +93,43 @@ for (const prefix of IMMUTABLE_PREFIXES) {
   }
 }
 
+for (const prefix of REVALIDATE_PREFIXES) {
+  const sample = `${prefix}sample.asset`;
+  const cache = resolveHeaders(headerRules, sample)['Cache-Control'] || '';
+  if (cache.includes('immutable')) {
+    fail(`${prefix}* must not be immutable (filenames are not content-hashed)`);
+  }
+  if (cache.includes('stale-while-revalidate')) {
+    fail(`${prefix}* must not use stale-while-revalidate (can serve stale assets after deploy)`);
+  }
+  if (!cache.includes('must-revalidate') && !cache.includes('no-store')) {
+    fail(`${prefix}* must revalidate (max-age=0, must-revalidate) or no-store`);
+  }
+}
+
 for (const page of HTML_PAGES) {
   const cache = resolveHeaders(headerRules, page)['Cache-Control'] || '';
   if (cache.includes('immutable')) {
     fail(`${page} must not be marked immutable`);
   }
+  if (cache.includes('stale-while-revalidate')) {
+    fail(`${page} must not use stale-while-revalidate`);
+  }
+  if (!isNoStoreCache(cache) && !cache.includes('no-store')) {
+    fail(`${page} must use no-cache/no-store so browsers never keep stale HTML`);
+  }
 }
 
 const indexCache = resolveHeaders(headerRules, '/index.html')['Cache-Control'] || '';
-if (!indexCache.includes('stale-while-revalidate')) {
-  fail('/index.html is missing stale-while-revalidate');
+if (!isNoStoreCache(indexCache)) {
+  fail('/index.html must use no-cache, no-store, must-revalidate');
+} else {
+  ok('/index.html is never cached');
+}
+
+const indexCdn = resolveHeaders(headerRules, '/index.html')['CDN-Cache-Control'] || '';
+if (indexCdn && !indexCdn.includes('no-store') && !indexCdn.includes('max-age=0')) {
+  fail('/index.html CDN-Cache-Control must not cache HTML at the edge');
 }
 
 for (const privatePage of ['/admin.html', '/vendor-upload.html']) {

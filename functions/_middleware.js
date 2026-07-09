@@ -52,6 +52,13 @@ export async function onRequest(context) {
   headers.delete('Content-Security-Policy-Report-Only');
   headers.set('Content-Security-Policy', CSP);
 
+  // Never cache HTML — Safari + Instagram in-app browsers retain stale documents
+  // when max-age / stale-while-revalidate are set. Force revalidation on every load.
+  headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  headers.set('CDN-Cache-Control', 'no-store');
+  headers.set('Pragma', 'no-cache');
+  headers.set('Expires', '0');
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

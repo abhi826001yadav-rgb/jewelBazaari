@@ -1,6 +1,12 @@
 # jewelBazaari — Cloudflare Pages headers
 # IMPORTANT: Cloudflare Pages applies the single best-matching rule per request.
 # Security headers MUST be repeated on every HTML rule (/*.html, /index.html, etc.).
+#
+# Caching policy (Safari / Instagram in-app browser safe):
+# - HTML documents: never cache (no-cache, no-store, must-revalidate)
+# - Unhashed JS/CSS: revalidate every request (max-age=0, must-revalidate)
+# - Images: long-lived (static filenames; purge or rename on change)
+# Clean URLs like /gold only match /* — so /* must also no-store HTML-like responses.
 
 # Shared CSP — Firebase + Tailwind CDN + Google APIs
 # connect-src includes firebasestorage.app (new Firebase storage bucket format)
@@ -16,47 +22,63 @@
   X-Permitted-Cross-Domain-Policies: none
   X-DNS-Prefetch-Control: off
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Cache-Control: no-cache, no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache
   Vary: Accept-Encoding
 
+# CSS filenames are NOT content-hashed — do not mark immutable.
 /css/*
-  Cache-Control: public, max-age=31536000, immutable
-  CDN-Cache-Control: max-age=31536000
+  Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: max-age=0, must-revalidate
   Vary: Accept-Encoding
 
+# JS filenames are NOT content-hashed — revalidate every request.
+# Cache-bust via ?v=BUILD_VERSION query strings in HTML.
 /js/*
-  Cache-Control: public, max-age=300, stale-while-revalidate=3600
-  CDN-Cache-Control: max-age=300, stale-while-revalidate=3600
+  Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: max-age=0, must-revalidate
   Vary: Accept-Encoding
 
 /js/portal-admin-login.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/portal-vendor-access.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/portal-tap-bridge.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/firebase-config.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/auth-redirect-path.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/ios-vendor-login-fix.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/vendor-login-fix.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/device-utils.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/firebase-product-service.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /js/customer-query-service.js
   Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: no-store
 
 /images/*
   Cache-Control: public, max-age=31536000, immutable
@@ -64,13 +86,15 @@
   Vary: Accept-Encoding
 
 /js/*.json
-  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
-  CDN-Cache-Control: max-age=3600, stale-while-revalidate=86400
+  Cache-Control: public, max-age=0, must-revalidate
+  CDN-Cache-Control: max-age=0, must-revalidate
   Vary: Accept-Encoding
 
+# Component HTML fragments — never serve stale layout chrome
 /components/*
-  Cache-Control: public, max-age=3600, stale-while-revalidate=604800
-  CDN-Cache-Control: max-age=3600, stale-while-revalidate=604800
+  Cache-Control: no-cache, no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache
   Vary: Accept-Encoding
 
 /robots.txt
@@ -93,8 +117,9 @@
   X-Permitted-Cross-Domain-Policies: none
   X-DNS-Prefetch-Control: off
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
-  Cache-Control: public, max-age=0, must-revalidate
-  CDN-Cache-Control: max-age=300, stale-while-revalidate=86400
+  Cache-Control: no-cache, no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache
   Vary: Accept-Encoding
 
 /index.html
@@ -108,8 +133,9 @@
   X-Permitted-Cross-Domain-Policies: none
   X-DNS-Prefetch-Control: off
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
-  Cache-Control: public, max-age=300, stale-while-revalidate=86400
-  CDN-Cache-Control: max-age=300, stale-while-revalidate=86400
+  Cache-Control: no-cache, no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache
   Vary: Accept-Encoding
 
 /admin.html
@@ -122,6 +148,7 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   Cache-Control: private, no-store, max-age=0, must-revalidate
   CDN-Cache-Control: no-store
+  Pragma: no-cache
   X-Robots-Tag: noindex, nofollow
 
 /admin
@@ -134,6 +161,7 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   Cache-Control: private, no-store, max-age=0, must-revalidate
   CDN-Cache-Control: no-store
+  Pragma: no-cache
   X-Robots-Tag: noindex, nofollow
 
 # Clean URLs (Cloudflare 308-strips .html) need the same private headers as the .html paths
@@ -147,6 +175,7 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   Cache-Control: private, no-store, max-age=0, must-revalidate
   CDN-Cache-Control: no-store
+  Pragma: no-cache
   X-Robots-Tag: noindex, nofollow
 
 /vendor-upload.html
@@ -159,18 +188,31 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   Cache-Control: private, no-store, max-age=0, must-revalidate
   CDN-Cache-Control: no-store
+  Pragma: no-cache
   X-Robots-Tag: noindex, nofollow
 
 /track-order
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: same-site
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
-  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+  Cache-Control: no-cache, no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache
   X-Robots-Tag: noindex, follow
 
 /track-order.html
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: same-site
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://www.gstatic.com https://apis.google.com https://www.googleapis.com https://accounts.google.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.gold-api.com https://cdn.tailwindcss.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://*.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://api.cloudinary.com wss://*.firebaseio.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
-  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+  Cache-Control: no-cache, no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache
   X-Robots-Tag: noindex, follow
