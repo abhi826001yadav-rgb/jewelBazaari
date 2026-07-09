@@ -12,6 +12,13 @@ export function formatLabel(value) {
     return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+/** Product detail page URL (clean query id). */
+export function getProductDetailUrl(productId) {
+    const id = String(productId || '').trim();
+    if (!id) return 'all-jewellery.html';
+    return `product.html?id=${encodeURIComponent(id)}`;
+}
+
 let galleryInitialized = false;
 let galleryImages = [];
 let galleryIndex = 0;
@@ -244,10 +251,10 @@ export async function renderProducts(products, gridId = 'products-grid', countId
 
     products.forEach((product, index) => {
         const card = document.createElement('article');
-        card.className = 'luxury-card bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 min-w-0';
+        card.className = 'luxury-card bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 min-w-0';
 
-        const images = getProductImages(product);
         const imageSrc = sanitizeImageUrl(getCoverImage(product), IMAGE_FALLBACK_DATA_URI);
+        const detailUrl = getProductDetailUrl(product.id);
         const imageLoading = index < 4 ? 'eager' : 'lazy';
         const imagePriority = index === 0 ? ' fetchpriority="high"' : '';
         const tags = [product.category, product.metalType, product.stoneType]
@@ -257,20 +264,18 @@ export async function renderProducts(products, gridId = 'products-grid', countId
 
         card.innerHTML = `
             <div class="aspect-square bg-gray-100 relative overflow-hidden">
-                <button type="button"
-                    class="product-gallery-trigger block w-full h-full"
-                    data-product-gallery="${escapeHtml(JSON.stringify(images))}"
-                    data-product-name="${escapeHtml(product.name || 'Product')}"
-                    aria-label="View product images">
+                <a href="${escapeHtml(detailUrl)}" class="block w-full h-full" aria-label="View ${escapeHtml(product.name || 'product')} details">
                     <img src="${escapeHtml(imageSrc)}" class="w-full h-full object-cover" alt="${escapeHtml(product.name || 'Jewellery product')}" width="400" height="400" loading="${imageLoading}" decoding="async"${imagePriority}>
-                </button>
+                </a>
                 ${buildWishlistHeartButton({ ...product, imageUrl: imageSrc })}
-                <div class="absolute top-3 left-3 bg-white/90 px-3 py-1 rounded-full text-xs font-medium capitalize">
+                <div class="absolute top-3 left-3 bg-white/90 px-3 py-1 rounded-full text-xs font-medium capitalize pointer-events-none">
                     ${escapeHtml(formatLabel(product.category) || 'Jewellery')}
                 </div>
             </div>
             <div class="p-4">
-                <h2 class="font-semibold text-lg text-[#2A2A2A] line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h2>
+                <h2 class="font-semibold text-lg text-[#2A2A2A] line-clamp-1">
+                    <a href="${escapeHtml(detailUrl)}" class="hover:text-[#4A0E17] transition">${escapeHtml(product.name || 'Beautiful Piece')}</a>
+                </h2>
                 ${product.description ? `<p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(product.description)}</p>` : ''}
                 ${tags ? `<p class="text-xs text-[#9B7E4B] mt-2 capitalize">${escapeHtml(tags)}</p>` : ''}
                 <div class="flex items-center justify-between mt-3 gap-2">

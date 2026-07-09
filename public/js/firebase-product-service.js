@@ -317,6 +317,31 @@ export async function getNewArrivals(limit = 10) {
     return products.slice(0, limit);
 }
 
+/**
+ * Fetch a single product by Firestore document id / productId.
+ */
+export async function getProductById(productId) {
+    const id = String(productId || '').trim();
+    if (!id) {
+        return null;
+    }
+
+    // Prefer warm cache when available (category/home pages).
+    if (productsCache?.length) {
+        const cached = productsCache.find((item) => item.id === id || item.productId === id);
+        if (cached) {
+            return cached;
+        }
+    }
+
+    const snapshot = await getDoc(doc(db, PRODUCTS_COLLECTION, id));
+    if (!snapshot.exists()) {
+        return null;
+    }
+
+    return mapDoc(snapshot);
+}
+
 export async function getProductsByMetal(metalType) {
     const normalizedMetal = (metalType || '').trim().toLowerCase();
     const q = query(

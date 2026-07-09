@@ -23,10 +23,11 @@ export function canAddMoreImages(state) {
 export function addFilesToPicker(state, incomingFiles = []) {
     const accepted = [];
     const errors = [];
+    const max = IMAGE_UPLOAD_LIMITS.maxImages;
 
     for (const file of incomingFiles) {
         if (!canAddMoreImages({ ...state, selectedFiles: [...state.selectedFiles, ...accepted] })) {
-            errors.push('Only 5 photos are allowed per jewellery item.');
+            errors.push(`Only ${max} photos are allowed per jewellery item.`);
             break;
         }
 
@@ -38,7 +39,7 @@ export function addFilesToPicker(state, incomingFiles = []) {
         }
     }
 
-    state.selectedFiles = [...state.selectedFiles, ...accepted].slice(0, IMAGE_UPLOAD_LIMITS.maxImages);
+    state.selectedFiles = [...state.selectedFiles, ...accepted].slice(0, max);
     return { acceptedCount: accepted.length, errors };
 }
 
@@ -57,13 +58,14 @@ export function resetImagePicker(state) {
 
 export function getTriggerLabel(state) {
     const total = totalSelectedImages(state);
+    const max = IMAGE_UPLOAD_LIMITS.maxImages;
     if (!total) {
-        return '📷 Choose up to 5 photos';
+        return `📷 Choose up to ${max} photos`;
     }
-    if (total >= IMAGE_UPLOAD_LIMITS.maxImages) {
-        return 'Maximum 5 photos selected';
+    if (total >= max) {
+        return `Maximum ${max} photos selected`;
     }
-    return `📷 Add more photos (${total}/5)`;
+    return `📷 Add more photos (${total}/${max})`;
 }
 
 export { IMAGE_UPLOAD_LIMITS };

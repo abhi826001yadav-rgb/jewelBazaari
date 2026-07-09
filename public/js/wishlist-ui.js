@@ -112,9 +112,13 @@ function renderWishlistDrawer() {
     itemsEl.innerHTML = wishlist.map((item) => `
         <div class="bg-white border border-gray-200 rounded-xl p-3" data-wishlist-item="${escapeHtml(item.id)}">
             <div class="flex gap-3">
-                <img src="${escapeHtml(sanitizeImageUrl(item.imageUrl, 'https://picsum.photos/id/1015/100/100'))}" alt="${escapeHtml(item.name)}" class="w-20 h-20 object-cover rounded-lg bg-gray-100 shrink-0" width="80" height="80" loading="lazy" decoding="async">
+                <a href="product.html?id=${encodeURIComponent(item.id)}" class="shrink-0" aria-label="View ${escapeHtml(item.name)} details">
+                    <img src="${escapeHtml(sanitizeImageUrl(item.imageUrl, 'https://picsum.photos/id/1015/100/100'))}" alt="${escapeHtml(item.name)}" class="w-20 h-20 object-cover rounded-lg bg-gray-100" width="80" height="80" loading="lazy" decoding="async">
+                </a>
                 <div class="flex-1 min-w-0">
-                    <h3 class="font-medium text-sm text-[#2A2A2A] line-clamp-2">${escapeHtml(item.name)}</h3>
+                    <h3 class="font-medium text-sm text-[#2A2A2A] line-clamp-2">
+                        <a href="product.html?id=${encodeURIComponent(item.id)}" class="hover:text-[#4A0E17] transition">${escapeHtml(item.name)}</a>
+                    </h3>
                     <p class="text-[10px] uppercase text-[#9B7E4B] font-semibold tracking-wider mt-1">${escapeHtml(item.vendor || 'Verified Vendor')}</p>
                     <p class="text-sm font-bold text-[#4A0E17] mt-1">${formatProductPrice(item.price)}</p>
                 </div>

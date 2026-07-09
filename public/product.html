@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Product | jewelBazaari</title>
+    <meta name="description" content="View product details on jewelBazaari — seller, description, price, and more.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/product">
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="Product | jewelBazaari">
+    <meta property="og:description" content="View product details on jewelBazaari — seller, description, price, and more.">
+    <meta property="og:url" content="https://jewelbazaari.com/product">
+    <meta property="og:image" content="https://jewelbazaari.com/images/photo1.jpg">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Product | jewelBazaari">
+    <meta name="twitter:description" content="View product details on jewelBazaari — seller, description, price, and more.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/photo1.jpg">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="modulepreload" href="js/product-detail-page.js?v=20260709b">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260709b" as="style">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260709b">
+    <link rel="stylesheet" href="css/accessibility.css">
+    <style>
+        body {
+            background-color: #FAF7F2;
+            color: #2A2A2A;
+            min-height: 100vh;
+        }
+        #product-detail-content h1 {
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+    </style>
+</head>
+<body class="jb-product-detail-page">
+
+    <div class="sticky top-0 z-50 bg-white jb-site-banner" role="banner">
+        <div id="announcement-placeholder"></div>
+        <div id="header-placeholder"></div>
+        <div id="category-placeholder"></div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <nav class="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+            <ol class="flex flex-wrap items-center gap-1.5">
+                <li><a href="index.html" class="hover:text-[#9B7E4B] transition">Home</a></li>
+                <li aria-hidden="true">/</li>
+                <li><a href="all-jewellery.html" class="hover:text-[#9B7E4B] transition">All Jewellery</a></li>
+                <li aria-hidden="true">/</li>
+                <li class="text-[#4A0E17] font-medium">Product</li>
+            </ol>
+        </nav>
+
+        <div id="product-detail-status" class="text-center py-16 text-gray-500">Loading product details...</div>
+        <div id="product-detail-content" class="hidden"></div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script type="module">
+        import { initProductDetailPage } from './js/product-detail-page.js?v=20260709b';
+        initProductDetailPage();
+    </script>
+</body>
+</html>

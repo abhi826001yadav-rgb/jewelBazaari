@@ -323,13 +323,13 @@
                 </div>
                 <div>
                     <label for="p-images" class="block text-sm font-medium text-gray-700 mb-1">Jewellery Photos *</label>
-                    <input type="file" id="p-images" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple class="sr-only">
-                    <button type="button" id="p-images-trigger" class="jb-image-picker-btn">📷 Choose up to 5 photos</button>
+                    <input type="file" id="p-images" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple class="sr-only">
+                    <button type="button" id="p-images-trigger" class="jb-image-picker-btn">📷 Choose up to 3 photos</button>
                     <div id="image-preview-grid" class="jb-image-upload-grid mt-3 hidden" aria-live="polite"></div>
                     <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm text-[#4A0E17] leading-relaxed mt-3">
                         <p class="font-semibold mb-2">Photo rules</p>
-                        <p>Upload up to <strong>5 photos</strong> per jewellery item. Only images <strong>under 1 MB</strong> are allowed.</p>
-                        <p class="mt-2">For photos to display perfectly on jewelBazaari, use a <strong>4:5 portrait</strong> image sized <strong>1200 × 1500 px</strong>.</p>
+                        <p>Upload up to <strong>3 photos</strong> per jewellery item. Only <strong>JPG, JPEG, and PNG</strong> formats are accepted.</p>
+                        <p class="mt-2">Every photo is automatically cropped to a <strong>1:1 square (1200 × 1200 px)</strong> and compressed to <strong>max 250 KB</strong> for fast loading, while keeping good quality.</p>
                         <p class="mt-2">After a successful upload, your photos are saved in the <strong>jewelBazaari database</strong> and your product goes live on the website.</p>
                         <p class="mt-2">Use bright, clear photos on a plain background for the best storefront display.</p>
                     </div>
@@ -338,7 +338,18 @@
                     </div>
                 </div>
                 <input type="number" id="p-price" required min="1" placeholder="Price (₹) *" class="w-full p-4 border-2 border-gray-300 rounded-2xl">
-                <input type="text" id="p-vendor" placeholder="Vendor / Shop Name" class="w-full p-4 border-2 border-gray-300 rounded-2xl text-gray-700">
+                <label for="p-vendor" class="sr-only">Seller company name</label>
+                <input
+                    type="text"
+                    id="p-vendor"
+                    name="vendor"
+                    required
+                    minlength="2"
+                    maxlength="120"
+                    autocomplete="organization"
+                    placeholder="Please input sellers company name *"
+                    class="w-full p-4 border-2 border-gray-300 rounded-2xl text-gray-700"
+                >
 
                 <button type="submit" id="upload-btn" class="w-full upload-btn py-4 mt-4 rounded-2xl text-lg tracking-wider shadow-lg">
                     ✨ Upload Product to jewelBazaari
@@ -359,7 +370,7 @@
             ProductSaveError,
             formatUploadedAssetsForCleanup
         } from './js/services/product-service.js';
-        import { IMAGE_UPLOAD_LIMITS } from './js/components/vendor-image-picker.js';
+        import { IMAGE_UPLOAD_LIMITS, addFilesToPicker, getTriggerLabel } from './js/components/vendor-image-picker.js';
         import { formatImageSize } from './js/utils/image-compress.js';
 
         const productForm = document.getElementById('product-form');
@@ -377,8 +388,9 @@
 
         function showUploadPortal(vendor) {
             currentVendor = vendor;
-            vendorSessionBadge.textContent = `${vendor.shopName} (${vendor.vendorId})`;
-            vendorNameInput.value = vendor.shopName;
+            vendorSessionBadge.textContent = 'Vendor portal';
+            // Company name must be entered by the seller — do not prefill a default.
+            vendorNameInput.value = '';
         }
 
         window.addEventListener('jb:vendor-authenticated', (event) => {
@@ -424,16 +436,15 @@
         function renderImagePreviews() {
             imagePreviewGrid.innerHTML = '';
 
+            const pickerState = { selectedFiles: selectedImageFiles, existingImages: [] };
+            imageTrigger.textContent = getTriggerLabel(pickerState);
+
             if (!selectedImageFiles.length) {
                 imagePreviewGrid.classList.add('hidden');
-                imageTrigger.textContent = '📷 Choose up to 5 photos';
                 return;
             }
 
             imagePreviewGrid.classList.remove('hidden');
-            imageTrigger.textContent = selectedImageFiles.length >= IMAGE_UPLOAD_LIMITS.maxImages
-                ? 'Maximum 5 photos selected'
-                : `📷 Add more photos (${selectedImageFiles.length}/5)`;
 
             selectedImageFiles.forEach((file, index) => {
                 const card = document.createElement('div');
@@ -464,7 +475,7 @@
 
         imageTrigger.addEventListener('click', () => {
             if (selectedImageFiles.length >= IMAGE_UPLOAD_LIMITS.maxImages) {
-                setUploadStatus('You can upload a maximum of 5 photos per jewellery item.', 'error');
+                setUploadStatus(`You can upload a maximum of ${IMAGE_UPLOAD_LIMITS.maxImages} photos per jewellery item.`, 'error');
                 return;
             }
             imageInput.click();
@@ -479,12 +490,16 @@
                 return;
             }
 
-            const merged = [...selectedImageFiles, ...incoming].slice(0, IMAGE_UPLOAD_LIMITS.maxImages);
-            if (merged.length < selectedImageFiles.length + incoming.length) {
-                setUploadStatus('Only the first 5 photos were kept. Remove a photo to add a different one.', 'info');
+            const state = { selectedFiles: [...selectedImageFiles], existingImages: [] };
+            const { acceptedCount, errors } = addFilesToPicker(state, incoming);
+            selectedImageFiles = state.selectedFiles;
+
+            if (errors.length) {
+                setUploadStatus(errors[0], errors[0].includes('allowed') ? 'info' : 'error');
+            } else if (acceptedCount < incoming.length) {
+                setUploadStatus(`Only the first ${IMAGE_UPLOAD_LIMITS.maxImages} photos were kept. Remove a photo to add a different one.`, 'info');
             }
 
-            selectedImageFiles = merged;
             renderImagePreviews();
         });
 
@@ -512,6 +527,13 @@
                 return;
             }
 
+            const sellerCompanyName = String(vendorNameInput.value || '').trim();
+            if (!sellerCompanyName) {
+                setUploadStatus('Please input sellers company name.', 'error');
+                vendorNameInput.focus();
+                return;
+            }
+
             if (!confirm('Upload this product to jewelBazaari?')) {
                 return;
             }
@@ -534,7 +556,7 @@
                         category: categoryValue,
                         metalType: metalValue,
                         stoneType: stoneValue,
-                        vendor: vendorNameInput.value || currentVendor?.shopName || '',
+                        vendor: sellerCompanyName,
                         vendorId: currentVendor?.vendorId || ''
                     },
                     onProgress: ({ completed, total, overallPercent }) => {
@@ -549,7 +571,8 @@
                 productForm.reset();
                 selectedImageFiles = [];
                 renderImagePreviews();
-                vendorNameInput.value = currentVendor?.shopName || '';
+                // Keep company name for the next product; seller can edit if needed.
+                vendorNameInput.value = sellerCompanyName;
             } catch (error) {
                 console.error('Upload error:', error);
                 if (error instanceof ProductSaveError && error.phase === 'firestore' && error.uploadedAssets?.length) {

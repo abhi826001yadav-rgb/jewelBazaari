@@ -565,8 +565,8 @@
         import { updateWishlistBadge, syncWishlistHeartStates, buildWishlistHeartButton } from './js/wishlist-ui.js';
         import { initCategoryNav } from './js/category-nav.js';
         import { getTrendingProducts, getNewArrivals } from './js/firebase-product-service.js';
-        import { getCoverImage, getProductImages } from './js/product-images.js';
-        import { initProductGalleryUI } from './js/product-ui.js?v=20260709b';
+        import { getCoverImage } from './js/product-images.js';
+        import { getProductDetailUrl } from './js/product-ui.js?v=20260709b';
         import { initShadowCarousel, destroyShadowCarousel } from './js/home-featured-carousel.js';
         import { initLucideIcons, initLinkPrefetch, scheduleStorefrontUiInit } from './js/performance-boot.js?v=20260709b';
         import { initPageSchemas } from './js/seo-schema.js';
@@ -632,12 +632,11 @@
 
         window.jewelBazaariCart = { updateCartBadge };
         scheduleStorefrontUiInit();
-        initProductGalleryUI();
         initGoldPriceModal();
 
         function buildTrendingCard(product, slot, index) {
-            const images = getProductImages(product);
             const imageSrc = sanitizeImageUrl(getCoverImage(product));
+            const detailUrl = getProductDetailUrl(product.id);
             const vendor = product.vendor || 'Verified Vendor';
             const bestSellerBadge = slot === 'center' && index === 0 && (Number(product.addToCartCount) || 0) > 0
                 ? '<span class="absolute top-2 left-2 bg-luxuryGold text-white text-[9px] uppercase tracking-wider px-2 py-0.5 font-medium">Best Seller</span>'
@@ -646,19 +645,17 @@
             return `
                 <div class="jb-home-product-card group bg-luxuryBg p-3 relative flex flex-col justify-between h-full min-w-0">
                     <div class="overflow-hidden aspect-square mb-4 bg-white relative">
-                        <button type="button"
-                            class="product-gallery-trigger block w-full h-full"
-                            data-product-gallery="${escapeHtml(JSON.stringify(images))}"
-                            data-product-name="${escapeHtml(product.name || 'Product')}"
-                            aria-label="View product images">
+                        <a href="${escapeHtml(detailUrl)}" class="block w-full h-full" aria-label="View ${escapeHtml(product.name || 'product')} details">
                             <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" width="400" height="400" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="${slot === 'center' ? 'eager' : 'lazy'}" decoding="async"${slot === 'center' ? ' fetchpriority="high"' : ''}>
-                        </button>
+                        </a>
                         ${slot === 'center' ? buildWishlistHeartButton({ ...product, imageUrl: imageSrc }, 'absolute top-2 right-2') : ''}
                         ${bestSellerBadge}
                     </div>
                     <div class="jb-featured-details">
                         <p class="text-[10px] uppercase font-semibold text-luxuryGold tracking-wider mb-1">${escapeHtml(vendor)}</p>
-                        <h3 class="font-luxury font-semibold text-base text-luxuryDark mb-2 line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h3>
+                        <h3 class="font-luxury font-semibold text-base text-luxuryDark mb-2 line-clamp-1">
+                            <a href="${escapeHtml(detailUrl)}" class="hover:text-luxuryMaroon transition">${escapeHtml(product.name || 'Beautiful Piece')}</a>
+                        </h3>
                         <div class="flex items-center justify-between mt-2 border-t border-gray-200/60 pt-3">
                             <div>
                                 <span class="text-sm font-bold text-luxuryMaroon">${formatProductPrice(product.price)}</span>
@@ -671,26 +668,24 @@
         }
 
         function buildNewArrivalCard(product, slot) {
-            const images = getProductImages(product);
             const imageSrc = sanitizeImageUrl(getCoverImage(product));
+            const detailUrl = getProductDetailUrl(product.id);
             const vendor = product.vendor || 'Verified Vendor';
 
             return `
                 <div class="jb-home-product-card group bg-white border border-gray-100 p-4 transition duration-300 hover:shadow-lg h-full flex flex-col">
                     <div class="aspect-square bg-luxuryBg mb-4 overflow-hidden relative">
-                        <button type="button"
-                            class="product-gallery-trigger block w-full h-full"
-                            data-product-gallery="${escapeHtml(JSON.stringify(images))}"
-                            data-product-name="${escapeHtml(product.name || 'Product')}"
-                            aria-label="View product images">
+                        <a href="${escapeHtml(detailUrl)}" class="block w-full h-full" aria-label="View ${escapeHtml(product.name || 'product')} details">
                             <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name || 'Product')}" width="400" height="400" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="${slot === 'center' ? 'eager' : 'lazy'}" decoding="async"${slot === 'center' ? ' fetchpriority="high"' : ''}>
-                        </button>
+                        </a>
                         ${slot === 'center' ? buildWishlistHeartButton({ ...product, imageUrl: imageSrc }, 'absolute top-3 right-3') : ''}
                     </div>
                     <div class="jb-featured-details flex flex-col flex-1 justify-between min-h-0">
                         <div>
                             <p class="text-[10px] uppercase text-luxuryGold font-semibold tracking-wider">${escapeHtml(vendor)}</p>
-                            <h3 class="font-luxury font-semibold text-base text-luxuryDark mt-1 mb-2 line-clamp-1">${escapeHtml(product.name || 'Beautiful Piece')}</h3>
+                            <h3 class="font-luxury font-semibold text-base text-luxuryDark mt-1 mb-2 line-clamp-1">
+                                <a href="${escapeHtml(detailUrl)}" class="hover:text-luxuryMaroon transition">${escapeHtml(product.name || 'Beautiful Piece')}</a>
+                            </h3>
                         </div>
                         <div class="flex justify-between items-center pt-2 border-t border-gray-50">
                             <span class="text-sm font-bold text-luxuryMaroon">${formatProductPrice(product.price)}</span>

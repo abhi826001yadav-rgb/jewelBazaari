@@ -8,6 +8,7 @@ import {
     IMAGE_UPLOAD_LIMITS,
     validateImageFile
 } from '../utils/image-compress.js';
+import { withCloudinaryAutoOptimization } from '../utils/image-url-utils.js';
 
 /**
  * Cloudinary upload service — client-side direct upload using an unsigned preset.
@@ -74,10 +75,10 @@ function uploadCompressedFileToCloudinary(file, vendorId, { onProgress } = {}) {
             }
 
             resolve({
-                url: payload.secure_url,
+                url: withCloudinaryAutoOptimization(payload.secure_url),
                 publicId: payload.public_id,
                 size: Number(payload.bytes || file.size || 0),
-                format: payload.format || 'webp',
+                format: payload.format || 'jpg',
                 sizeLabel: formatImageSize(file.size)
             });
         });
@@ -150,14 +151,14 @@ export async function uploadImages(files, vendorId, { onProgress } = {}) {
 export function mapUploadsToProductFields(uploads = []) {
     const clean = uploads
         .map((item) => ({
-            url: String(item?.url || '').trim(),
+            url: withCloudinaryAutoOptimization(String(item?.url || '').trim()),
             publicId: String(item?.publicId || '').trim()
         }))
         .filter((item) => item.url);
 
     const fields = {};
-    const urlKeys = ['imageUrl', 'imageUrl2', 'imageUrl3', 'imageUrl4', 'imageUrl5'];
-    const publicIdKeys = ['imagePublicId', 'imagePublicId2', 'imagePublicId3', 'imagePublicId4', 'imagePublicId5'];
+    const urlKeys = ['imageUrl', 'imageUrl2', 'imageUrl3'];
+    const publicIdKeys = ['imagePublicId', 'imagePublicId2', 'imagePublicId3'];
 
     clean.slice(0, IMAGE_UPLOAD_LIMITS.maxImages).forEach((item, index) => {
         fields[urlKeys[index]] = item.url;
