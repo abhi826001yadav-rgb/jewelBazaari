@@ -110,15 +110,21 @@ for (const [label, rule] of [['/*.html', htmlCspRule], ['/index.html', indexCspR
   }
 }
 
+// Cloudflare 308-strips .html → clean URL. Any /slug → /slug.html 301 loops forever.
 const loopRiskySlugs = [
   'gold', 'diamond', 'gemstones', 'earrings', 'rings',
-  'wedding', 'combos', 'more', 'query', 'all-jewellery'
+  'wedding', 'combos', 'more', 'query', 'all-jewellery',
+  'admin', 'vendor-upload', 'track-order', 'index', 'home'
 ];
 
 for (const slug of loopRiskySlugs) {
-  const loopRule = redirects.find((entry) => entry.from === `/${slug}`);
+  const loopRule = redirects.find((entry) => {
+    if (entry.from !== `/${slug}` && entry.from !== `/${slug}/`) return false;
+    const dest = String(entry.to || '');
+    return dest === `/${slug}.html` || dest.endsWith(`/${slug}.html`) || dest === `${slug}.html`;
+  });
   if (loopRule) {
-    fail(`Redirect loop risk: remove /${slug} -> .html rule (conflicts with Cloudflare .html handling)`);
+    fail(`Redirect loop risk: remove ${loopRule.from} -> ${loopRule.to} (conflicts with Cloudflare .html → /${slug} 308)`);
   }
 }
 
