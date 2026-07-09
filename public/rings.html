@@ -21,9 +21,9 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="modulepreload" href="js/category-page-init.js">
-    <link rel="preload" href="css/mobile-responsive.css?v=20260706i" as="style">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260709b" as="style">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260706i">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260709b">
     <link rel="stylesheet" href="css/accessibility.css">
 </head>
 <body class="jb-category-page">
@@ -57,13 +57,13 @@
 
         <div id="no-products" class="hidden text-center py-16">
             <p class="text-gray-500 text-lg">No rings found yet.</p>
-            <a href="vendor-upload.html" class="inline-block mt-4 text-[#9B7E4B] hover:underline">Become a vendor</a>
+            <a href="vendor-upload.html" class="inline-block mt-4 text-[#9B7E4B] hover:underline">Sell on jewelBazaari</a>
         </div>
     </main>
     <div id="footer-placeholder"></div>
 
     <script type="module">
-        import { initCategoryPageDeferred } from './js/category-page-init.js?v=20260706i';
+        import { initCategoryPageDeferred } from './js/category-page-init.js?v=20260709b';
         import { getProductsByCategory } from './js/firebase-product-service.js';
 
         initCategoryPageDeferred(() => getProductsByCategory('rings'), { pageKey: 'rings.html' });

@@ -136,6 +136,18 @@
       { "name": "Contact Us", "path": "/query.html" }
     ]
   },
+  "about-us.html": {
+    "title": "About Us | jewelBazaari",
+    "description": "About JewelBazaari — India's digital jewellery marketplace connecting manufacturers, wholesalers, retailers, and buyers on one trusted platform.",
+    "path": "/about-us.html",
+    "image": "/images/logo.png",
+    "robots": "index, follow",
+    "type": "website",
+    "breadcrumb": [
+      { "name": "Home", "path": "/index.html" },
+      { "name": "About Us", "path": "/about-us.html" }
+    ]
+  },
   "admin.html": {
     "title": "Admin Dashboard | jewelBazaari",
     "description": "jewelBazaari admin access.",

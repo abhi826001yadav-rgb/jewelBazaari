@@ -275,46 +275,51 @@ textarea {
     max-width: 100%;
 }
 
-/* Two-line announcement — identical on homepage and every navigation page */
+/* One-line announcement — identical on homepage and every navigation page */
 .jb-announcement,
+.jb-announcement--one-line,
 .jb-announcement--two-line,
 #announcement-placeholder .jb-announcement,
 .jb-site-banner .jb-announcement {
     background-color: #4A0E17;
     color: #fff;
-    display: grid !important;
-    grid-template-rows: auto auto !important;
-    grid-template-columns: minmax(0, 1fr) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
     align-items: center;
-    justify-items: center;
-    row-gap: 0 !important;
-    gap: 0 !important;
+    justify-content: center;
+    gap: 0.4em;
     font-weight: 400;
     text-align: center;
-    padding: 0.35rem 0.5rem;
+    padding: 0.4rem 0.75rem;
     letter-spacing: 0;
     text-transform: none;
-    line-height: 1;
+    line-height: 1.2;
     overflow-x: clip;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .jb-announcement-sep {
-    display: none !important;
+    display: inline !important;
+    flex: 0 0 auto;
+    opacity: 0.85;
+    white-space: nowrap !important;
 }
 
 .jb-announcement-main,
 .jb-announcement-by {
-    display: block !important;
+    display: inline !important;
     font-weight: 400;
     text-align: center;
-    width: max-content;
-    max-width: 100%;
+    width: auto;
+    max-width: none;
     white-space: nowrap !important;
     overflow: hidden;
     text-overflow: clip;
     letter-spacing: 0;
-    grid-column: 1;
+    box-sizing: border-box;
 }
 
 .jb-announcement-by::before {
@@ -322,25 +327,37 @@ textarea {
 }
 
 .jb-announcement-main {
-    font-size: clamp(9px, 3.525vw, 15px);
+    font-size: clamp(9px, 2.8vw, 14px);
 }
 
-.jb-announcement-by {
-    font-size: clamp(9px, 3.3vw, 13.5px);
+.jb-announcement-by,
+.jb-announcement-sep {
+    font-size: clamp(9px, 2.6vw, 13px);
 }
 
+/* Desktop: full-width bar + fluid type spanning the screen */
 @media (min-width: 1025px) {
-    .jb-announcement-main {
-        font-size: 0.9375rem;
-    }
-
-    .jb-announcement-by {
-        font-size: 0.8125rem;
-    }
-
     .jb-announcement,
-    .jb-announcement--two-line {
-        padding: 0.4rem 1rem;
+    .jb-announcement--one-line,
+    .jb-announcement--two-line,
+    #announcement-placeholder .jb-announcement,
+    .jb-site-banner .jb-announcement {
+        width: 100%;
+        max-width: none;
+        padding: 0.5rem 1.25rem;
+        justify-content: center;
+        gap: 0.55em;
+    }
+
+    .jb-announcement-main {
+        font-size: clamp(0.95rem, 1.35vw, 1.25rem);
+        letter-spacing: 0.04em;
+    }
+
+    .jb-announcement-by,
+    .jb-announcement-sep {
+        font-size: clamp(0.875rem, 1.15vw, 1.1rem);
+        letter-spacing: 0.05em;
     }
 }
 

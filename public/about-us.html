@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>About Us | jewelBazaari</title>
+    <meta name="description" content="About JewelBazaari — India's digital jewellery marketplace connecting manufacturers, wholesalers, retailers, and buyers on one trusted platform.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/about-us.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="About Us | jewelBazaari">
+    <meta property="og:description" content="India's digital jewellery marketplace connecting manufacturers, wholesalers, retailers, and buyers on one trusted platform.">
+    <meta property="og:url" content="https://jewelbazaari.com/about-us.html">
+    <meta property="og:image" content="https://jewelbazaari.com/images/logo.png">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About Us | jewelBazaari">
+    <meta name="twitter:description" content="India's digital jewellery marketplace connecting manufacturers, wholesalers, retailers, and buyers on one trusted platform.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/logo.png">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preload" href="css/mobile-responsive.css?v=20260709b" as="style">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260709b">
+    <link rel="stylesheet" href="css/accessibility.css">
+    <script src="js/tailwind-config.js"></script>
+    <style>
+        html { overflow-x: clip; scroll-behavior: smooth; }
+        body {
+            background-color: #FAF7F2;
+            font-family: 'Montserrat', system-ui, sans-serif;
+            min-height: 100vh;
+            color: #2A2A2A;
+        }
+        .section-title { font-family: 'Playfair Display', Georgia, serif; }
+        .jb-site-banner, #announcement-placeholder, #header-placeholder, #category-placeholder { position: relative; z-index: 40; }
+        main { position: relative; z-index: 1; }
+
+        .about-hero {
+            background: linear-gradient(135deg, #4A0E17 0%, #2A0A0F 55%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(155, 126, 75, 0.18) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(197, 168, 128, 0.12) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .gold-line {
+            width: 4rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #9B7E4B, transparent);
+            margin: 0.75rem auto 0;
+        }
+        .gold-line--left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+        .about-card {
+            background: #fff;
+            border: 1px solid rgba(155, 126, 75, 0.22);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .about-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -8px rgba(74, 14, 23, 0.12);
+        }
+        .about-icon {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4A0E17, #6B1520);
+            color: #C5A880;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .offer-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            background: #fff;
+            border: 1px solid rgba(155, 126, 75, 0.22);
+            border-radius: 0.875rem;
+            padding: 0.9rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .offer-chip:hover {
+            border-color: rgba(155, 126, 75, 0.45);
+            box-shadow: 0 8px 20px -8px rgba(74, 14, 23, 0.15);
+        }
+        .why-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.65rem 0;
+        }
+        .why-item::before {
+            content: '✓';
+            color: #9B7E4B;
+            font-weight: 700;
+            line-height: 1.4;
+            flex-shrink: 0;
+        }
+        .contact-link {
+            color: #4A0E17;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .contact-link:hover { color: #9B7E4B; }
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+        }
+        .cta-btn:hover { transform: translateY(-2px); }
+        .cta-primary {
+            background: linear-gradient(135deg, #4A0E17, #6B1520);
+            color: #fff;
+            box-shadow: 0 8px 20px -4px rgba(74, 14, 23, 0.35);
+        }
+        .cta-secondary {
+            background: #fff;
+            color: #4A0E17;
+            border: 1px solid rgba(155, 126, 75, 0.4);
+        }
+        .join-banner {
+            background: linear-gradient(135deg, #4A0E17 0%, #3A0A12 55%, #2A0A0F 100%);
+            border-radius: 1.25rem;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .join-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 85% 20%, rgba(197, 168, 128, 0.15) 0%, transparent 45%);
+            pointer-events: none;
+        }
+        @media (max-width: 640px) {
+            .about-hero h1 { font-size: 2rem; }
+            .about-card { padding: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sticky top-0 z-50 bg-white jb-site-banner" role="banner">
+        <div id="announcement-placeholder"></div>
+        <div id="header-placeholder"></div>
+        <div id="category-placeholder"></div>
+    </div>
+
+    <!-- Hero -->
+    <section class="about-hero text-white text-center py-14 sm:py-20 px-4">
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <a href="index.html" aria-label="jewelBazaari Home" class="inline-block mb-4">
+                <img src="images/logo.png" alt="jewelBazaari" width="176" height="80" class="h-14 sm:h-16 w-auto mx-auto object-contain">
+            </a>
+            <p class="text-[#C5A880] text-xs sm:text-sm uppercase tracking-[0.2em] font-medium mb-3">About JewelBazaari</p>
+            <h1 class="section-title text-3xl sm:text-5xl font-bold leading-tight">India's Digital Jewellery Marketplace</h1>
+            <div class="gold-line"></div>
+            <p class="text-white/80 mt-5 text-base sm:text-lg font-light max-w-2xl mx-auto">
+                Connecting manufacturers, wholesalers, retailers, designers, and buyers on one trusted platform.
+            </p>
+        </div>
+    </section>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+
+        <!-- Intro -->
+        <section class="mb-12 sm:mb-16">
+            <div class="about-card max-w-4xl mx-auto">
+                <h2 class="section-title text-2xl sm:text-3xl text-[#4A0E17] mb-3">About JewelBazaari</h2>
+                <div class="gold-line gold-line--left mb-5"></div>
+                <div class="space-y-4 text-gray-600 text-sm sm:text-base leading-relaxed">
+                    <p>
+                        JewelBazaari is a modern online marketplace built to connect jewellery manufacturers, wholesalers, retailers, designers, and buyers on one trusted platform. Our goal is to simplify jewellery sourcing by creating a place where businesses can showcase their collections and customers can discover quality jewellery from verified sellers.
+                    </p>
+                    <p>
+                        Whether you're searching for diamond jewellery, gold jewellery, silver jewellery, gemstone collections, or custom-made designs, JewelBazaari brings the jewellery industry together through a seamless digital experience.
+                    </p>
+                    <p>
+                        As our platform continues to grow, we are committed to making jewellery trading more transparent, efficient, and accessible for businesses across India and beyond.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mission & Vision -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 mb-12 sm:mb-16">
+            <article class="about-card">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="about-icon" aria-hidden="true">
+                        <i data-lucide="target" class="w-5 h-5"></i>
+                    </div>
+                    <h2 class="section-title text-xl sm:text-2xl text-[#4A0E17]">Our Mission</h2>
+                </div>
+                <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                    To empower jewellery businesses by providing a secure, professional, and easy-to-use marketplace where sellers can reach more customers and buyers can confidently discover exceptional jewellery.
+                </p>
+            </article>
+            <article class="about-card">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="about-icon" aria-hidden="true">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                    </div>
+                    <h2 class="section-title text-xl sm:text-2xl text-[#4A0E17]">Our Vision</h2>
+                </div>
+                <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                    To become India's most trusted jewellery marketplace by connecting manufacturers, wholesalers, retailers, and customers through technology, innovation, and trust.
+                </p>
+            </article>
+        </section>
+
+        <!-- What We Offer -->
+        <section class="mb-12 sm:mb-16">
+            <div class="text-center mb-8">
+                <h2 class="section-title text-2xl sm:text-3xl text-[#4A0E17]">What We Offer</h2>
+                <div class="gold-line"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">💎</span>
+                    <span class="text-sm font-medium text-gray-700">Jewellery Marketplace</span>
+                </div>
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">✅</span>
+                    <span class="text-sm font-medium text-gray-700">Verified Seller Platform</span>
+                </div>
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">📦</span>
+                    <span class="text-sm font-medium text-gray-700">Easy Product Listings</span>
+                </div>
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">🔍</span>
+                    <span class="text-sm font-medium text-gray-700">Smart Product Search</span>
+                </div>
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">❤️</span>
+                    <span class="text-sm font-medium text-gray-700">Wishlist &amp; Favorites</span>
+                </div>
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">👥</span>
+                    <span class="text-sm font-medium text-gray-700">Growing Jewellery Community</span>
+                </div>
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">🔐</span>
+                    <span class="text-sm font-medium text-gray-700">Secure User Authentication</span>
+                </div>
+                <div class="offer-chip">
+                    <span class="text-lg" aria-hidden="true">📱</span>
+                    <span class="text-sm font-medium text-gray-700">Accessible Across Devices</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose -->
+        <section class="mb-12 sm:mb-16">
+            <div class="about-card max-w-4xl mx-auto">
+                <h2 class="section-title text-2xl sm:text-3xl text-[#4A0E17] mb-3">Why Choose JewelBazaari?</h2>
+                <div class="gold-line gold-line--left mb-5"></div>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-sm sm:text-base text-gray-600">
+                    <li class="why-item">Multiple jewellery categories in one place</li>
+                    <li class="why-item">Easy seller registration and product management</li>
+                    <li class="why-item">User-friendly shopping experience</li>
+                    <li class="why-item">Fast and responsive interface</li>
+                    <li class="why-item">Secure login system</li>
+                    <li class="why-item">Continuous feature improvements</li>
+                    <li class="why-item sm:col-span-2">Designed specifically for the jewellery industry</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Values -->
+        <section class="mb-12 sm:mb-16">
+            <div class="text-center mb-8">
+                <h2 class="section-title text-2xl sm:text-3xl text-[#4A0E17]">Our Values</h2>
+                <div class="gold-line"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+                <article class="about-card text-center">
+                    <div class="about-icon mx-auto mb-3" aria-hidden="true">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-semibold text-[#4A0E17] mb-2">Trust</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Building long-term relationships through transparency and reliability.</p>
+                </article>
+                <article class="about-card text-center">
+                    <div class="about-icon mx-auto mb-3" aria-hidden="true">
+                        <i data-lucide="gem" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-semibold text-[#4A0E17] mb-2">Quality</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Encouraging high standards in every jewellery listing.</p>
+                </article>
+                <article class="about-card text-center">
+                    <div class="about-icon mx-auto mb-3" aria-hidden="true">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-semibold text-[#4A0E17] mb-2">Innovation</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Using modern technology to improve jewellery buying and selling.</p>
+                </article>
+                <article class="about-card text-center">
+                    <div class="about-icon mx-auto mb-3" aria-hidden="true">
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-semibold text-[#4A0E17] mb-2">Customer First</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Creating the best possible experience for buyers and sellers.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section class="mb-12 sm:mb-16">
+            <div class="about-card max-w-3xl mx-auto">
+                <h2 class="section-title text-2xl sm:text-3xl text-[#4A0E17] mb-3 text-center">Contact Us</h2>
+                <div class="gold-line mb-6"></div>
+                <p class="text-center section-title text-lg text-[#4A0E17] mb-6">JewelBazaari</p>
+                <ul class="space-y-4 text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
+                    <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                        <span class="text-[#9B7E4B] font-semibold uppercase tracking-wider text-xs w-24 shrink-0">Phone</span>
+                        <a href="https://wa.me/918917219139" class="contact-link" target="_blank" rel="noopener noreferrer">+91 8917219139</a>
+                    </li>
+                    <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                        <span class="text-[#9B7E4B] font-semibold uppercase tracking-wider text-xs w-24 shrink-0">Email</span>
+                        <a href="mailto:abhishekyadav98.official@gmail.com" class="contact-link break-all">abhishekyadav98.official@gmail.com</a>
+                    </li>
+                    <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                        <span class="text-[#9B7E4B] font-semibold uppercase tracking-wider text-xs w-24 shrink-0">Website</span>
+                        <a href="index.html" class="contact-link">JewelBazaari</a>
+                    </li>
+                    <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                        <span class="text-[#9B7E4B] font-semibold uppercase tracking-wider text-xs w-24 shrink-0">Instagram</span>
+                        <a href="https://www.instagram.com/jewelbazaari.insta" class="contact-link" target="_blank" rel="noopener noreferrer">@jewelbazaari.insta</a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Join CTA -->
+        <section class="join-banner px-6 sm:px-10 py-10 sm:py-12 text-center mb-6">
+            <div class="relative z-10 max-w-3xl mx-auto">
+                <h2 class="section-title text-2xl sm:text-3xl mb-3">Join the JewelBazaari Community</h2>
+                <div class="gold-line mb-5"></div>
+                <p class="text-white/85 text-sm sm:text-base leading-relaxed mb-8">
+                    Whether you're a jewellery manufacturer, wholesaler, retailer, designer, or jewellery enthusiast, JewelBazaari is built for you. Join our growing marketplace, showcase your products, discover new collections, and become part of the future of digital jewellery commerce.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+                    <a href="vendor-upload.html" class="cta-btn cta-primary">Sell on jewelBazaari</a>
+                    <a href="all-jewellery.html" class="cta-btn cta-secondary">Browse Collections</a>
+                    <a href="query.html" class="cta-btn cta-secondary">Contact Support</a>
+                </div>
+                <p class="mt-8 text-[#C5A880] text-sm sm:text-base italic font-light">
+                    JewelBazaari — Connecting the Jewellery Industry, One Marketplace at a Time.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script type="module">
+        import { loadPageLayout } from './js/product-ui.js?v=20260709b';
+        import { initPageSchemas } from './js/seo-schema.js';
+
+        initPageSchemas({ pageKey: 'about-us.html' });
+        loadPageLayout().then(() => {
+            if (window.lucide?.createIcons) window.lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

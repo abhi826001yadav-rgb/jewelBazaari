@@ -1,7 +1,7 @@
 import { getCoverImage, getProductImages } from './product-images.js';
 
 import { escapeHtml, sanitizeImageUrl, IMAGE_FALLBACK_DATA_URI } from './security-utils.js';
-import { initLucideIcons, initLinkPrefetch, scheduleIdleTask } from './performance-boot.js?v=20260706i';
+import { initLucideIcons, initLinkPrefetch, scheduleIdleTask } from './performance-boot.js?v=20260709b';
 import { announce, openAccessibleDialog, closeAccessibleDialog } from './accessibility.js';
 import { formatProductPrice } from './format-utils.js';
 
@@ -183,7 +183,7 @@ export function ensureSiteBanner() {
 }
 
 export async function loadPageLayout() {
-    const { loadPageComponents } = await import('./load-components.js?v=20260706i');
+    const { loadPageComponents } = await import('./load-components.js?v=20260709b');
     const { scheduleStorefrontUiInit } = await import('./performance-boot.js');
     const announcementEl = document.getElementById('announcement-placeholder');
     const headerEl = document.getElementById('header-placeholder');

@@ -1,5 +1,5 @@
 import { BUILD_VERSION } from './build-version.js';
-import { scheduleStorefrontUiInit, initLinkPrefetch } from './performance-boot.js?v=20260706i';
+import { scheduleStorefrontUiInit, initLinkPrefetch } from './performance-boot.js?v=20260709b';
 import { getPageSeo } from './seo-config.js';
 import { initPageSchemas } from './seo-schema.js';
 

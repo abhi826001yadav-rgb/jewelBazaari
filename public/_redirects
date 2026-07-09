@@ -18,5 +18,9 @@
 /contact/          /query        301
 /contact-us/       /query        301
 
+# About aliases → clean path (CF serves about-us.html at /about-us)
+/about             /about-us     301
+/about/            /about-us     301
+
 # Legacy / removed paths
 /diamond%20copy.html    /diamond    301

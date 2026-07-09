@@ -85,22 +85,24 @@ function sanitizeAdminLinks() {
 
 function sanitizeAnnouncement() {
     document.querySelectorAll('.jb-announcement').forEach((el) => {
-        el.classList.add('jb-announcement--two-line');
-        el.querySelectorAll('.jb-announcement-sep').forEach((sep) => sep.remove());
+        el.classList.remove('jb-announcement--two-line');
+        el.classList.add('jb-announcement--one-line');
 
-        el.style.display = 'grid';
-        el.style.gridTemplateRows = 'auto auto';
-        el.style.justifyItems = 'center';
+        el.style.display = 'flex';
+        el.style.flexDirection = 'row';
+        el.style.flexWrap = 'nowrap';
         el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
         el.style.textAlign = 'center';
-        el.style.gap = '0';
-        el.style.rowGap = '0';
+        el.style.width = '100%';
+        el.style.gap = '0.4em';
 
         const main = el.querySelector('.jb-announcement-main');
         const by = el.querySelector('.jb-announcement-by');
 
         if (main) {
-            main.style.display = 'block';
+            main.style.display = 'inline';
+            main.style.width = 'auto';
             main.style.whiteSpace = 'nowrap';
             if (/across India/i.test(main.textContent)) {
                 main.textContent = 'Affordable jewellery from verified sellers in India';
@@ -108,8 +110,23 @@ function sanitizeAnnouncement() {
         }
 
         if (by) {
-            by.style.display = 'block';
+            by.style.display = 'inline';
+            by.style.width = 'auto';
             by.style.whiteSpace = 'nowrap';
+        }
+
+        // Ensure a mid-dot separator between the two phrases
+        let sep = el.querySelector('.jb-announcement-sep');
+        if (!sep && main && by) {
+            sep = document.createElement('span');
+            sep.className = 'jb-announcement-sep';
+            sep.setAttribute('aria-hidden', 'true');
+            sep.textContent = '·';
+            main.insertAdjacentElement('afterend', sep);
+        }
+        if (sep) {
+            sep.style.display = 'inline';
+            sep.style.whiteSpace = 'nowrap';
         }
     });
 }
