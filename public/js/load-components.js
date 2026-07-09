@@ -85,37 +85,39 @@ function sanitizeAdminLinks() {
 
 function sanitizeAnnouncement() {
     document.querySelectorAll('.jb-announcement').forEach((el) => {
+        // Layout is CSS-driven: one line on desktop/tablet, two lines on phone.
         el.classList.remove('jb-announcement--two-line');
         el.classList.add('jb-announcement--one-line');
 
-        el.style.display = 'flex';
-        el.style.flexDirection = 'row';
-        el.style.flexWrap = 'nowrap';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        el.style.textAlign = 'center';
-        el.style.width = '100%';
-        el.style.gap = '0.4em';
+        // Clear any legacy inline layout so mobile two-line CSS can apply.
+        el.style.display = '';
+        el.style.flexDirection = '';
+        el.style.flexWrap = '';
+        el.style.alignItems = '';
+        el.style.justifyContent = '';
+        el.style.textAlign = '';
+        el.style.width = '';
+        el.style.gap = '';
 
         const main = el.querySelector('.jb-announcement-main');
         const by = el.querySelector('.jb-announcement-by');
 
         if (main) {
-            main.style.display = 'inline';
-            main.style.width = 'auto';
-            main.style.whiteSpace = 'nowrap';
+            main.style.display = '';
+            main.style.width = '';
+            main.style.whiteSpace = '';
             if (/across India/i.test(main.textContent)) {
                 main.textContent = 'Affordable jewellery from verified sellers in India';
             }
         }
 
         if (by) {
-            by.style.display = 'inline';
-            by.style.width = 'auto';
-            by.style.whiteSpace = 'nowrap';
+            by.style.display = '';
+            by.style.width = '';
+            by.style.whiteSpace = '';
         }
 
-        // Ensure a mid-dot separator between the two phrases
+        // Separator is visible on desktop one-line; hidden via CSS on phone.
         let sep = el.querySelector('.jb-announcement-sep');
         if (!sep && main && by) {
             sep = document.createElement('span');
@@ -125,8 +127,8 @@ function sanitizeAnnouncement() {
             main.insertAdjacentElement('afterend', sep);
         }
         if (sep) {
-            sep.style.display = 'inline';
-            sep.style.whiteSpace = 'nowrap';
+            sep.style.display = '';
+            sep.style.whiteSpace = '';
         }
     });
 }
