@@ -4,6 +4,13 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const publicDir = path.join(root, 'public');
 
+/* Keep homepage banners in sync before deploy */
+try {
+  require('./sync-hero-carousel').syncHeroCarousel();
+} catch (err) {
+  console.warn('[predeploy] hero carousel sync skipped:', err.message);
+}
+
 const errors = [];
 const warnings = [];
 

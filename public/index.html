@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://www.gstatic.com">
-    <link rel="preload" href="images/photo1.webp" as="image" type="image/webp" fetchpriority="high">
+    <link rel="preload" href="images/hero-carousel/banner-02.jpg" as="image" fetchpriority="high">
     <link rel="preload" href="css/mobile-responsive.css?v=20260709b" as="style">
     <link rel="modulepreload" href="js/load-components.js?v=20260709b">
     <link rel="modulepreload" href="js/home-featured-carousel.js">
@@ -32,16 +32,338 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <style>
-        /* Hero banner swiper only */
-        .mySwiper {
+        /* ── Premium Tanishq-style hero carousel (always L | C | R) ── */
+        .jb-hero {
+            position: relative;
             width: 100%;
-            height: 500px;
+            /* Clean white page like Tanishq — breathing room top + bottom */
+            background: #ffffff;
+            padding: 1.5rem 0 2.75rem;
+            overflow: hidden;
         }
 
-        .mySwiper .swiper-slide img {
+        .jb-hero-inner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /*
+         * Stage: full-bleed peeks on L/R with clear gaps between cards.
+         * Extra bottom margin = empty space under banners (like Tanishq).
+         */
+        .jb-hero-stage {
+            position: relative;
+            width: 100%;
+            height: clamp(210px, 36vw, 400px);
+            margin: 0 auto 1.75rem;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: grab;
+        }
+
+        .jb-hero-stage:active {
+            cursor: grabbing;
+        }
+
+        .jb-hero-card {
+            position: absolute;
+            top: 50%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            transform: translateY(-50%);
+            transition:
+                left 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                right 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                width 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                z-index 0s linear 0.35s;
+            will-change: transform, left, right, opacity;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            outline: none;
+        }
+
+        .jb-hero-card:focus-visible {
+            outline: 2px solid #C5A880;
+            outline-offset: 3px;
+        }
+
+        /*
+         * Gaps like Tanishq:
+         * - Center ~72% wide → ~14% free each side
+         * - Side peeks ~11% wide, pulled slightly off-edge
+         * - Leaves ~1.25–1.75rem visible gutter between cards
+         */
+        .jb-hero-card[data-pos="left"] {
+            left: 0;
+            right: auto;
+            width: 12%;
+            transform: translateY(-50%) translateX(-18%);
+            opacity: 0.72;
+            filter: brightness(0.88) saturate(0.95);
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .jb-hero-card[data-pos="center"] {
+            left: 50%;
+            right: auto;
+            width: min(72%, 1040px);
+            transform: translateY(-50%) translateX(-50%);
+            opacity: 1;
+            filter: brightness(1) saturate(1);
+            z-index: 3;
+            cursor: default;
+            transition-delay: 0s;
+        }
+
+        .jb-hero-card[data-pos="right"] {
+            left: auto;
+            right: 0;
+            width: 12%;
+            transform: translateY(-50%) translateX(18%);
+            opacity: 0.72;
+            filter: brightness(0.88) saturate(0.95);
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        /* Slides beyond the 3 visible slots (supports up to 10) */
+        .jb-hero-card[data-pos="hidden"] {
+            left: 50%;
+            right: auto;
+            width: min(72%, 1040px);
+            transform: translateY(-50%) translateX(-50%) scale(0.92);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .jb-hero-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.65rem;
+            overflow: hidden;
+            background: #1a0a0c;
+            box-shadow:
+                0 6px 18px rgba(0, 0, 0, 0.08),
+                0 16px 36px -10px rgba(0, 0, 0, 0.14);
+        }
+
+        .jb-hero-card[data-pos="center"] .jb-hero-frame {
+            border-radius: 0.75rem;
+            box-shadow:
+                0 10px 28px rgba(0, 0, 0, 0.1),
+                0 24px 48px -12px rgba(0, 0, 0, 0.16);
+        }
+
+        .jb-hero-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .jb-hero-frame picture,
+        .jb-hero-frame img {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
+        }
+
+        /* Dots sit in the empty band under the banners (Tanishq spacing) */
+        .jb-hero-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.5rem;
+            padding: 0 1rem;
+        }
+
+        .jb-hero-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(155, 126, 75, 0.4);
+            background: rgba(255, 255, 255, 0.96);
+            color: #4A0E17;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(74, 14, 23, 0.1);
+            transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .jb-hero-btn:hover {
+            background: #4A0E17;
+            color: #fff;
+            border-color: #4A0E17;
+        }
+
+        .jb-hero-btn:active {
+            transform: scale(0.96);
+        }
+
+        .jb-hero-btn:focus-visible {
+            outline: 2px solid #C5A880;
+            outline-offset: 2px;
+        }
+
+        .jb-hero-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .jb-hero-dot {
+            width: 0.45rem;
+            height: 0.45rem;
+            padding: 0;
+            border: 0;
+            border-radius: 9999px;
+            background: rgba(74, 14, 23, 0.28);
+            cursor: pointer;
+            transition: width 0.35s ease, background 0.35s ease;
+        }
+
+        .jb-hero-dot[aria-current="true"] {
+            width: 1.35rem;
+            background: #9B7E4B;
+        }
+
+        @media (min-width: 640px) {
+            .jb-hero {
+                padding: 1.75rem 0 3.25rem;
+            }
+
+            .jb-hero-stage {
+                height: clamp(260px, 32vw, 430px);
+                margin-bottom: 2rem;
+            }
+
+            .jb-hero-card[data-pos="left"],
+            .jb-hero-card[data-pos="right"] {
+                width: 11%;
+            }
+
+            .jb-hero-card[data-pos="left"] {
+                transform: translateY(-50%) translateX(-22%);
+            }
+
+            .jb-hero-card[data-pos="right"] {
+                transform: translateY(-50%) translateX(22%);
+            }
+
+            .jb-hero-card[data-pos="center"] {
+                width: min(74%, 1080px);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .jb-hero {
+                /* Extra empty band under hero like Tanishq */
+                padding: 2rem 0 3.75rem;
+            }
+
+            .jb-hero-stage {
+                height: clamp(300px, 28vw, 460px);
+                margin-bottom: 2.25rem;
+            }
+
+            .jb-hero-card[data-pos="left"],
+            .jb-hero-card[data-pos="right"] {
+                width: 10.5%;
+            }
+
+            .jb-hero-card[data-pos="left"] {
+                transform: translateY(-50%) translateX(-28%);
+            }
+
+            .jb-hero-card[data-pos="right"] {
+                transform: translateY(-50%) translateX(28%);
+            }
+
+            .jb-hero-card[data-pos="center"] {
+                width: min(76%, 1120px);
+            }
+
+            .jb-hero-frame {
+                border-radius: 0.85rem;
+            }
+
+            .jb-hero-card[data-pos="center"] .jb-hero-frame {
+                border-radius: 1rem;
+            }
+
+            .jb-hero-btn {
+                width: 2.75rem;
+                height: 2.75rem;
+            }
+        }
+
+        @media (max-width: 639px) {
+            .jb-hero {
+                padding: 1rem 0 2.25rem;
+            }
+
+            .jb-hero-stage {
+                height: clamp(190px, 50vw, 280px);
+                margin-bottom: 1.35rem;
+            }
+
+            .jb-hero-card[data-pos="left"] {
+                width: 14%;
+                transform: translateY(-50%) translateX(-35%);
+            }
+
+            .jb-hero-card[data-pos="right"] {
+                width: 14%;
+                transform: translateY(-50%) translateX(35%);
+            }
+
+            .jb-hero-card[data-pos="center"] {
+                width: min(78%, 520px);
+            }
+
+            .jb-hero-frame {
+                border-radius: 0.5rem;
+            }
+
+            .jb-hero-btn {
+                width: 2.15rem;
+                height: 2.15rem;
+                font-size: 1.15rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .jb-hero-card {
+                transition: none;
+            }
         }
 
         /* Trending Now + New Arrivals shadow carousel */
@@ -334,35 +656,22 @@
 
     <main id="main-content">
 
-    <section class="w-full">
-        <div class="swiper mySwiper">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <picture>
-                        <source srcset="images/photo1.webp" type="image/webp">
-                        <img src="images/photo1.jpg" alt="Premium gold and diamond jewellery collection at jewelBazaari" width="1920" height="500" fetchpriority="high" loading="eager" decoding="async">
-                    </picture>
-                </div>
-                <div class="swiper-slide">
-                    <picture>
-                        <source srcset="images/photo3.webp" type="image/webp">
-                        <img src="images/photo3.jpg" alt="Designer gemstone earrings and necklaces" width="1920" height="500" loading="lazy" decoding="async">
-                    </picture>
-                </div>
-                <div class="swiper-slide">
-                    <picture>
-                        <source srcset="images/photo4.webp" type="image/webp">
-                        <img src="images/photo4.jpg" alt="Luxury diamond rings and fine jewellery" width="1920" height="500" loading="lazy" decoding="async">
-                    </picture>
-                </div>
-            
+    <section class="jb-hero" aria-roledescription="carousel" aria-label="Featured jewellery collections">
+        <div class="jb-hero-inner">
+            <!--
+              Banners load from carousel-homepage/ (project folder) via
+              scripts/sync-hero-carousel.js → public/js/hero-carousel-data.json
+              Supports 1–10 photos. Drop files in carousel-homepage/ then sync.
+            -->
+            <div class="jb-hero-stage" id="jb-hero-stage"></div>
+            <div class="jb-hero-controls">
+                <button type="button" class="jb-hero-btn" id="jb-hero-prev" aria-label="Previous banner">&#8249;</button>
+                <div class="jb-hero-dots" id="jb-hero-dots" role="tablist" aria-label="Banner pagination"></div>
+                <button type="button" class="jb-hero-btn" id="jb-hero-next" aria-label="Next banner">&#8250;</button>
             </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-pagination"></div>
         </div>
     </section>
-    
+
     <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <section class="jb-trending-section bg-white">
@@ -575,27 +884,18 @@
         import { initGoldPriceModal } from './js/gold-price-modal.js';
         import { getSwiperAutoplayOptions } from './js/mobile-perf.js';
         import { initHomeSearchRotator } from './js/home-search-rotator.js?v=20260709b';
+        import { initHomeHeroCarousel } from './js/home-hero-carousel.js';
         import './js/header-search.js?v=20260709b';
 
         initPageSchemas({ pageKey: 'index.html' });
+        initHomeHeroCarousel();
 
         let swipersInitialized = false;
 
         function initSwipers() {
             if (!window.Swiper || swipersInitialized) return false;
 
-            const heroAutoplay = getSwiperAutoplayOptions(6000);
             const whyAutoplay = getSwiperAutoplayOptions(2334);
-
-            if (document.querySelector('.mySwiper')) {
-                new Swiper('.mySwiper', {
-                    loop: true,
-                    speed: heroAutoplay ? 1000 : 0,
-                    autoplay: heroAutoplay,
-                    pagination: { el: '.swiper-pagination', clickable: true },
-                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
-                });
-            }
 
             if (document.querySelector('.jb-why-swiper')) {
                 new Swiper('.jb-why-swiper', {
@@ -607,9 +907,6 @@
                     watchSlidesProgress: true
                 });
             }
-
-            document.querySelector('.mySwiper .swiper-button-next')?.setAttribute('aria-label', 'Next slide');
-            document.querySelector('.mySwiper .swiper-button-prev')?.setAttribute('aria-label', 'Previous slide');
 
             swipersInitialized = true;
             return true;

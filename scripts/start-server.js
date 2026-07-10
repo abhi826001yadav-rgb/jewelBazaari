@@ -7,12 +7,20 @@ const {
   loadRedirects,
   resolveRedirect
 } = require('./cf-pages-utils');
+const { syncHeroCarousel } = require('./sync-hero-carousel');
 
 
 const projectRoot = path.join(__dirname, '..');
 const root = path.join(projectRoot, 'public');
 // Prefer 5500 (VS Code Live Server default) so bookmarks/links match; fallback 3000.
 const port = Number(process.env.PORT || 5500);
+
+/* Refresh homepage banners from carousel-homepage/ on every local start */
+try {
+  syncHeroCarousel();
+} catch (err) {
+  console.warn('[hero-carousel] sync failed:', err.message);
+}
 
 
 const headerRules = loadHeaders(root);

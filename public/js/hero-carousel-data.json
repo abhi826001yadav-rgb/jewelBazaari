@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-07-10T13:19:19.559Z",
+  "max": 10,
+  "count": 3,
+  "sourceFolder": "carousel-homepage",
+  "slides": [
+    {
+      "src": "images/hero-carousel/banner-01.jpg",
+      "alt": "jewelBazaari featured collection 1",
+      "file": "01.jpg"
+    },
+    {
+      "src": "images/hero-carousel/banner-02.jpg",
+      "alt": "jewelBazaari featured collection 2",
+      "file": "02.jpg"
+    },
+    {
+      "src": "images/hero-carousel/banner-03.jpg",
+      "alt": "jewelBazaari featured collection 3",
+      "file": "03.jpg"
+    }
+  ]
+}

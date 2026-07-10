@@ -825,8 +825,9 @@ button.jb-mobile-menu-link {
 }
 
 @media (max-width: 768px) {
-    .swiper {
-        height: 280px !important;
+    /* Scoped to Why section only — hero uses aspect-ratio frames */
+    .jb-why-swiper {
+        height: auto !important;
     }
 
     main.max-w-7xl,
@@ -938,8 +939,8 @@ button.jb-mobile-menu-link {
 }
 
 @media (max-width: 480px) {
-    .swiper {
-        height: 220px !important;
+    .jb-why-swiper {
+        height: auto !important;
     }
 
     .jb-header-nav {
