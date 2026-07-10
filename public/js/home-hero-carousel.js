@@ -7,7 +7,7 @@
  */
 
 const MANIFEST_URL = 'js/hero-carousel-data.json';
-const HOLD_MS = 2000;
+const HOLD_MS = 5000;
 const FALLBACK_SLIDES = [
   {
     src: 'images/photo1.jpg',
@@ -47,12 +47,14 @@ async function loadSlides() {
   }
 }
 
+const ALL_JEWELLERY_HREF = 'all-jewellery.html';
+
 function buildCard(slide, index, total) {
   const isCenterCandidate = total === 1 ? index === 0 : index === 1;
   const loading = isCenterCandidate ? 'eager' : 'lazy';
   const priority = isCenterCandidate ? ' fetchpriority="high"' : '';
   return `
-    <button type="button" class="jb-hero-card" data-index="${index}" aria-label="Banner ${index + 1} of ${total}">
+    <button type="button" class="jb-hero-card" data-index="${index}" aria-label="Banner ${index + 1} of ${total} — view all jewellery">
       <div class="jb-hero-frame">
         <img src="${escapeAttr(slide.src)}" alt="${escapeAttr(slide.alt)}" width="1920" height="800" loading="${loading}" decoding="async"${priority}>
       </div>
@@ -188,8 +190,8 @@ export async function initHomeHeroCarousel() {
         e.preventDefault();
         return;
       }
-      if (card.dataset.pos === 'left') prev();
-      else if (card.dataset.pos === 'right') next();
+      /* Any banner tap → All Jewellery (swipe still changes slides) */
+      window.location.href = ALL_JEWELLERY_HREF;
     });
   });
 

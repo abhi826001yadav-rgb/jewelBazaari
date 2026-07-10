@@ -15,12 +15,12 @@ const root = path.join(projectRoot, 'public');
 // Prefer 5500 (VS Code Live Server default) so bookmarks/links match; fallback 3000.
 const port = Number(process.env.PORT || 5500);
 
-/* Refresh homepage banners from carousel-homepage/ on every local start */
-try {
-  syncHeroCarousel();
-} catch (err) {
-  console.warn('[hero-carousel] sync failed:', err.message);
-}
+/* Refresh + auto-compress homepage banners from carousel-homepage/ on start */
+const syncReady = Promise.resolve()
+  .then(() => syncHeroCarousel())
+  .catch((err) => {
+    console.warn('[hero-carousel] sync failed:', err.message);
+  });
 
 
 const headerRules = loadHeaders(root);
@@ -112,9 +112,11 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
-server.listen(port, () => {
-  console.log(`jewelBazaari running at http://localhost:${port}`);
-  console.log(`Loaded ${headerRules.length} _headers rules, ${redirects.length} _redirects`);
-  console.log('Local mode: HSTS + upgrade-insecure-requests disabled so http://localhost works');
-  console.log('Vendor image uploads: direct to Cloudinary from the browser (see public/js/utils/cloudinary-config.js)');
+syncReady.finally(() => {
+  server.listen(port, () => {
+    console.log(`jewelBazaari running at http://localhost:${port}`);
+    console.log(`Loaded ${headerRules.length} _headers rules, ${redirects.length} _redirects`);
+    console.log('Local mode: HSTS + upgrade-insecure-requests disabled so http://localhost works');
+    console.log('Vendor image uploads: direct to Cloudinary from the browser (see public/js/utils/cloudinary-config.js)');
+  });
 });

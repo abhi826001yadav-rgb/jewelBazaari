@@ -8,7 +8,10 @@
   Height:  800 pixels
   Ratio:   2.4 : 1   (wide landscape, not square, not portrait)
   Format:  JPG or WEBP
-  File size: under 500 KB if possible
+
+  File size: you may drop large files (even 2–5 MB).
+  On sync they are AUTO-COMPRESSED for the website to ≤ 500 KB
+  (your originals in this folder stay full quality).
 
   Example names:
     01.jpg   02.jpg   03.jpg  … up to 10 photos

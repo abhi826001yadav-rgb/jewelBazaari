@@ -1,0 +1,26 @@
+{
+  "name": "jewelbazaari",
+  "version": "1.0.0",
+  "description": "",
+  "main": "live-server.middleware.js",
+  "scripts": {
+    "sync-carousel": "node scripts/sync-hero-carousel.js",
+    "start": "node scripts/start-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhi826001yadav-rgb/jewelBazaari.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/abhi826001yadav-rgb/jewelBazaari/issues"
+  },
+  "homepage": "https://github.com/abhi826001yadav-rgb/jewelBazaari#readme",
+  "dependencies": {
+    "sharp": "^0.35.3"
+  }
+}

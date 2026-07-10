@@ -4,13 +4,6 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const publicDir = path.join(root, 'public');
 
-/* Keep homepage banners in sync before deploy */
-try {
-  require('./sync-hero-carousel').syncHeroCarousel();
-} catch (err) {
-  console.warn('[predeploy] hero carousel sync skipped:', err.message);
-}
-
 const errors = [];
 const warnings = [];
 
@@ -142,16 +135,26 @@ for (const img of fs.readdirSync(imagesDir)) {
   if (size > 250 * 1024) warn(`Large image: images/${img} (${Math.round(size / 1024)} KB)`);
 }
 
-// --- Report ---
-console.log('=== Pre-Deploy Check ===\n');
-if (errors.length) {
-  console.log('ERRORS:');
-  errors.forEach((e) => console.log(`  ✗ ${e}`));
+// --- Report (after hero sync so compressed banners are current) ---
+async function finish() {
+  try {
+    await require('./sync-hero-carousel').syncHeroCarousel();
+  } catch (err) {
+    console.warn('[predeploy] hero carousel sync skipped:', err.message);
+  }
+
+  console.log('=== Pre-Deploy Check ===\n');
+  if (errors.length) {
+    console.log('ERRORS:');
+    errors.forEach((e) => console.log(`  ✗ ${e}`));
+  }
+  if (warnings.length) {
+    console.log('\nWARNINGS:');
+    warnings.forEach((w) => console.log(`  ! ${w}`));
+  }
+  if (!errors.length && !warnings.length) console.log('All checks passed.');
+  console.log(`\nSummary: ${errors.length} error(s), ${warnings.length} warning(s)`);
+  process.exit(errors.length ? 1 : 0);
 }
-if (warnings.length) {
-  console.log('\nWARNINGS:');
-  warnings.forEach((w) => console.log(`  ! ${w}`));
-}
-if (!errors.length && !warnings.length) console.log('All checks passed.');
-console.log(`\nSummary: ${errors.length} error(s), ${warnings.length} warning(s)`);
-process.exit(errors.length ? 1 : 0);
+
+finish();

@@ -48,7 +48,12 @@ edges may crop slightly if aspect ratio differs).
       Height:  800 px
       Ratio:   2.4 : 1   (or 12 : 5)
       Format:  .jpg or .webp
-      Size:    under ~400–500 KB each (for fast loading)
+
+  AUTO-COMPRESS (built into sync):
+      Your originals in this folder stay untouched.
+      Website copies are resized (max 1920×800) and JPEG-
+      compressed with adaptive quality until each file is
+      ≤ 500 KB. Safe to drop large 2–5 MB camera exports.
 
   Also good:
       1920 × 720   (wider / more cinematic)

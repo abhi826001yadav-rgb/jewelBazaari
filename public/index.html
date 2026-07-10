@@ -123,7 +123,7 @@
             opacity: 1;
             filter: brightness(1) saturate(1);
             z-index: 3;
-            cursor: default;
+            cursor: pointer;
             transition-delay: 0s;
         }
 
@@ -327,12 +327,18 @@
 
         @media (max-width: 639px) {
             .jb-hero {
-                padding: 1rem 0 2.25rem;
+                /* Tighter to Trending Now (further -25% from prior mobile gap) */
+                padding: 1rem 0 0.85rem;
             }
 
             .jb-hero-stage {
                 height: clamp(190px, 50vw, 280px);
-                margin-bottom: 1.35rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .jb-hero-controls {
+                margin-top: 0.1rem;
+                margin-bottom: 0.2rem;
             }
 
             .jb-hero-card[data-pos="left"] {
@@ -405,7 +411,13 @@
         }
 
         @media (max-width: 767px) {
+            /* Tighter gap: carousel → Trending Now (another -25% on mobile) */
+            .jb-hero {
+                padding-bottom: 0.95rem;
+            }
+
             .jb-trending-section {
+                padding-top: 1.5rem; /* was 2rem */
                 padding-bottom: 1.2rem;
             }
 
