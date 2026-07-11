@@ -188,6 +188,27 @@
             object-position: center;
         }
 
+        /*
+         * Desktop side peeks are narrow strips. With object-fit: cover + center,
+         * you only see the middle of the banner. Anchor crop so:
+         * - left peek  → extreme RIGHT of that slide (continues from off-screen L)
+         * - right peek → extreme LEFT of that slide (continues from off-screen R)
+         */
+        .jb-hero-card[data-pos="left"] .jb-hero-frame img,
+        .jb-hero-card[data-pos="left"] .jb-hero-frame picture img {
+            object-position: right center;
+        }
+
+        .jb-hero-card[data-pos="right"] .jb-hero-frame img,
+        .jb-hero-card[data-pos="right"] .jb-hero-frame picture img {
+            object-position: left center;
+        }
+
+        .jb-hero-card[data-pos="center"] .jb-hero-frame img,
+        .jb-hero-card[data-pos="center"] .jb-hero-frame picture img {
+            object-position: center center;
+        }
+
         /* Dots sit in the empty band under the banners (Tanishq spacing) */
         .jb-hero-controls {
             display: flex;
