@@ -72,6 +72,25 @@ textarea:focus-visible,
     outline-offset: 2px;
 }
 
+/* Search bar: no brown rectangular focus ring; caret stays left of lens */
+.home-search-input:focus,
+.home-search-input:focus-visible,
+.jb-header-search:focus,
+.jb-header-search:focus-visible,
+#header-search-input:focus,
+#header-search-input:focus-visible,
+#search-input:focus,
+#search-input:focus-visible,
+.home-search-submit:focus,
+.home-search-submit:focus-visible,
+.jb-header-search-submit:focus,
+.jb-header-search-submit:focus-visible,
+.home-search-bar:focus-within {
+    outline: none !important;
+    outline-offset: 0;
+    box-shadow: none !important;
+}
+
 .jb-nav-dropdown a:focus-visible,
 .jb-mobile-menu a:focus-visible,
 .jb-mobile-menu button:focus-visible {

@@ -11,7 +11,7 @@
 
 .home-search-bar:focus-within {
     outline: none;
-    box-shadow: 0 0 0 2px #9ca3af;
+    box-shadow: none;
 }
 
 .home-search-submit,
@@ -45,15 +45,39 @@
 
 .home-search-input,
 .jb-header-search.home-search-input {
-    text-align: center;
+    /* Cursor/text start immediately to the right of the lens */
+    text-align: left;
     width: 100%;
     padding-left: 2.75rem;
     padding-right: 1rem;
+    outline: none !important;
+    box-shadow: none !important;
+    caret-color: #4A0E17;
+}
+
+.home-search-input:focus,
+.home-search-input:focus-visible,
+.jb-header-search.home-search-input:focus,
+.jb-header-search.home-search-input:focus-visible,
+.jb-header-search:focus,
+.jb-header-search:focus-visible {
+    /* No brown/grey rectangular focus ring on search */
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.home-search-submit:focus,
+.home-search-submit:focus-visible,
+.jb-header-search-submit:focus,
+.jb-header-search-submit:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .jb-header-search-form .jb-header-search {
     padding-left: 2.75rem;
     padding-right: 1rem;
+    text-align: left;
 }
 
 .jb-search-suggestions {
@@ -96,10 +120,11 @@
 }
 
 .home-search-input::placeholder {
-    text-align: center;
+    text-align: left;
     color: inherit;
     letter-spacing: normal;
     word-spacing: normal;
+    opacity: 0.85;
 }
 
 .home-search-bar .heart-icon {
