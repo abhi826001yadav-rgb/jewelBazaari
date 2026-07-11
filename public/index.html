@@ -327,42 +327,76 @@
 
         @media (max-width: 639px) {
             .jb-hero {
-                /* Tighter to Trending Now (further -25% from prior mobile gap) */
-                padding: 1rem 0 0.85rem;
+                /* Tanishq mobile: tall hero card, tight gap under dots */
+                padding: 0.65rem 0 0.75rem;
             }
 
+            /*
+             * Tanishq-style mobile hero, scaled to 75% of the tall layout
+             * (25% smaller than clamp(360px, min(108vw, 56vh), 480px)).
+             */
             .jb-hero-stage {
-                height: clamp(190px, 50vw, 280px);
-                margin-bottom: 0.5rem;
+                height: clamp(270px, min(81vw, 42vh), 360px);
+                margin-bottom: 0.35rem;
             }
 
             .jb-hero-controls {
-                margin-top: 0.1rem;
-                margin-bottom: 0.2rem;
+                margin-top: 0.15rem;
+                margin-bottom: 0.15rem;
+                gap: 0.75rem;
             }
 
-            .jb-hero-card[data-pos="left"] {
-                width: 14%;
-                transform: translateY(-50%) translateX(-35%);
+            /* Dots-only like Tanishq mobile (arrows take space & clutter) */
+            .jb-hero-btn {
+                display: none;
             }
 
-            .jb-hero-card[data-pos="right"] {
-                width: 14%;
-                transform: translateY(-50%) translateX(35%);
+            /*
+             * Mobile: single banner only (no left/right peeks), like Tanishq.
+             * Swipe / dots still rotate; only the active slide is visible.
+             */
+            .jb-hero-card[data-pos="left"],
+            .jb-hero-card[data-pos="right"],
+            .jb-hero-card[data-pos="hidden"] {
+                opacity: 0 !important;
+                visibility: hidden;
+                pointer-events: none;
+                z-index: 0;
+                width: min(92%, 400px);
             }
 
             .jb-hero-card[data-pos="center"] {
-                width: min(78%, 520px);
+                left: 50%;
+                right: auto;
+                width: min(92%, 400px);
+                transform: translateY(-50%) translateX(-50%);
+                opacity: 1;
+                filter: none;
+                z-index: 3;
             }
 
             .jb-hero-frame {
-                border-radius: 0.5rem;
+                border-radius: 0.75rem;
             }
 
-            .jb-hero-btn {
-                width: 2.15rem;
-                height: 2.15rem;
-                font-size: 1.15rem;
+            .jb-hero-card[data-pos="center"] .jb-hero-frame {
+                border-radius: 0.85rem;
+                box-shadow:
+                    0 8px 22px rgba(0, 0, 0, 0.1),
+                    0 18px 40px -12px rgba(0, 0, 0, 0.14);
+            }
+
+            .jb-hero-dot {
+                width: 0.4rem;
+                height: 0.4rem;
+            }
+
+            .jb-hero-dot[aria-current="true"] {
+                width: 0.4rem;
+                /* diamond-style active dot (Tanishq) */
+                border-radius: 0.1rem;
+                transform: rotate(45deg);
+                background: #7a1f2e;
             }
         }
 

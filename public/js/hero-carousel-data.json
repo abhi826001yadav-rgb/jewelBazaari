@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-10T13:53:25.465Z",
+  "generatedAt": "2026-07-11T15:07:48.399Z",
   "max": 10,
   "maxBytes": 512000,
   "count": 3,
@@ -13,7 +13,7 @@
     {
       "src": "images/hero-carousel/banner-02.jpg",
       "alt": "jewelBazaari featured collection 2",
-      "file": "02.jpg"
+      "file": "02.png"
     },
     {
       "src": "images/hero-carousel/banner-03.jpg",
