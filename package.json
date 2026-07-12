@@ -4,7 +4,9 @@
   "description": "",
   "main": "live-server.middleware.js",
   "scripts": {
-    "sync-carousel": "node scripts/sync-hero-carousel.js",
+    "sync-carousel": "node scripts/sync-hero-carousel.js && node scripts/sync-hero-carousel-mobile.js",
+    "sync-carousel-desktop": "node scripts/sync-hero-carousel.js",
+    "sync-carousel-mobile": "node scripts/sync-hero-carousel-mobile.js",
     "start": "node scripts/start-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

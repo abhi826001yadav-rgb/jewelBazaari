@@ -37,3 +37,6 @@
 
 
 Full details: see README.txt in this same folder.
+
+Mobile phones use a SEPARATE folder (do not put mobile-only
+photos here):  mobile_carousel-homepage\

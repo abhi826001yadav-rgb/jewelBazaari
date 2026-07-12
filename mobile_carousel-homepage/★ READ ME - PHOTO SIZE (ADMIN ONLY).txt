@@ -1,0 +1,52 @@
+★ ADMIN ONLY — visitors never see this folder or this note ★
+
+────────────────────────────────────────
+  PERFECT PHOTO SIZE FOR MOBILE CAROUSEL
+────────────────────────────────────────
+
+  Width:   1080 pixels
+  Height:  960 pixels
+  Ratio:   9 : 8   (slightly wider than square — NOT desktop-wide)
+  Format:  JPG or WEBP
+
+  File size: you may drop large files (even 2–5 MB).
+  On sync they are AUTO-COMPRESSED for the website to ≤ 150 KB
+  (your originals in this folder stay full quality).
+
+  Example names:
+    01.jpg   02.jpg   03.jpg  … up to 10 photos
+
+
+────────────────────────────────────────
+  DESKTOP VS MOBILE (DO NOT MIX)
+────────────────────────────────────────
+
+  Desktop  →  carousel-homepage\          1920 × 800   ≤ 500 KB
+  Mobile   →  mobile_carousel-homepage\   1080 × 960   ≤ 150 KB
+
+  Same algorithm, different size standard.
+  Keep desktop folder untouched when editing mobile banners.
+
+
+────────────────────────────────────────
+  HOW THEY “UPLOAD” EVERY TIME
+────────────────────────────────────────
+
+  This is NOT Cloudinary / admin panel upload.
+
+  1. Drop photos HERE (mobile_carousel-homepage folder)
+  2. Start the site  OR  run:
+       node scripts\sync-hero-carousel-mobile.js
+  3. Sync copies them into the public website folder
+  4. Phones (≤ 639px) show them after refresh
+
+  Starting with scripts\start-jewelbazaari.bat
+  always re-syncs desktop + mobile for you.
+
+  Live site: sync first, then deploy the project
+  (so public\images\hero-carousel-mobile\ is included).
+
+  Empty folder? Mobile falls back to desktop banners.
+
+
+Full details: see README.txt in this same folder.

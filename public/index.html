@@ -23,7 +23,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://www.gstatic.com">
-    <link rel="preload" href="images/hero-carousel/banner-02.jpg" as="image" fetchpriority="high">
+    <link rel="preload" href="images/hero-carousel/banner-02.jpg" as="image" media="(min-width: 640px)" fetchpriority="high">
+    <link rel="preload" href="images/hero-carousel-mobile/banner-02.jpg" as="image" media="(max-width: 639px)" fetchpriority="high">
     <link rel="preload" href="css/mobile-responsive.css?v=20260709b" as="style">
     <link rel="modulepreload" href="js/load-components.js?v=20260709b">
     <link rel="modulepreload" href="js/home-featured-carousel.js">
@@ -726,9 +727,11 @@
     <section class="jb-hero" aria-roledescription="carousel" aria-label="Featured jewellery collections">
         <div class="jb-hero-inner">
             <!--
-              Banners load from carousel-homepage/ (project folder) via
-              scripts/sync-hero-carousel.js → public/js/hero-carousel-data.json
-              Supports 1–10 photos. Drop files in carousel-homepage/ then sync.
+              Desktop banners: carousel-homepage/ → sync-hero-carousel.js
+                → public/js/hero-carousel-data.json + images/hero-carousel/
+              Mobile banners (≤639px): mobile_carousel-homepage/ → sync-hero-carousel-mobile.js
+                → public/js/hero-carousel-data-mobile.json + images/hero-carousel-mobile/
+              Supports 1–10 photos each. Desktop folder is independent of mobile.
             -->
             <div class="jb-hero-stage" id="jb-hero-stage"></div>
             <div class="jb-hero-controls">

@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-07-12T15:14:52.132Z",
+  "max": 10,
+  "maxBytes": 153600,
+  "maxWidth": 1080,
+  "maxHeight": 960,
+  "count": 3,
+  "sourceFolder": "mobile_carousel-homepage",
+  "slides": [
+    {
+      "src": "images/hero-carousel-mobile/banner-01.jpg",
+      "alt": "jewelBazaari featured collection 1",
+      "file": "01.jpg"
+    },
+    {
+      "src": "images/hero-carousel-mobile/banner-02.jpg",
+      "alt": "jewelBazaari featured collection 2",
+      "file": "02.jpg"
+    },
+    {
+      "src": "images/hero-carousel-mobile/banner-03.jpg",
+      "alt": "jewelBazaari featured collection 3",
+      "file": "03.jpg"
+    }
+  ]
+}

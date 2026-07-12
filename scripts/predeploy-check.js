@@ -142,6 +142,11 @@ async function finish() {
   } catch (err) {
     console.warn('[predeploy] hero carousel sync skipped:', err.message);
   }
+  try {
+    await require('./sync-hero-carousel-mobile').syncHeroCarouselMobile();
+  } catch (err) {
+    console.warn('[predeploy] mobile hero carousel sync skipped:', err.message);
+  }
 
   console.log('=== Pre-Deploy Check ===\n');
   if (errors.length) {

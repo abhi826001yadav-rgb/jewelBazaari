@@ -8,6 +8,7 @@ const {
   resolveRedirect
 } = require('./cf-pages-utils');
 const { syncHeroCarousel } = require('./sync-hero-carousel');
+const { syncHeroCarouselMobile } = require('./sync-hero-carousel-mobile');
 
 
 const projectRoot = path.join(__dirname, '..');
@@ -15,11 +16,15 @@ const root = path.join(projectRoot, 'public');
 // Prefer 5500 (VS Code Live Server default) so bookmarks/links match; fallback 3000.
 const port = Number(process.env.PORT || 5500);
 
-/* Refresh + auto-compress homepage banners from carousel-homepage/ on start */
+/* Refresh + auto-compress homepage banners (desktop + mobile) on start */
 const syncReady = Promise.resolve()
   .then(() => syncHeroCarousel())
   .catch((err) => {
     console.warn('[hero-carousel] sync failed:', err.message);
+  })
+  .then(() => syncHeroCarouselMobile())
+  .catch((err) => {
+    console.warn('[hero-carousel-mobile] sync failed:', err.message);
   });
 
 
