@@ -1002,7 +1002,7 @@ button.jb-mobile-menu-link {
         min-height: 44px;
     }
 
-    .jb-shadow-card {
+    .jb-shadow-card:not(.jb-shadow-card--center) {
         width: 82% !important;
     }
 
@@ -1137,6 +1137,30 @@ button.jb-mobile-menu-link {
 }
 
 @media (max-width: 767px) {
+    /* Homepage Trending / New Arrivals: no ghost peeks of next product */
+    .jb-shadow-card--left,
+    .jb-shadow-card--right {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    .jb-shadow-card--center {
+        width: 100% !important;
+        max-width: 20rem;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) scale(1) !important;
+        opacity: 1 !important;
+        z-index: 3;
+    }
+
+    .jb-shadow-carousel,
+    .jb-shadow-carousel-stage {
+        overflow: hidden !important;
+    }
+
     .jb-shadow-card {
         will-change: auto;
     }

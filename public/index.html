@@ -610,6 +610,35 @@
             cursor: not-allowed;
         }
 
+        @media (max-width: 767px) {
+            /* Mobile: one product only — hide left/right shadow peeks */
+            .jb-shadow-card--left,
+            .jb-shadow-card--right {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+
+            .jb-shadow-card--center {
+                width: 100%;
+                max-width: 20rem;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+                z-index: 3;
+            }
+
+            .jb-shadow-carousel {
+                overflow: hidden;
+            }
+
+            .jb-shadow-carousel-stage {
+                overflow: hidden;
+            }
+        }
+
         @media (max-width: 640px) {
             .jb-featured-carousel-wrap {
                 padding: 0 2.25rem;
@@ -617,6 +646,11 @@
 
             .jb-shadow-card {
                 width: 78%;
+            }
+
+            .jb-shadow-card--center {
+                width: 100%;
+                max-width: 18.5rem;
             }
 
             .jb-shadow-carousel-stage {
