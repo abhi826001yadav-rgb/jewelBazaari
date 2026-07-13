@@ -100,7 +100,7 @@ function renderDetail(product) {
                 <div>
                     <p class="text-xs uppercase tracking-[0.18em] text-[#9B7E4B] font-semibold mb-2">jewelBazaari</p>
                     <h1 id="pd-title" class="text-2xl sm:text-3xl font-bold text-[#4A0E17] leading-tight">${escapeHtml(product.name || 'Beautiful Piece')}</h1>
-                    <p class="text-2xl sm:text-3xl font-bold text-[#4A0E17] mt-3">${formatProductPrice(product.price)}</p>
+                    <p class="jb-price text-2xl sm:text-3xl font-bold text-[#4A0E17] mt-3">${formatProductPrice(product.price)}</p>
                 </div>
 
                 <div class="rounded-2xl border border-[#9B7E4B]/25 bg-white p-4 sm:p-5 space-y-3">

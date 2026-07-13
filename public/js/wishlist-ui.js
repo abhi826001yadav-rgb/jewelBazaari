@@ -120,7 +120,7 @@ function renderWishlistDrawer() {
                         <a href="product.html?id=${encodeURIComponent(item.id)}" class="hover:text-[#4A0E17] transition">${escapeHtml(item.name)}</a>
                     </h3>
                     <p class="text-[10px] uppercase text-[#9B7E4B] font-semibold tracking-wider mt-1">${escapeHtml(item.vendor || 'Verified Vendor')}</p>
-                    <p class="text-sm font-bold text-[#4A0E17] mt-1">${formatProductPrice(item.price)}</p>
+                    <p class="jb-price text-sm font-bold text-[#4A0E17] mt-1">${formatProductPrice(item.price)}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">

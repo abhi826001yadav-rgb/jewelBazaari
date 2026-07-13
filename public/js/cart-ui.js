@@ -33,7 +33,7 @@ function ensureCartDrawer() {
                 </div>
                 <div class="flex justify-between text-lg font-bold text-[#4A0E17] mb-4">
                     <span>Total Amount</span>
-                    <span id="cart-total-amount">₹0</span>
+                    <span id="cart-total-amount" class="jb-price">₹0</span>
                 </div>
                 <button type="button" id="cart-clear-btn" class="w-full py-2 mb-2 border border-[#9B7E4B] text-[#4A0E17] rounded-full text-sm font-medium hover:bg-[#FAF7F2]">
                     Clear Cart
@@ -71,7 +71,7 @@ function renderCartDrawer() {
                 <img src="${escapeHtml(sanitizeImageUrl(item.imageUrl, 'https://picsum.photos/id/1015/100/100'))}" alt="${escapeHtml(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 shrink-0" width="64" height="64" loading="lazy" decoding="async">
                 <div class="flex-1 min-w-0">
                     <h3 class="font-medium text-sm text-[#2A2A2A] line-clamp-2">${escapeHtml(item.name)}</h3>
-                    <p class="text-sm font-bold text-[#4A0E17] mt-1">${formatCartPrice(item.price)}</p>
+                    <p class="jb-price text-sm font-bold text-[#4A0E17] mt-1">${formatCartPrice(item.price)}</p>
                     <div class="flex items-center gap-2 mt-2">
                         <button type="button" data-cart-decrease="${escapeHtml(item.id)}" class="w-7 h-7 rounded-full border border-gray-300 text-sm leading-none" aria-label="Decrease quantity of ${escapeHtml(item.name)}">-</button>
                         <span class="text-sm font-medium w-6 text-center" aria-label="Quantity">${item.quantity}</span>

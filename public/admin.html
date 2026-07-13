@@ -577,11 +577,10 @@
                 <div>
                     <label for="m-category" class="block text-xs font-semibold text-gray-600 mb-1">Category *</label>
                     <select id="m-category" required class="modify-field">
-                        <option value="gold">Gold</option>
-                        <option value="diamond">Diamond</option>
-                        <option value="gemstone">Gemstone</option>
                         <option value="earrings">Earrings</option>
                         <option value="rings">Rings</option>
+                        <option value="necklace">Necklace</option>
+                        <option value="nose-pins">Nose Pins</option>
                         <option value="wedding">Wedding</option>
                         <option value="combos">Combos</option>
                         <option value="all-jewellery">All Jewellery</option>
@@ -596,6 +595,26 @@
                         <option value="none">No Metal / Other</option>
                     </select>
                 </div>
+                <div id="m-gold-purity-wrap" class="hidden">
+                    <label for="m-gold-purity" class="block text-xs font-semibold text-gray-600 mb-1">Gold Purity *</label>
+                    <select id="m-gold-purity" class="modify-field">
+                        <option value="">-- Select Purity --</option>
+                        <option value="9kt">9kt</option>
+                        <option value="14kt">14kt</option>
+                        <option value="18kt">18kt</option>
+                        <option value="22kt">22kt</option>
+                    </select>
+                </div>
+                <div id="m-gold-color-wrap" class="hidden">
+                    <label for="m-gold-color" class="block text-xs font-semibold text-gray-600 mb-1">Gold Colour *</label>
+                    <select id="m-gold-color" class="modify-field">
+                        <option value="">-- Select Colour --</option>
+                        <option value="rose gold">Rose Gold</option>
+                        <option value="white gold">White Gold</option>
+                        <option value="yellow gold">Yellow Gold</option>
+                    </select>
+                </div>
+                <p id="m-metal-preview" class="hidden text-xs font-medium text-[#4A0E17]"></p>
                 <div>
                     <label for="m-stone" class="block text-xs font-semibold text-gray-600 mb-1">Stone</label>
                     <select id="m-stone" class="modify-field">

@@ -780,6 +780,9 @@
 
     <section class="jb-trending-section bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="jb-ig-browser-notice md:hidden text-center text-[11px] leading-snug text-red-600 mb-3 px-1">
+                Tap the ⋮ (three dots) in the top-right corner of Instagram and select Open in Chrome or Open in External Browser.
+            </p>
             <div class="jb-trending-header flex flex-col md:flex-row md:items-end justify-between mb-12">
                 <div>
                     <h2 class="font-luxury text-3xl font-bold text-luxuryMaroon">Trending Now</h2>
@@ -1057,11 +1060,11 @@
                         <h3 class="font-luxury font-semibold text-base text-luxuryDark mb-2 line-clamp-1">
                             <a href="${escapeHtml(detailUrl)}" class="hover:text-luxuryMaroon transition">${escapeHtml(product.name || 'Beautiful Piece')}</a>
                         </h3>
-                        <div class="flex items-center justify-between mt-2 border-t border-gray-200/60 pt-3">
-                            <div>
-                                <span class="text-sm font-bold text-luxuryMaroon">${formatProductPrice(product.price)}</span>
+                        <div class="flex items-center justify-between mt-2 border-t border-gray-200/60 pt-3 gap-2 min-w-0">
+                            <div class="min-w-0">
+                                <span class="jb-price text-sm font-bold text-luxuryMaroon">${formatProductPrice(product.price)}</span>
                             </div>
-                            <button type="button" data-add-cart="${escapeHtml(product.id)}" data-add-name="${escapeHtml(product.name || 'Product')}" data-add-price="${escapeHtml(product.price || 0)}" data-add-image="${escapeHtml(imageSrc)}" class="text-xs uppercase font-semibold tracking-wider text-luxuryGold hover:text-luxuryMaroon transition">Add to Cart</button>
+                            <button type="button" data-add-cart="${escapeHtml(product.id)}" data-add-name="${escapeHtml(product.name || 'Product')}" data-add-price="${escapeHtml(product.price || 0)}" data-add-image="${escapeHtml(imageSrc)}" class="text-xs uppercase font-semibold tracking-wider text-luxuryGold hover:text-luxuryMaroon transition shrink-0">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -1088,9 +1091,9 @@
                                 <a href="${escapeHtml(detailUrl)}" class="hover:text-luxuryMaroon transition">${escapeHtml(product.name || 'Beautiful Piece')}</a>
                             </h3>
                         </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-50">
-                            <span class="text-sm font-bold text-luxuryMaroon">${formatProductPrice(product.price)}</span>
-                            <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 uppercase tracking-wide">New In</span>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-50 gap-2 min-w-0">
+                            <span class="jb-price text-sm font-bold text-luxuryMaroon shrink-0">${formatProductPrice(product.price)}</span>
+                            <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 uppercase tracking-wide shrink-0">New In</span>
                         </div>
                     </div>
                 </div>

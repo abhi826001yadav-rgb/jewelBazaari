@@ -92,6 +92,8 @@ const CATEGORY_PREFIX_MAP = {
     gemstone: 'GEMSTONE',
     earrings: 'EARRINGS',
     rings: 'RINGS',
+    necklace: 'NECKLACE',
+    'nose-pins': 'NOSEPINS',
     wedding: 'WEDDING',
     combos: 'COMBOS',
     'all-jewellery': 'ALLJEWELLERY'
@@ -345,6 +347,17 @@ export async function getProductById(productId) {
 
 export async function getProductsByMetal(metalType) {
     const normalizedMetal = (metalType || '').trim().toLowerCase();
+
+    // Gold may be stored as detailed variants e.g. "14kt rose gold".
+    // Match exact "gold" (legacy) and any metalType containing "gold".
+    if (normalizedMetal === 'gold') {
+        const products = await getAllProducts();
+        return products.filter((product) => {
+            const metal = (product.metalType || '').trim().toLowerCase();
+            return metal === 'gold' || metal.includes('gold');
+        });
+    }
+
     const q = query(
         collection(db, PRODUCTS_COLLECTION),
         where('metalType', '==', normalizedMetal)

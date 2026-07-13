@@ -833,8 +833,15 @@ button.jb-mobile-menu-link {
 
 .luxury-card h3,
 .luxury-card p,
-.luxury-card span {
+.luxury-card span:not(.jb-price) {
     overflow-wrap: anywhere;
+}
+
+/* Keep formatted prices (e.g. ₹6,75,000) on a single line everywhere */
+.jb-price {
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 #products-grid {
@@ -920,6 +927,12 @@ button.jb-mobile-menu-link {
     .luxury-card .flex.items-center.justify-between {
         flex-wrap: wrap;
         gap: 0.5rem;
+    }
+
+    /* Prefer wrapping Add to Cart under the price rather than breaking the price text */
+    .luxury-card .jb-price {
+        white-space: nowrap;
+        max-width: 100%;
     }
 
     .jb-placeholder-card {

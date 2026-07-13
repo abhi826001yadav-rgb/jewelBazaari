@@ -20,6 +20,11 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             uploadImages
         } from './services/cloudinary-upload-service.js';
         import { formatImageSize } from './utils/image-compress.js';
+        import {
+            composeMetalType,
+            formatMetalTypeLabel,
+            parseMetalType
+        } from './metal-type-utils.js';
 
         const adminLogoutBtn = document.getElementById('admin-logout-btn');
         const loadingState = document.getElementById('loading-state');
@@ -68,6 +73,58 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             vendorName: ''
         };
         const modifyPreviewObjectUrls = new Set();
+        const metalSelect = document.getElementById('m-metal');
+        const goldPurityWrap = document.getElementById('m-gold-purity-wrap');
+        const goldColorWrap = document.getElementById('m-gold-color-wrap');
+        const goldPuritySelect = document.getElementById('m-gold-purity');
+        const goldColorSelect = document.getElementById('m-gold-color');
+        const metalPreview = document.getElementById('m-metal-preview');
+
+        function syncAdminGoldMetalFields() {
+            if (!metalSelect || !goldPurityWrap || !goldColorWrap || !goldPuritySelect || !goldColorSelect) {
+                return;
+            }
+
+            const isGold = metalSelect.value === 'gold';
+            goldPurityWrap.classList.toggle('hidden', !isGold);
+            if (!isGold) {
+                goldPuritySelect.value = '';
+                goldColorSelect.value = '';
+                goldColorWrap.classList.add('hidden');
+                if (metalPreview) {
+                    metalPreview.classList.add('hidden');
+                    metalPreview.textContent = '';
+                }
+                return;
+            }
+
+            const hasPurity = Boolean(goldPuritySelect.value);
+            goldColorWrap.classList.toggle('hidden', !hasPurity);
+            if (!hasPurity) {
+                goldColorSelect.value = '';
+            }
+
+            const composed = composeMetalType('gold', goldPuritySelect.value, goldColorSelect.value);
+            if (metalPreview) {
+                if (composed) {
+                    metalPreview.classList.remove('hidden');
+                    metalPreview.textContent = `Metal type: ${formatMetalTypeLabel(composed)}`;
+                } else {
+                    metalPreview.classList.add('hidden');
+                    metalPreview.textContent = '';
+                }
+            }
+        }
+
+        if (metalSelect) {
+            metalSelect.addEventListener('change', syncAdminGoldMetalFields);
+        }
+        if (goldPuritySelect) {
+            goldPuritySelect.addEventListener('change', syncAdminGoldMetalFields);
+        }
+        if (goldColorSelect) {
+            goldColorSelect.addEventListener('change', syncAdminGoldMetalFields);
+        }
 
         function loadAdminDashboard() {
             loadProducts();
@@ -391,7 +448,17 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
             const productId = product.productId || product.productCode || product.id || '';
             document.getElementById('m-id').value = product.id;
             document.getElementById('m-category').value = product.category || 'all-jewellery';
-            document.getElementById('m-metal').value = product.metalType || 'none';
+            const parsedMetal = parseMetalType(product.metalType || 'none');
+            if (metalSelect) metalSelect.value = parsedMetal.base || 'none';
+            if (goldPuritySelect) goldPuritySelect.value = parsedMetal.purity || '';
+            if (goldColorSelect) goldColorSelect.value = parsedMetal.color || '';
+            syncAdminGoldMetalFields();
+            // Restore purity/color after sync (sync clears when not gold)
+            if (parsedMetal.base === 'gold') {
+                if (goldPuritySelect) goldPuritySelect.value = parsedMetal.purity || '';
+                if (goldColorSelect) goldColorSelect.value = parsedMetal.color || '';
+                syncAdminGoldMetalFields();
+            }
             document.getElementById('m-stone').value = product.stoneType || '';
             document.getElementById('m-name').value = product.name || '';
             document.getElementById('m-description').value = product.description || '';
@@ -545,6 +612,37 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
                 return;
             }
 
+            const metalBase = metalSelect?.value || '';
+            const metalValue = composeMetalType(
+                metalBase,
+                goldPuritySelect?.value || '',
+                goldColorSelect?.value || ''
+            );
+
+            if (!metalBase) {
+                setModifyStatus('Please select a metal type.', 'error');
+                metalSelect?.focus();
+                return;
+            }
+
+            if (metalBase === 'gold') {
+                if (!goldPuritySelect?.value) {
+                    setModifyStatus('Please select gold purity (9kt, 14kt, 18kt, or 22kt).', 'error');
+                    goldPuritySelect?.focus();
+                    return;
+                }
+                if (!goldColorSelect?.value) {
+                    setModifyStatus('Please select gold colour (rose, white, or yellow gold).', 'error');
+                    goldColorSelect?.focus();
+                    return;
+                }
+            }
+
+            if (!metalValue) {
+                setModifyStatus('Please complete the metal type selection.', 'error');
+                return;
+            }
+
             try {
                 saveBtn.disabled = true;
                 deleteBtn.disabled = true;
@@ -599,7 +697,7 @@ import { getAllProducts, updateProduct, deleteProduct } from './firebase-product
                     description: document.getElementById('m-description').value,
                     price: document.getElementById('m-price').value,
                     category: document.getElementById('m-category').value,
-                    metalType: document.getElementById('m-metal').value,
+                    metalType: metalValue,
                     stoneType: document.getElementById('m-stone').value,
                     vendor: document.getElementById('m-vendor').value,
                     vendorId: modifyImageState.vendorId || '',

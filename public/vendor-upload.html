@@ -274,11 +274,10 @@
                     <label for="p-category" class="block text-sm font-medium text-gray-700 mb-1">Jewellery Category *</label>
                     <select id="p-category" required class="w-full p-4 border-2 border-gray-300 rounded-2xl text-lg">
                         <option value="">-- Select Category --</option>
-                        <option value="gold">Gold</option>
-                        <option value="diamond">Diamond</option>
-                        <option value="gemstone">Gemstone</option>
                         <option value="earrings">Earrings</option>
                         <option value="rings">Rings</option>
+                        <option value="necklace">Necklace</option>
+                        <option value="nose-pins">Nose Pins</option>
                         <option value="wedding">Wedding</option>
                         <option value="combos">Combos</option>
                         <option value="all-jewellery">All Jewellery</option>
@@ -295,6 +294,29 @@
                         <option value="none">No Metal / Other</option>
                     </select>
                 </div>
+
+                <div id="p-gold-purity-wrap" class="hidden">
+                    <label for="p-gold-purity" class="block text-sm font-medium text-gray-700 mb-1">Gold Purity *</label>
+                    <select id="p-gold-purity" class="w-full p-4 border-2 border-gray-300 rounded-2xl text-lg">
+                        <option value="">-- Select Purity --</option>
+                        <option value="9kt">9kt</option>
+                        <option value="14kt">14kt</option>
+                        <option value="18kt">18kt</option>
+                        <option value="22kt">22kt</option>
+                    </select>
+                </div>
+
+                <div id="p-gold-color-wrap" class="hidden">
+                    <label for="p-gold-color" class="block text-sm font-medium text-gray-700 mb-1">Gold Colour *</label>
+                    <select id="p-gold-color" class="w-full p-4 border-2 border-gray-300 rounded-2xl text-lg">
+                        <option value="">-- Select Colour --</option>
+                        <option value="rose gold">Rose Gold</option>
+                        <option value="white gold">White Gold</option>
+                        <option value="yellow gold">Yellow Gold</option>
+                    </select>
+                </div>
+
+                <p id="p-metal-preview" class="hidden text-sm font-medium text-[#4A0E17] bg-white/70 border border-[#9B7E4B]/40 rounded-xl px-3 py-2"></p>
 
                 <div>
                     <label for="p-stone" class="block text-sm font-medium text-gray-700 mb-1">Stone Type</label>
@@ -358,7 +380,7 @@
             </form>
 
             <p class="text-center text-xs text-gray-500 mt-6">
-                Example: Diamond + Gold Ring → appears in All Jewellery, Diamond, Gold, and Rings.
+                Example: 14kt Rose Gold ring with Diamond → Metal Type “14kt rose gold”, Stone “Diamond”, Category “Rings”.
             </p>
         </div>
     </div>
@@ -372,6 +394,7 @@
         } from './js/services/product-service.js';
         import { IMAGE_UPLOAD_LIMITS, addFilesToPicker, getTriggerLabel } from './js/components/vendor-image-picker.js';
         import { formatImageSize } from './js/utils/image-compress.js';
+        import { composeMetalType, formatMetalTypeLabel } from './js/metal-type-utils.js';
 
         const productForm = document.getElementById('product-form');
         const imageInput = document.getElementById('p-images');
@@ -382,9 +405,48 @@
         const uploadStatus = document.getElementById('upload-status');
         const vendorSessionBadge = document.getElementById('vendor-session-badge');
         const vendorNameInput = document.getElementById('p-vendor');
+        const metalSelect = document.getElementById('p-metal');
+        const goldPurityWrap = document.getElementById('p-gold-purity-wrap');
+        const goldColorWrap = document.getElementById('p-gold-color-wrap');
+        const goldPuritySelect = document.getElementById('p-gold-purity');
+        const goldColorSelect = document.getElementById('p-gold-color');
+        const metalPreview = document.getElementById('p-metal-preview');
 
         let selectedImageFiles = [];
         let currentVendor = null;
+
+        function syncGoldMetalFields() {
+            const isGold = metalSelect.value === 'gold';
+            goldPurityWrap.classList.toggle('hidden', !isGold);
+            if (!isGold) {
+                goldPuritySelect.value = '';
+                goldColorSelect.value = '';
+                goldColorWrap.classList.add('hidden');
+                metalPreview.classList.add('hidden');
+                metalPreview.textContent = '';
+                return;
+            }
+
+            const hasPurity = Boolean(goldPuritySelect.value);
+            goldColorWrap.classList.toggle('hidden', !hasPurity);
+            if (!hasPurity) {
+                goldColorSelect.value = '';
+            }
+
+            const composed = composeMetalType('gold', goldPuritySelect.value, goldColorSelect.value);
+            if (composed) {
+                metalPreview.classList.remove('hidden');
+                metalPreview.textContent = `Metal type: ${formatMetalTypeLabel(composed)}`;
+            } else {
+                metalPreview.classList.add('hidden');
+                metalPreview.textContent = '';
+            }
+        }
+
+        metalSelect.addEventListener('change', syncGoldMetalFields);
+        goldPuritySelect.addEventListener('change', syncGoldMetalFields);
+        goldColorSelect.addEventListener('change', syncGoldMetalFields);
+        syncGoldMetalFields();
 
         function showUploadPortal(vendor) {
             currentVendor = vendor;
@@ -409,6 +471,7 @@
             productForm.reset();
             selectedImageFiles = [];
             renderImagePreviews();
+            syncGoldMetalFields();
             vendorSessionBadge.textContent = '';
             vendorNameInput.value = '';
         });
@@ -507,8 +570,9 @@
             event.preventDefault();
             clearUploadStatus();
 
-            const metalValue = document.getElementById('p-metal').value;
+            const metalBase = metalSelect.value;
             const stoneValue = document.getElementById('p-stone').value;
+            const metalValue = composeMetalType(metalBase, goldPuritySelect.value, goldColorSelect.value);
 
             if (!selectedImageFiles.length) {
                 setUploadStatus('Please choose at least one jewellery photo.', 'error');
@@ -522,8 +586,27 @@
                 return;
             }
 
-            if (!metalValue) {
+            if (!metalBase) {
                 setUploadStatus('Please select a metal type.', 'error');
+                metalSelect.focus();
+                return;
+            }
+
+            if (metalBase === 'gold') {
+                if (!goldPuritySelect.value) {
+                    setUploadStatus('Please select gold purity (9kt, 14kt, 18kt, or 22kt).', 'error');
+                    goldPuritySelect.focus();
+                    return;
+                }
+                if (!goldColorSelect.value) {
+                    setUploadStatus('Please select gold colour (rose, white, or yellow gold).', 'error');
+                    goldColorSelect.focus();
+                    return;
+                }
+            }
+
+            if (!metalValue) {
+                setUploadStatus('Please complete the metal type selection.', 'error');
                 return;
             }
 
@@ -571,6 +654,7 @@
                 productForm.reset();
                 selectedImageFiles = [];
                 renderImagePreviews();
+                syncGoldMetalFields();
                 // Keep company name for the next product; seller can edit if needed.
                 vendorNameInput.value = sellerCompanyName;
             } catch (error) {

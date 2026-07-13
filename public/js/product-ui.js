@@ -9,7 +9,11 @@ export { formatProductPrice as formatPrice };
 
 export function formatLabel(value) {
     if (!value) return '';
-    return value.charAt(0).toUpperCase() + value.slice(1);
+    return String(value)
+        .split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(' ');
 }
 
 /** Product detail page URL (clean query id). */
@@ -268,9 +272,6 @@ export async function renderProducts(products, gridId = 'products-grid', countId
                     <img src="${escapeHtml(imageSrc)}" class="w-full h-full object-cover" alt="${escapeHtml(product.name || 'Jewellery product')}" width="400" height="400" loading="${imageLoading}" decoding="async"${imagePriority}>
                 </a>
                 ${buildWishlistHeartButton({ ...product, imageUrl: imageSrc })}
-                <div class="absolute top-3 left-3 bg-white/90 px-3 py-1 rounded-full text-xs font-medium capitalize pointer-events-none">
-                    ${escapeHtml(formatLabel(product.category) || 'Jewellery')}
-                </div>
             </div>
             <div class="p-4">
                 <h2 class="font-semibold text-lg text-[#2A2A2A] line-clamp-1">
@@ -278,8 +279,8 @@ export async function renderProducts(products, gridId = 'products-grid', countId
                 </h2>
                 ${product.description ? `<p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(product.description)}</p>` : ''}
                 ${tags ? `<p class="text-xs text-[#9B7E4B] mt-2 capitalize">${escapeHtml(tags)}</p>` : ''}
-                <div class="flex items-center justify-between mt-3 gap-2">
-                    <span class="text-xl font-bold text-[#4A0E17]">${formatProductPrice(product.price)}</span>
+                <div class="flex items-center justify-between mt-3 gap-2 min-w-0">
+                    <span class="jb-price text-xl font-bold text-[#4A0E17] shrink-0">${formatProductPrice(product.price)}</span>
                     <button type="button" data-add-cart="${escapeHtml(product.id)}" data-add-name="${escapeHtml(product.name)}" data-add-price="${escapeHtml(product.price || 0)}" data-add-image="${escapeHtml(imageSrc)}"
                         class="px-4 py-1.5 text-xs font-medium bg-[#4A0E17] text-white rounded-full hover:bg-[#3A0A12] shrink-0">
                         Add to Cart
