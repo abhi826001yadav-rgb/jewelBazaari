@@ -30,6 +30,10 @@ export function scheduleStorefrontUiInit() {
     import('./build-version.js').then(({ BUILD_VERSION }) => {
         import(`./header-search.js?v=${BUILD_VERSION}`);
         import(`./home-search-rotator.js?v=${BUILD_VERSION}`).then(({ initHomeSearchRotator }) => initHomeSearchRotator());
+        // Instagram in-app browser notice (User-Agent gated; no layout shift).
+        import(`./instagram-browser-banner.js?v=${BUILD_VERSION}`).then(({ initInstagramBrowserBanner }) => {
+            initInstagramBrowserBanner();
+        });
     });
     import('./accessibility.js').then(() => {
         window.jbA11y?.ensureSkipLink?.();

@@ -387,11 +387,13 @@
 
     <script type="module">
         import './js/portal-vendor-access.js';
+        import { initInstagramBrowserBanner } from './js/instagram-browser-banner.js';
         import {
             createProductWithImages,
             ProductSaveError,
             formatUploadedAssetsForCleanup
         } from './js/services/product-service.js';
+        initInstagramBrowserBanner();
         import { IMAGE_UPLOAD_LIMITS, addFilesToPicker, getTriggerLabel } from './js/components/vendor-image-picker.js';
         import { formatImageSize } from './js/utils/image-compress.js';
         import { composeMetalType, formatMetalTypeLabel } from './js/metal-type-utils.js';
