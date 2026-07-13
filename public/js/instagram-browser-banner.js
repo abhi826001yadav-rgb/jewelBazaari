@@ -1,11 +1,13 @@
 /**
- * Instagram in-app browser notice.
- * Shows only when User-Agent contains "Instagram".
- * Dismissal is remembered in localStorage for future Instagram sessions.
+ * Instagram in-app browser notices.
+ * - Red strip: always shown on every page load inside Instagram only.
+ * - Popup card: shown until user dismisses / taps "I Opened It" (localStorage).
+ * Never shown in Chrome, Safari, Firefox, Edge, etc.
  */
 
 const STORAGE_KEY = 'jb_ig_inapp_banner_dismissed';
-const BANNER_ID = 'jb-ig-browser-banner';
+const POPUP_ID = 'jb-ig-browser-banner';
+const RED_NOTICE_ID = 'jb-ig-red-notice';
 const STYLE_ID = 'jb-ig-browser-banner-styles';
 
 export function isInstagramInAppBrowser() {
@@ -13,7 +15,7 @@ export function isInstagramInAppBrowser() {
     return /Instagram/i.test(ua);
 }
 
-function wasDismissed() {
+function wasPopupDismissed() {
     try {
         return window.localStorage.getItem(STORAGE_KEY) === '1';
     } catch {
@@ -21,11 +23,11 @@ function wasDismissed() {
     }
 }
 
-function rememberDismissal() {
+function rememberPopupDismissal() {
     try {
         window.localStorage.setItem(STORAGE_KEY, '1');
     } catch {
-        // Ignore private-mode / storage failures; banner just stays hidden for this page load.
+        // Ignore private-mode / storage failures.
     }
 }
 
@@ -35,7 +37,32 @@ function injectStyles() {
     const style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = `
-        #${BANNER_ID} {
+        /* Always-visible red notice (Instagram only). Fixed = no document layout shift. */
+        #${RED_NOTICE_ID} {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 99991;
+            padding: calc(0.4rem + env(safe-area-inset-top, 0px)) 0.65rem 0.4rem;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid rgba(220, 38, 38, 0.25);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            text-align: center;
+            pointer-events: none;
+        }
+        #${RED_NOTICE_ID} p {
+            margin: 0 auto;
+            max-width: 36rem;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #dc2626;
+            font-weight: 500;
+        }
+
+        /* Dismissible popup (bottom card) */
+        #${POPUP_ID} {
             position: fixed;
             left: 0;
             right: 0;
@@ -45,7 +72,7 @@ function injectStyles() {
             padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
-        #${BANNER_ID} .jb-ig-banner-card {
+        #${POPUP_ID} .jb-ig-banner-card {
             pointer-events: auto;
             max-width: 28rem;
             margin: 0 auto;
@@ -57,7 +84,7 @@ function injectStyles() {
             padding: 0.9rem 1rem 1rem;
             position: relative;
         }
-        #${BANNER_ID} .jb-ig-banner-close {
+        #${POPUP_ID} .jb-ig-banner-close {
             position: absolute;
             top: 0.35rem;
             right: 0.45rem;
@@ -71,35 +98,35 @@ function injectStyles() {
             border-radius: 9999px;
             cursor: pointer;
         }
-        #${BANNER_ID} .jb-ig-banner-close:hover,
-        #${BANNER_ID} .jb-ig-banner-close:focus-visible {
+        #${POPUP_ID} .jb-ig-banner-close:hover,
+        #${POPUP_ID} .jb-ig-banner-close:focus-visible {
             color: #4A0E17;
             background: rgba(74, 14, 23, 0.06);
             outline: none;
         }
-        #${BANNER_ID} .jb-ig-banner-title {
+        #${POPUP_ID} .jb-ig-banner-title {
             margin: 0 1.75rem 0.45rem 0;
             font-size: 0.875rem;
             font-weight: 700;
             color: #4A0E17;
             line-height: 1.35;
         }
-        #${BANNER_ID} .jb-ig-banner-body {
+        #${POPUP_ID} .jb-ig-banner-body {
             margin: 0 0 0.85rem;
             font-size: 0.75rem;
             line-height: 1.45;
             color: #4b5563;
         }
-        #${BANNER_ID} .jb-ig-banner-body strong {
+        #${POPUP_ID} .jb-ig-banner-body strong {
             color: #2A2A2A;
             font-weight: 600;
         }
-        #${BANNER_ID} .jb-ig-banner-actions {
+        #${POPUP_ID} .jb-ig-banner-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
-        #${BANNER_ID} .jb-ig-banner-primary {
+        #${POPUP_ID} .jb-ig-banner-primary {
             flex: 1 1 auto;
             min-height: 2.5rem;
             border: 0;
@@ -112,31 +139,42 @@ function injectStyles() {
             padding: 0.55rem 1rem;
             cursor: pointer;
         }
-        #${BANNER_ID} .jb-ig-banner-primary:hover,
-        #${BANNER_ID} .jb-ig-banner-primary:focus-visible {
+        #${POPUP_ID} .jb-ig-banner-primary:hover,
+        #${POPUP_ID} .jb-ig-banner-primary:focus-visible {
             background: #3A0A12;
             outline: none;
         }
-        #${BANNER_ID}[hidden] {
+        #${POPUP_ID}[hidden] {
             display: none !important;
         }
     `;
     document.head.appendChild(style);
 }
 
-function hideBanner(root) {
+function buildRedNotice() {
+    const root = document.createElement('div');
+    root.id = RED_NOTICE_ID;
+    root.setAttribute('role', 'status');
+    root.setAttribute('aria-live', 'polite');
+    root.setAttribute('aria-label', 'Instagram browser tip');
+    root.innerHTML = `
+        <p>Tap the ⋮ (three dots) in the top-right corner of Instagram and select Open in Chrome or Open in External Browser.</p>
+    `;
+    return root;
+}
+
+function hidePopup(root) {
     if (!root) return;
     root.hidden = true;
     root.setAttribute('aria-hidden', 'true');
-    // Remove from DOM so it never affects stacking/focus later.
     window.setTimeout(() => {
         root.remove();
     }, 0);
 }
 
-function buildBanner() {
+function buildPopup() {
     const root = document.createElement('div');
-    root.id = BANNER_ID;
+    root.id = POPUP_ID;
     root.setAttribute('role', 'region');
     root.setAttribute('aria-label', 'Open in external browser');
     root.setAttribute('aria-live', 'polite');
@@ -156,8 +194,8 @@ function buildBanner() {
     `;
 
     const dismiss = () => {
-        rememberDismissal();
-        hideBanner(root);
+        rememberPopupDismissal();
+        hidePopup(root);
     };
 
     root.querySelector('[data-ig-banner-dismiss]')?.addEventListener('click', dismiss);
@@ -166,32 +204,33 @@ function buildBanner() {
     return root;
 }
 
-/**
- * Show the Instagram in-app browser banner when appropriate.
- * Safe to call multiple times (idempotent).
- */
-export function initInstagramBrowserBanner() {
-    if (typeof document === 'undefined') return;
-    if (document.getElementById(BANNER_ID)) return;
+function mountNotices() {
+    if (!document.body) return;
 
-    // Only Instagram in-app browser (User-Agent contains "Instagram").
-    if (!isInstagramInAppBrowser()) return;
+    // Red notice: every Instagram visit, every page load (not stored / not dismissible).
+    if (!document.getElementById(RED_NOTICE_ID)) {
+        document.body.appendChild(buildRedNotice());
+    }
 
-    // User already dismissed / confirmed open in a previous Instagram session.
-    if (wasDismissed()) return;
-
-    injectStyles();
-
-    const mount = () => {
-        if (document.getElementById(BANNER_ID)) return;
-        if (!document.body) return;
-        document.body.appendChild(buildBanner());
-    };
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', mount, { once: true });
-    } else {
-        mount();
+    // Popup: only if user has not dismissed it yet.
+    if (!document.getElementById(POPUP_ID) && !wasPopupDismissed()) {
+        document.body.appendChild(buildPopup());
     }
 }
 
+/**
+ * Instagram-only notices. Safe to call multiple times (idempotent).
+ * No-op for Chrome, Safari, Firefox, Edge, and all non-Instagram browsers.
+ */
+export function initInstagramBrowserBanner() {
+    if (typeof document === 'undefined') return;
+    if (!isInstagramInAppBrowser()) return;
+
+    injectStyles();
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', mountNotices, { once: true });
+    } else {
+        mountNotices();
+    }
+}
