@@ -75,6 +75,19 @@
     ],
     "listingsHeading": "Rings Listings"
   },
+  "bangles.html": {
+    "title": "Bangles Collection | jewelBazaari",
+    "description": "Shop gold, diamond, and traditional bangles from verified Indian jewellers on jewelBazaari.",
+    "path": "/bangles.html",
+    "image": "/images/bangles.jpg",
+    "robots": "index, follow",
+    "type": "website",
+    "breadcrumb": [
+      { "name": "Home", "path": "/index.html" },
+      { "name": "Bangles", "path": "/bangles.html" }
+    ],
+    "listingsHeading": "Bangles Listings"
+  },
   "all-jewellery.html": {
     "title": "All Jewellery | jewelBazaari",
     "description": "Browse the complete jewelBazaari catalogue — gold, diamond, gemstones, rings, earrings, and more from verified sellers.",

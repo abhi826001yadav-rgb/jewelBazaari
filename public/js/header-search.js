@@ -5,6 +5,7 @@ const SEARCH_DESTINATIONS = [
     { label: 'Gemstones', url: 'gemstones.html', emoji: '💎', keywords: ['gemstone', 'gemstones', 'gem', 'ruby', 'emerald', 'sapphire'] },
     { label: 'Earrings', url: 'earrings.html', emoji: '👂', keywords: ['earring', 'earrings', 'jhumka', 'stud'] },
     { label: 'Rings', url: 'rings.html', emoji: '💍', keywords: ['ring', 'rings', 'engagement'] },
+    { label: 'Bangles', url: 'bangles.html', emoji: '💫', keywords: ['bangle', 'bangles', 'kada', 'kadas', 'bracelet'] },
     { label: 'All Jewellery', url: 'all-jewellery.html', emoji: '💎', keywords: ['jewellery', 'jewelry', 'all', 'browse', 'shop'] },
     { label: 'Wedding', url: 'wedding.html', emoji: '💒', keywords: ['wedding', 'bridal', 'mangalsutra', 'haram'] },
     { label: 'Combos', url: 'combos.html', emoji: '🎁', keywords: ['combo', 'combos', 'set', 'bundle'] }

@@ -92,6 +92,7 @@ const CATEGORY_PREFIX_MAP = {
     gemstone: 'GEMSTONE',
     earrings: 'EARRINGS',
     rings: 'RINGS',
+    bangles: 'BANGLES',
     necklace: 'NECKLACE',
     'nose-pins': 'NOSEPINS',
     wedding: 'WEDDING',

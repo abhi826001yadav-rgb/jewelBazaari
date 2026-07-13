@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Bangles Collection | jewelBazaari</title>
+    <meta name="description" content="Shop gold, diamond, and traditional bangles from verified Indian jewellers on jewelBazaari.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jewelbazaari.com/bangles.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="jewelBazaari">
+    <meta property="og:title" content="Bangles Collection | jewelBazaari">
+    <meta property="og:description" content="Shop gold, diamond, and traditional bangles from verified Indian jewellers on jewelBazaari.">
+    <meta property="og:url" content="https://jewelbazaari.com/bangles.html">
+    <meta property="og:image" content="https://jewelbazaari.com/images/bangles.jpg">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bangles Collection | jewelBazaari">
+    <meta name="twitter:description" content="Shop gold, diamond, and traditional bangles from verified Indian jewellers on jewelBazaari.">
+    <meta name="twitter:image" content="https://jewelbazaari.com/images/bangles.jpg">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="modulepreload" href="js/category-page-init.js">
+    <link rel="preload" href="css/mobile-responsive.css?v=20260709b" as="style">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/mobile-responsive.css?v=20260709b">
+    <link rel="stylesheet" href="css/accessibility.css">
+</head>
+<body class="jb-category-page">
+
+    <div class="sticky top-0 z-50 bg-white jb-site-banner" role="banner">
+        <div id="announcement-placeholder"></div>
+        <div id="header-placeholder"></div>
+        <div id="category-placeholder"></div>
+    </div>
+
+    <section class="jb-category-hero">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 jb-category-hero-inner text-center">
+            <p class="jb-category-hero-eyebrow">Grace on Every Wrist</p>
+            <h1 class="jb-category-hero-title">Bangles Collection</h1>
+            <div class="jb-category-hero-line mx-auto"></div>
+            <p class="jb-category-hero-sub">Filtered by category = bangles</p>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <label for="search-input" class="sr-only">Search bangles</label>
+
+            <input type="search" id="search-input" aria-label="Search bangles" placeholder="Search bangles..."
+                class="w-full md:w-80 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#9B7E4B]">
+            <div id="product-count" class="text-sm text-gray-500 whitespace-nowrap"></div>
+        </div>
+
+        <h2 class="sr-only">Bangles Listings</h2>
+        <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+
+        <div id="no-products" class="hidden text-center py-16">
+            <p class="text-gray-500 text-lg">No bangles found yet.</p>
+            <a href="vendor-upload.html" class="inline-block mt-4 text-[#9B7E4B] hover:underline">Sell on jewelBazaari</a>
+        </div>
+    </main>
+    <div id="footer-placeholder"></div>
+
+    <script type="module">
+        import { initCategoryPageDeferred } from './js/category-page-init.js?v=20260709b';
+        import { getProductsByCategory } from './js/firebase-product-service.js';
+
+        initCategoryPageDeferred(() => getProductsByCategory('bangles'), { pageKey: 'bangles.html' });
+    </script>
+</body>
+</html>
