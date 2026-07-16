@@ -143,20 +143,16 @@ function renderDetail(product) {
                     <p class="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">${escapeHtml(product.description || 'No description provided for this piece.')}</p>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <div class="flex pt-2">
                     <button type="button"
                         id="pd-add-cart"
                         data-add-cart="${escapeHtml(product.id)}"
                         data-add-name="${escapeHtml(product.name || 'Product')}"
                         data-add-price="${escapeHtml(product.price || 0)}"
                         data-add-image="${escapeHtml(cover)}"
-                        class="flex-1 py-3.5 px-6 rounded-full bg-[#4A0E17] text-white font-semibold text-sm tracking-wide hover:bg-black transition shadow-md">
+                        class="w-full sm:w-auto min-w-[12rem] py-3.5 px-6 rounded-full bg-[#4A0E17] text-white font-semibold text-sm tracking-wide hover:bg-black transition shadow-md">
                         Add to Cart
                     </button>
-                    <a href="all-jewellery.html"
-                        class="inline-flex items-center justify-center flex-1 py-3.5 px-6 rounded-full border border-[#9B7E4B] text-[#4A0E17] font-semibold text-sm hover:bg-[#FAF7F2] transition">
-                        Continue Shopping
-                    </a>
                 </div>
 
                 <p class="text-xs text-gray-400 leading-relaxed">

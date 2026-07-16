@@ -380,8 +380,9 @@
         <div class="relative group jb-combos-group h-14 flex items-center">
             <a href="combos.html" class="hover:text-amber-700 border-b-2 border-transparent hover:border-amber-700 h-14 flex items-center transition">Combos</a>
             
-            <div class="absolute top-14 left-0 w-[420px] jb-nav-dropdown hidden group-hover:block z-50">
-                <div class="grid grid-cols-2 gap-6">
+            <!-- 336px = 80% of 420px → ~20% less horizontal space between Bride & Groom -->
+            <div class="absolute top-14 left-0 w-[336px] jb-nav-dropdown hidden group-hover:block z-50">
+                <div class="grid grid-cols-2 gap-y-6 gap-x-[1.2rem]">
                     <a href="#" class="jb-nav-dropdown-card group flex flex-col items-center">
                         <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 mb-2">
                             <img src="images/bride.jpg" alt="Bride jewellery combo" width="96" height="96" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition">

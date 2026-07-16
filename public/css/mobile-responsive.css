@@ -265,6 +265,14 @@ body.jb-category-page main {
     color: #fff !important;
 }
 
+/* MORE dropdown: start 20% left of the More trigger so the panel opens leftward */
+.jb-more-dropdown {
+    left: 0 !important;
+    right: auto !important;
+    transform: translateX(-20%);
+    transform-origin: top left;
+}
+
 html {
     overflow-x: clip;
 }
@@ -770,6 +778,15 @@ button.jb-mobile-menu-link {
     flex-wrap: nowrap;
     justify-content: flex-end;
     gap: 1ch;
+}
+
+/* Match Instagram logo size to wishlist/cart header emoji (1.125rem) */
+.jb-header-instagram-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 .jb-header-nav-item {
